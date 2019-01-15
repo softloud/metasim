@@ -1,0 +1,31 @@
+#' one row, one simulations
+#'
+#' runs on one row, returns coverage probability
+#'
+#' @param trial_fn the function to repeat
+#' @param trials the number of trials per simulation
+#' @param ... \code{trial_fn} arguments
+#' @inheritParams metatrial
+#'
+#' @export
+
+metasim <- function(
+  ...,
+  id = "simulation1",
+  trial_fn = metatrial,
+  trials = 4
+) {
+  purrr::rerun(.n = trials, trial_fn(...)) %>%
+    do.call(rbind, .) %>%
+    group_by(effect_type) %>%
+    summarise(ci_width = mean(ci_ub - ci_lb),
+              ci_lb = mean(ci_lb),
+              ci_ub = mean(ci_ub),
+              tau2 = mean(tau2),
+              i2 = mean(i2),
+              cp_sum = sum(in_ci),
+              cp_length = length(in_ci),
+              cp = sum(in_ci) / length(in_ci)) %>%
+    mutate(id = id)
+
+}
