@@ -26,7 +26,7 @@ metasims <- function(dist_tribble =
     # apply(., 1, metasim, trials = trials, trial_fn = trial_fn)
   # %>%
     rap::rap(
-      sim = list() ~ metasim(
+      sim_results = list() ~ metasim(
         between_study_variation = between_study_variation,
         within_study_variation = within_study_variation,
         median_ratio = median_ratio,

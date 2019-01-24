@@ -41,6 +41,6 @@ metatrial <- function(between_study_variation = 0.6,
                   x(metadata, y)
                 }
                 ) %>%
-   mutate(effect_type = c("m", "md"))
+   dplyr::mutate(effect_type = c("m", "md"))
 
 }

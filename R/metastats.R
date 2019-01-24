@@ -1,4 +1,4 @@
-#' simulate a meta-analysis dataset
+ #' simulate a meta-analysis dataset
 #'
 #' @param n_df \code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.
 #' @param sample_fn
