@@ -17,8 +17,8 @@ metasim <- function(
 ) {
   purrr::rerun(.n = trials, trial_fn(...)) %>%
     do.call(rbind, .) %>%
-    group_by(effect_type) %>%
-    summarise(ci_width = mean(ci_ub - ci_lb),
+    dplyr::group_by(effect_type) %>%
+    dplyr::summarise(ci_width = mean(ci_ub - ci_lb),
               ci_lb = mean(ci_lb),
               ci_ub = mean(ci_ub),
               tau2 = mean(tau2),
@@ -26,6 +26,6 @@ metasim <- function(
               cp_sum = sum(in_ci),
               cp_length = length(in_ci),
               cp = sum(in_ci) / length(in_ci)) %>%
-    mutate(id = id)
+    dplyr::mutate(id = id)
 
 }

@@ -12,6 +12,6 @@ trial_returns <- function(rem, true_effect) {
     tau2 = rem[["tau2"]],
     effect = as.numeric(rem[["beta"]])
   ) %>%
-    mutate(in_ci = ci_lb < true_effect & true_effect < ci_ub)
+    dplyr::mutate(in_ci = ci_lb < true_effect & true_effect < ci_ub)
 
 }

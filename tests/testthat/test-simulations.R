@@ -71,13 +71,22 @@ test_that("simulation on one row works", {
   expect_is(trial_returns(simdf, true_effect = 1) %>% mutate(test = "a"),
             "data.frame")
 
+  # check simualation id is parsed
+  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+
+})
+
+
+test_that("metasim loops", {
+
 
 })
 
 
 
 test_that("metasimulation runs as I think it does", {
-  expect_is(metasims(), "data.frame")
+  # expect_is(metasims(), "data.frame")
+
   # expect_true(nrow(metasims()) > 0)
   # expect_true("k" %in% colnames(metasims()))
   # expect_true("sim" %in% colnames(metasims()))
@@ -137,6 +146,9 @@ test_that("simulation parameter set up", {
     ),
     "data.frame"
   )
+
+  # check that simulation id is unique
+  expect_equal(meta_df() %>% pluck("id") %>% unique() %>% length(), meta_df() %>% nrow())
 })
 
 

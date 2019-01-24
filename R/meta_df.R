@@ -45,9 +45,9 @@ meta_df <- function(dist_tribble =
     dplyr::mutate(n = purrr::map2(k, prop, meta_n),
                   id = paste0("sim_", seq(1, nrow(.)))) %>%
     dplyr::mutate(
-      true_median = map2_dbl(rdist, parameters, density_fn, type = "q", x = 0.5)
+      true_median = purrr::map2_dbl(rdist, parameters, density_fn, type = "q", x = 0.5)
     ) %>%
-    select(between_study_variation,
+    dplyr::select(between_study_variation,
            between_study_variation,
            within_study_variation,
            median_ratio,
