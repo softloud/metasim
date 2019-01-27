@@ -4,7 +4,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
+```{r set up, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -39,11 +39,15 @@ You can install metasim from github with:
 devtools::install_github("softloud/metasim")
 ```
 
-## Examples
+## examples
 
-```{r packages}
+
+### simulate paired sample sizes
+
+```{r packages, message=FALSE}
 # packages
 library(metasim)
+library(tidyverse)
 
 # so these results are reproducible
 set.seed(38) 
@@ -85,7 +89,7 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ```{r prop}
 # small variation between sample sizes of studies
-meta_n(k = 2, prop = 0.025, max_n = 50)
+meta_n(k = 2, prop = 0.05, max_n = 50)
 
 ```
 
@@ -95,15 +99,54 @@ This is also useful for calculations that convert two measures to one, say, the 
 
 Consider four classrooms of children, who may have one or two away for illness.
 
-```{r }
+```{r wide n}
 meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
   # from here I'm just relabelling the class variable for prettiness
   separate(study, into = c("remove", "class"), sep = "_") %>% 
   select(-remove) %>% 
   mutate(class = letters[as.numeric(class)])
-  
-  # rename study classroom
-   
-  # rename(study = classroom) %>% 
 ```
+
+
+### simulation parameters
+
+Adding a few values of $\tau$, different numbers of studies $k$, and so forth can ramp up the number of combinations of simulation parameters very quickly.  
+
+I haven't settled on a _way_ of simulating data, and haven't found heaps in the way of guidance yet. So, this is all a bit experimental. My guiding star is packaging what I'd use right now. 
+
+What I do always end up with is generating a dataset that summarises what I would like to iterate over in simulation. 
+
+The `sim_df` takes user inputs for distributions, numbers of studies, between-study error $\tau$, within-study error $\varepsilon$, and the proportion $\rho$ of sample size we expect the sample sizes to different within study cohorts.
+
+```{r}
+# defaults
+sim_df()
+
+sim_df() %>%   str(1)
+
+# only consider small values of k
+sim_df(k = c(2, 5, 7)) %>% str(1)
+```
+
+For the list-column of tibbles `n`, the `sim_df` function calls `meta_n` and generates a set of sample sizes based on the value in the column `k`.
+
+```{r}
+demo_k <- sim_df() 
+
+# the variable n is a list-column of tibbles
+demo_k %>% pluck("n") %>% head(3)
+
+
+# compare the number of rows in the dataframe in the n column with the k value
+# divide by two because there are two rows for each study,
+# one for each group, control and intervention
+demo_k %>% pluck("n") %>% map_int(nrow) %>% head(3) / 2
+demo_k %>% pluck("k") %>% head(3)
+
+```
+
+
+
+
+
 

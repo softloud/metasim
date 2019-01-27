@@ -30,12 +30,15 @@ You can install metasim from github with:
 devtools::install_github("softloud/metasim")
 ```
 
-Examples
+examples
 --------
+
+### simulate paired sample sizes
 
 ``` r
 # packages
 library(metasim)
+library(tidyverse)
 
 # so these results are reproducible
 set.seed(38) 
@@ -114,11 +117,11 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ``` r
 # small variation between sample sizes of studies
-meta_n(k = 2, prop = 0.025, max_n = 50)
+meta_n(k = 2, prop = 0.05, max_n = 50)
 #> # A tibble: 4 x 3
 #>   study   group            n
 #>   <chr>   <chr>        <int>
-#> 1 study_1 control         48
+#> 1 study_1 control         47
 #> 2 study_2 control         45
 #> 3 study_1 intervention    49
 #> 4 study_2 intervention    45
@@ -131,12 +134,129 @@ This is also useful for calculations that convert two measures to one, say, the 
 Consider four classrooms of children, who may have one or two away for illness.
 
 ``` r
-meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE)
+meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
+  # from here I'm just relabelling the class variable for prettiness
+  separate(study, into = c("remove", "class"), sep = "_") %>% 
+  select(-remove) %>% 
+  mutate(class = letters[as.numeric(class)])
 #> # A tibble: 4 x 3
-#>   study   control intervention
-#>   <chr>     <int>        <int>
-#> 1 study_1      26           23
-#> 2 study_2      29           29
-#> 3 study_3      31           31
-#> 4 study_4      27           28
+#>   class control intervention
+#>   <chr>   <int>        <int>
+#> 1 a          26           23
+#> 2 b          29           29
+#> 3 c          31           31
+#> 4 d          27           28
+```
+
+### simulation parameters
+
+Adding a few values of *τ*, different numbers of studies *k*, and so forth can ramp up the number of combinations of simulation parameters very quickly.
+
+I haven't settled on a *way* of simulating data, and haven't found heaps in the way of guidance yet. So, this is all a bit experimental. My guiding star is packaging what I'd use right now.
+
+What I do always end up with is generating a dataset that summarises what I would like to iterate over in simulation.
+
+The `sim_df` takes user inputs for distributions, numbers of studies, between-study error *τ*, within-study error *ε*, and the proportion *ρ* of sample size we expect the sample sizes to different within study cohorts.
+
+``` r
+# defaults
+sim_df()
+#> # A tibble: 108 x 9
+#>        k between_study_v… within_study_va… median_ratio rdist parameters
+#>    <dbl>            <dbl>            <dbl>        <dbl> <chr> <list>    
+#>  1     3              0                  0            1 norm  <list [2]>
+#>  2     3              0                  0            1 exp   <list [1]>
+#>  3     7              0                  0            1 norm  <list [2]>
+#>  4     7              0                  0            1 exp   <list [1]>
+#>  5    50              0                  0            1 norm  <list [2]>
+#>  6    50              0                  0            1 exp   <list [1]>
+#>  7     3              0.2                0            1 norm  <list [2]>
+#>  8     3              0.2                0            1 exp   <list [1]>
+#>  9     7              0.2                0            1 norm  <list [2]>
+#> 10     7              0.2                0            1 exp   <list [1]>
+#> # ... with 98 more rows, and 3 more variables: n <list>,
+#> #   true_median <dbl>, id <chr>
+
+sim_df() %>%   str(1)
+#> Classes 'tbl_df', 'tbl' and 'data.frame':    108 obs. of  9 variables:
+#>  $ k                      : num  3 3 7 7 50 50 3 3 7 7 ...
+#>  $ between_study_variation: num  0 0 0 0 0 0 0.2 0.2 0.2 0.2 ...
+#>  $ within_study_variation : num  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ median_ratio           : num  1 1 1 1 1 1 1 1 1 1 ...
+#>  $ rdist                  : chr  "norm" "exp" "norm" "exp" ...
+#>  $ parameters             :List of 108
+#>  $ n                      :List of 108
+#>  $ true_median            : num  50 0.347 50 0.347 50 ...
+#>  $ id                     : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
+
+# only consider small values of k
+sim_df(k = c(2, 5, 7)) %>% str(1)
+#> Classes 'tbl_df', 'tbl' and 'data.frame':    108 obs. of  9 variables:
+#>  $ k                      : num  2 2 5 5 7 7 2 2 5 5 ...
+#>  $ between_study_variation: num  0 0 0 0 0 0 0.2 0.2 0.2 0.2 ...
+#>  $ within_study_variation : num  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ median_ratio           : num  1 1 1 1 1 1 1 1 1 1 ...
+#>  $ rdist                  : chr  "norm" "exp" "norm" "exp" ...
+#>  $ parameters             :List of 108
+#>  $ n                      :List of 108
+#>  $ true_median            : num  50 0.347 50 0.347 50 ...
+#>  $ id                     : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
+```
+
+For the list-column of tibbles `n`, the `sim_df` function calls `meta_n` and generates a set of sample sizes based on the value in the column `k`.
+
+``` r
+demo_k <- sim_df() 
+
+# the variable n is a list-column of tibbles
+demo_k %>% pluck("n") %>% head(3)
+#> [[1]]
+#> # A tibble: 6 x 3
+#>   study   group            n
+#>   <chr>   <chr>        <int>
+#> 1 study_1 control        157
+#> 2 study_2 control        144
+#> 3 study_3 control         96
+#> 4 study_1 intervention   150
+#> 5 study_2 intervention   139
+#> 6 study_3 intervention    75
+#> 
+#> [[2]]
+#> # A tibble: 6 x 3
+#>   study   group            n
+#>   <chr>   <chr>        <int>
+#> 1 study_1 control        196
+#> 2 study_2 control        165
+#> 3 study_3 control         47
+#> 4 study_1 intervention   180
+#> 5 study_2 intervention   119
+#> 6 study_3 intervention    22
+#> 
+#> [[3]]
+#> # A tibble: 14 x 3
+#>    study   group            n
+#>    <chr>   <chr>        <int>
+#>  1 study_1 control          3
+#>  2 study_2 control        127
+#>  3 study_3 control         11
+#>  4 study_4 control         44
+#>  5 study_5 control        117
+#>  6 study_6 control        124
+#>  7 study_7 control          2
+#>  8 study_1 intervention     2
+#>  9 study_2 intervention   211
+#> 10 study_3 intervention    11
+#> 11 study_4 intervention    35
+#> 12 study_5 intervention   140
+#> 13 study_6 intervention   251
+#> 14 study_7 intervention     2
+
+
+# compare the number of rows in the dataframe in the n column with the k value
+# divide by two because there are two rows for each study,
+# one for each group, control and intervention
+demo_k %>% pluck("n") %>% map_int(nrow) %>% head(3) / 2
+#> [1] 3 3 7
+demo_k %>% pluck("k") %>% head(3)
+#> [1] 3 3 7
 ```
