@@ -8,9 +8,6 @@ metatrial(between_study_variation = 0.6, within_study_variation = 0.3,
   median_ratio = 1.2, rdist = "norm", parameters = list(mean = 50, sd
   = 0.2), n_df = meta_n(k = 3), true_effect = 50)
 }
-\arguments{
-\item{n_df}{\code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.}
-}
 \description{
 one trial
 }

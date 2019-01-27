@@ -8,12 +8,16 @@
 #' @export
 
 
-sim_df <- function(dist_tribble,
-                   k,
-                   between_study_variation,
-                   within_study_variation,
-                   median_ratio,
-                   prop) {
+
+sim_df <- function(dist_tribble =
+                     tibble::tribble(~ dist,  ~ par,
+                                     "norm", list(mean = 50, sd = 0.2),
+                                     "exp", list(rate = 2)),
+                   k = c(3, 7, 50),
+                   between_study_variation = seq(0, 0.4, 0.2),
+                   within_study_variation = seq(0, 0.4, 0.2),
+                   median_ratio = c(1, 1.2),
+                   prop = 0.3) {
   dist_tribble %>%
     dplyr::mutate(distribution =
                     purrr::map2(dist, par,
