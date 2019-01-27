@@ -18,16 +18,17 @@ The goal of metasim is to simulate meta-analysis data.
 
 I found I was rewriting the same types of analyses. I got to thinking how to make a modular set of tools for simulating meta-anlaysis data. 
 
-In particular, I'm interested in simulating for different 
+In particular, I'm interested in simulating for different values of 
+
 - $k$, number of studies
 - $\tau$ variation between studies
-- $\epsilon$ variation within a study
+- $\varepsilon$ variation within a study
 - numbers of trials
-- distributions, and multiple sets of parameters
+- distributions, _and_ parameters; e.g., $\exp(\lambda = 1)$ and $\exp(\lambda = 2)$. 
 
 ## work in progress
 
-This package is a work in progress, not intended for public consumption. 
+This package is a work in progress, can't guarantee anything works as intended.  
 
 ## installation
 
@@ -41,7 +42,14 @@ devtools::install_github("softloud/metasim")
 ## Examples
 
 ```{r packages}
+# packages
 library(metasim)
+
+# so these results are reproducible
+set.seed(38) 
+
+# I like to set.seed with my age. It makes me feel smug that I'm a middle-aged woman who codes. 
+
 ```
 
 
@@ -77,8 +85,25 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ```{r prop}
 # small variation between sample sizes of studies
-meta_n(k = 2, prop = 0.1)
+meta_n(k = 2, prop = 0.025, max_n = 50)
 
 ```
 
+It can be useful, for more human-interpretable purposes, to display the sample sizes in wide format. 
+
+This is also useful for calculations that convert two measures to one, say, the standardised mean difference of the control and intervention groups. 
+
+Consider four classrooms of children, who may have one or two away for illness.
+
+```{r }
+meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
+  # from here I'm just relabelling the class variable for prettiness
+  separate(study, into = c("remove", "class"), sep = "_") %>% 
+  select(-remove) %>% 
+  mutate(class = letters[as.numeric(class)])
+  
+  # rename study classroom
+   
+  # rename(study = classroom) %>% 
+```
 

@@ -12,12 +12,11 @@
 meta_n <- function(k = 3,
                    min_n = 20,
                    max_n = 200,
-                   prop = 0.3) {
-
-
-  tibble::tibble(study = paste0("study_", seq(1, k)),
-                 study_n = sample(seq(min_n, max_n),
-                                  size = k, replace = TRUE)) %>%
+                   prop = 0.3,
+                   wide = FALSE) {
+  n_df <- tibble::tibble(study = paste0("study_", seq(1, k)),
+                         study_n = sample(seq(min_n, max_n),
+                                          size = k, replace = TRUE)) %>%
     dplyr::mutate(
       study_n_sd = prop * study_n,
       control = purrr::map2_int(
@@ -35,9 +34,15 @@ meta_n <- function(k = 3,
         }
       )
     ) %>%
-    dplyr::select(-study_n, -study_n_sd) %>%
-    tidyr::gather(key = "group",
-           value = "n",
-           control, intervention)
+    dplyr::select(-study_n,-study_n_sd)
+
+  if (wide == FALSE) {
+    return(n_df %>%
+             tidyr::gather(key = "group",
+                           value = "n",
+                           control, intervention))
+  } else {
+    return(n_df)
+  }
 
 }
