@@ -3,6 +3,7 @@ context("simulations")
 library(metasim)
 library(tidyverse)
 
+# for reproducibility
 set.seed(38)
 
 # testing parameters ------------------------------------------------------
@@ -30,6 +31,106 @@ metadata <- metastats(meta_n(k = k)) %>%
 
 simdf <- metadata %>%
   metafor::rma(yi = effect, sei = effect_se, data = .)
+
+testdf <- sim_df(dist_tribble =
+                   tibble::tribble(~ dist,  ~ par,
+                                   "norm", list(mean = 50, sd = 0.2),
+                                   "exp", list(rate = 2)),
+                 k = c(3, 7, 50),
+                 between_study_variation = seq(0, 0.4, 0.2),
+                 within_study_variation = seq(0, 0.4, 0.2),
+                 median_ratio = c(1, 1.2),
+                 prop = 0.3)
+
+# check that testdf is non-empty
+
+
+# initialise simulations --------------------------------------------------
+
+
+
+test_that("different inputs parse in meta_n", {
+  # sanity check
+  expect_is(meta_n(), "data.frame")
+  # check that we can specify the number of studies
+  expect_true(nrow(meta_n(k = 5)) == 10)
+  expect_true(nrow(meta_n(k = k)) == 2 * k)
+
+  # check what the column names are
+  # there are probably better tests for this
+  expect_true(sum(colnames(meta_n(k = k)) == c("study", "group", "n")) == 3)
+  expect_true(sum(unique(meta_n(k = k)$group) == c("control", "intervention")) == 2)
+  expect_true(length(unique(meta_n(k = k)$study)) == k)
+
+  # check the table is non-empty
+  expect_gt(nrow(testdf), 0)
+})
+
+
+
+test_that("from user inputs, generate a simulation overview dataframe", {
+  expect_is(testdf, "data.frame")
+  expect_gt(nrow(testdf), 0)
+  expect_error(sim_df()) # default params not inherited
+  expect_is(testdf %>% pluck("rdist"), "character")
+  expect_is(testdf %>% pluck("n"), "list")
+  expect_true("median_ratio" %in% colnames(testdf))
+  expect_true("true_median" %in% colnames(testdf))
+  # expect_is(sim_df(prop = 0.4), "data.frame")
+  # expect_is(sim_df(prop = prop), "data.frame")
+
+  # check the sample size dataset has control and intervention rows for k studies
+  expect_is(testdf %>% pluck("n") %>% map_int(nrow) / 2, "numeric")
+  expect_equal(testdf %>% pluck("n") %>% map_int(nrow) / 2,
+               testdf %>% pluck("k") %>% as.integer())
+  expect_gt(testdf %>% nrow(), 2)
+
+  # expect_is(sim_df(between_study_variation = 0.3), "data.frame")
+
+  expect_is(
+    sim_df(
+      dist_tribble =
+        tibble::tribble(
+          ~ dist,
+          ~ par,
+          "norm",
+          list(mean = 50, sd = 0.2),
+          "exp",
+          list(rate = 2)
+        ),
+      k = k,
+      between_study_variation = between_study_variation,
+      within_study_variation = within_study_variation,
+      median_ratio = median_ratio,
+      prop = prop
+    ),
+    "data.frame"
+  )
+
+  # check that simulation id is unique
+  expect_equal(testdf %>% pluck("id") %>% unique() %>% length(), testdf %>% nrow())
+})
+
+
+test_that("effect_se works for various inputs", {
+  expect_is(effect_se(
+    centre = centre,
+    spread = spread,
+    n = n
+  ), "numeric")
+  expect_true(length(effect_se(
+    centre = centre,
+    spread = spread,
+    n = n
+  )) == 1)
+  expect_true(effect_se(
+    centre = centre,
+    spread = spread,
+    n = n
+  ) > 0)
+
+})
+
 
 # simulations -------------------------------------------------------------
 
@@ -77,12 +178,6 @@ test_that("simulation on one row works", {
 })
 
 
-test_that("metasim loops", {
-
-
-})
-
-
 
 test_that("metasimulation runs as I think it does", {
   # expect_is(metasims(), "data.frame")
@@ -93,83 +188,7 @@ test_that("metasimulation runs as I think it does", {
   # expect_true("median_ratio" %in% colnames(metasims()))
 })
 
-# test inputs work --------------------------------------------------------
 
-test_that("different inputs parse in meta_n", {
-  # sanity check
-  expect_is(meta_n(), "data.frame")
-  # check that we can specify the number of studies
-  expect_true(nrow(meta_n(k = 5)) == 10)
-  expect_true(nrow(meta_n(k = k)) == 2 * k)
-
-  # check what the column names are
-  # there are probably better tests for this
-  expect_true(sum(colnames(meta_n(k = k)) == c("study", "group", "n")) == 3)
-  expect_true(sum(unique(meta_n(k = k)$group) == c("control", "intervention")) == 2)
-  expect_true(length(unique(meta_n(k = k)$study)) == k)
-  # how to test if a vector is a vector of integers?
-})
-
-test_that("simulation parameter set up", {
-  expect_is(meta_df(), "data.frame")
-  expect_is(meta_df() %>% pluck("rdist"), "character")
-  expect_is(meta_df() %>% pluck("n"), "list")
-  expect_true("median_ratio" %in% colnames(meta_df()))
-  expect_true("true_median" %in% colnames(meta_df()))
-  expect_is(meta_df(prop = 0.4), "data.frame")
-  expect_is(meta_df(prop = prop), "data.frame")
-
-  # check the sample size dataset has control and intervention rows for k studies
-  expect_is(meta_df() %>% pluck("n") %>% map_int(nrow) / 2, "numeric")
-  expect_equal(meta_df() %>% pluck("n") %>% map_int(nrow) / 2,
-               meta_df() %>% pluck("k"))
-  expect_gt(meta_df() %>% nrow(), 2)
-
-  expect_is(meta_df(between_study_variation = 0.3), "data.frame")
-
-  expect_is(
-    meta_df(
-      dist_tribble =
-        tibble::tribble(
-          ~ dist,
-          ~ par,
-          "norm",
-          list(mean = 50, sd = 0.2),
-          "exp",
-          list(rate = 2)
-        ),
-      k = k,
-      between_study_variation = between_study_variation,
-      within_study_variation = within_study_variation,
-      median_ratio = median_ratio,
-      prop = prop
-    ),
-    "data.frame"
-  )
-
-  # check that simulation id is unique
-  expect_equal(meta_df() %>% pluck("id") %>% unique() %>% length(), meta_df() %>% nrow())
-})
-
-
-test_that("effect_se works for various inputs", {
-  expect_is(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  ), "numeric")
-  expect_true(length(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  )) == 1)
-  expect_true(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  ) > 0)
-
-})
 
 # trials ------------------------------------------------------------------
 
