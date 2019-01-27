@@ -10,17 +10,6 @@ metasims(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
   within_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
   prop = 0.3, trials = 10, trial_fn = metatrial)
 }
-\arguments{
-\item{dist_tribble}{A \code{\link{tibble::tribble}} with one column for distribution, and one column for the parameters.}
-
-\item{k}{Simulate for different numbers of studies.}
-
-\item{between_study_variation}{tau}
-
-\item{within_study_variation}{epsilon}
-
-\item{prop}{proportion of sample size we expect to cohorts to vary by most of the time}
-}
 \description{
 simulate over all
 }

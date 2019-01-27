@@ -1,6 +1,9 @@
 #' simulate over all
 #'
-#' @inheritParams meta_df
+#' @param k Simulate for different numbers of studies.
+#' @param between_study_variation tau
+#' @param within_study_variation epsilon
+#' @param prop proportion of sample size we expect to cohorts to vary by most of the time
 #'
 #' @export
 
@@ -15,7 +18,7 @@ metasims <- function(dist_tribble =
                      prop = 0.3,
                      trials = 10,
                      trial_fn = metatrial) {
-  meta_df(
+  sim_df(
     dist_tribble = dist_tribble,
     k = k,
     between_study_variation = between_study_variation,
