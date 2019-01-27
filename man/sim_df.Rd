@@ -4,10 +4,14 @@
 \alias{sim_df}
 \title{generate simulation parameter dataframe}
 \usage{
-sim_df()
+sim_df(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
+  50, sd = 0.2), "exp", list(rate = 2)), k = c(3, 7, 50),
+  between_study_variation = seq(0, 0.4, 0.2),
+  within_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
+  prop = 0.3)
 }
 \arguments{
-\item{dist_tribble}{A \code{\link{tibble::tribble}} with one column for distribution, and one column for the parameters.}
+\item{dist_tribble}{A \code{\link{tibble::tribble}} with one column for distribution, and one column for the parameters}
 
 \item{k}{Simulate for different numbers of studies.}
 

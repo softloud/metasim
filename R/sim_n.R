@@ -9,7 +9,7 @@
 #'
 #' @export
 
-meta_n <- function(k = 3,
+sim_n <- function(k = 3,
                    min_n = 20,
                    max_n = 200,
                    prop = 0.3,
