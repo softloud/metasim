@@ -5,63 +5,31 @@
 #'
 #' @export
 
-sim_stats <- function(n_df,
-                      sampling_fn = rnorm,
+sim_stats <- function(n_df = sim_n(),
+                      sampling_dist = "norm",
                       fn_parameters = list(mean = 50, sd = 0.2),
                       between_study_variation = 0.4,
                       within_study_variation = 0.2,
-                      median_ratio = 1.2
-                      ) {
-  # return junk summary stats
-  n_df %>%
-    mutate(sample = pmap(list(n, sampling_fn, fn_parameters),
-                         .f = function(n, sampling_fn, fn_parameters){
-      if (length(fn_parameters) == 1)
-      sampling_fn()
-    }))
+                      median_ratio = 1.2) {
 
-}
+  # generate study-level random effects
+  tibble(
+    bn_study_error = rnorm(nrow(n_df) / 2, 0, between_study_variation) / 2,
+    wn_study_error = rnorm(nrow(n_df) / 2, 0, within_study_variation) / 2,
+    study = paste0("study_", seq(1, nrow(n_df) / 2))
+  ) %>%
+  # join to df
+  full_join(n_df, by = "study") %>%
+    mutate(control_indicator = group == "control",
+           sample = pmap(list(n = n, tau = bn_study_error, epsilon = wn_study_error, control = control_indicator), sim_sample, rdist = sampling_dist, par = fn_parameters, median_ratio = median_ratio),
+           min = map_dbl(sample, min),
+           max = map_dbl(sample, max),
+           mean = map_dbl(sample, mean),
+           sd = map_dbl(sample, sd),
+           first_q = map_dbl(sample, quantile, 0.25),
+           median = map_dbl(sample, quantile, 0.5),
+           third_q = map_dbl(sample, quantile, 0.75),
+           iqr = third_q - first_q) %>%
+    select(-sample) # remove the sample and return the summary stats
 
-
-# sim_stats <- function(n_df,
-#                       sampling_fn = rnorm,
-#                       fn_parameters = list(mean = 50, sd = 0.2),
-#                       between_study_variation = 0.4,
-#                       within_study_variation = 0.2,
-#                       median_ratio = 1.2
-#                       ) {
-#   n_df %>%
-#     tidyr::spread(group, n) %>%
-#     # add random effect for study
-#     dplyr::mutate(
-#       study_var = rnorm(nrow(.), mean = 0, sd = between_study_variation) / 2,
-#       study_err = rnorm(nrow(.), mean = 0, sd = within_study_variation) / 2
-#     ) %>%
-#     tidyr::gather(key = "group",
-#            value = "n",
-#            control, intervention
-#            ) %>%
-#     dplyr::mutate(summary_stats = purrr::pmap(list(n, study_var, study_err),
-#                                 .f = function(n, study_var, study_err){
-#                                   # figure out splicing thing eventually
-#                                   if (length(fn_parameters) ==  1) {
-#                                     sampling_fn(n, fn_parameters[[1]] *
-#                                                   exp(study_var + study_err)) }
-#                                   if (length(fn_parameters) == 2) {
-#                                     sampling_fn(n, fn_parameters[[1]] *
-#                                                   exp(study_var + study_err),
-#                                                 fn_parameters[[2]]) } %>%
-#                                       {tibble::tibble(
-#                                         min = min(.),
-#                                         max = max(.),
-#                                         first_quartile = quantile(., 0.25),
-#                                         third_quartile = quantile(., 0.75),
-#                                         mean = mean(.),
-#                                         median = median(.),
-#                                         var = var(.),
-#                                         n = length(.)
-#                                       )}
-#                                 }))
-#
-#
-#   }
+  }

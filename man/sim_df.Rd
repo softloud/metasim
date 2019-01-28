@@ -13,13 +13,13 @@ sim_df(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
 \arguments{
 \item{dist_tribble}{A \code{\link{tibble::tribble}} with one column for distribution, and one column for the parameters}
 
-\item{k}{Simulate for different numbers of studies.}
+\item{k}{number of studies, defaults to 3}
 
 \item{between_study_variation}{tau}
 
 \item{within_study_variation}{epsilon}
 
-\item{prop}{proportion of sample size we expect to cohorts to vary by most of the time}
+\item{prop}{proportion of n we expect}
 }
 \description{
 generate simulation parameter dataframe

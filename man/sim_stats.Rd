@@ -4,8 +4,9 @@
 \alias{sim_stats}
 \title{simulate a meta-analysis dataset}
 \usage{
-sim_stats(n_df, sampling_fn = rnorm, fn_parameters = list(mean = 50, sd
-  = 0.2), between_study_variation = 0.4, within_study_variation = 0.2,
+sim_stats(n_df = sim_n(), sampling_fn = rnorm,
+  fn_parameters = list(mean = 50, sd = 0.2),
+  between_study_variation = 0.4, within_study_variation = 0.2,
   median_ratio = 1.2)
 }
 \arguments{

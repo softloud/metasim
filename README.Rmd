@@ -21,9 +21,9 @@ I found I was rewriting the same types of analyses. I got to thinking how to mak
 In particular, I'm interested in simulating for different values of 
 
 - $k$, number of studies
-- $\tau$ variation between studies
-- $\varepsilon$ variation within a study
-- numbers of trials
+- $\tau^2$, variation between studies
+- $\varepsilon^2$, variation within a study
+- numbers of trials, say 10, 100, 1000
 - distributions, _and_ parameters; e.g., $\exp(\lambda = 1)$ and $\exp(\lambda = 2)$. 
 
 ## work in progress
@@ -64,13 +64,13 @@ Given a specific $k$, generate a set of sample sizes.
 ```{r different k}
 
 # defaults to k = 3
-meta_n()
+sim_n()
 
-meta_n(k = 3)
+sim_n(k = 3)
 
 # set k to a different value
 
-meta_n(k = 6) 
+sim_n(k = 6) 
 
 
 ```
@@ -79,7 +79,7 @@ Suppose we require data that mimics small cohorts, say as small as 3, and as lar
 
 ```{r small cohort}
 # control upper and lower bounds
-meta_n(min_n = 3, max_n = 50)
+sim_n(min_n = 3, max_n = 50)
  
 ```
 
@@ -89,7 +89,7 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ```{r prop}
 # small variation between sample sizes of studies
-meta_n(k = 2, prop = 0.05, max_n = 50)
+sim_n(k = 2, prop = 0.05, max_n = 50)
 
 ```
 
@@ -100,7 +100,7 @@ This is also useful for calculations that convert two measures to one, say, the 
 Consider four classrooms of children, who may have one or two away for illness.
 
 ```{r wide n}
-meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
+sim_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
   # from here I'm just relabelling the class variable for prettiness
   separate(study, into = c("remove", "class"), sep = "_") %>% 
   select(-remove) %>% 
@@ -128,7 +128,7 @@ sim_df() %>%   str(1)
 sim_df(k = c(2, 5, 7)) %>% str(1)
 ```
 
-For the list-column of tibbles `n`, the `sim_df` function calls `meta_n` and generates a set of sample sizes based on the value in the column `k`.
+For the list-column of tibbles `n`, the `sim_df` function calls `sim_n` and generates a set of sample sizes based on the value in the column `k`.
 
 ```{r}
 demo_k <- sim_df() 

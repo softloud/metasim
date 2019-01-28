@@ -10,9 +10,9 @@ I found I was rewriting the same types of analyses. I got to thinking how to mak
 In particular, I'm interested in simulating for different values of
 
 -   *k*, number of studies
--   *τ* variation between studies
--   *ε* variation within a study
--   numbers of trials
+-   *τ*<sup>2</sup>, variation between studies
+-   *ε*<sup>2</sup>, variation within a study
+-   numbers of trials, say 10, 100, 1000
 -   distributions, *and* parameters; e.g., exp(*λ* = 1) and exp(*λ* = 2).
 
 work in progress
@@ -53,7 +53,7 @@ Given a specific *k*, generate a set of sample sizes.
 ``` r
 
 # defaults to k = 3
-meta_n()
+sim_n()
 #> # A tibble: 6 x 3
 #>   study   group            n
 #>   <chr>   <chr>        <int>
@@ -64,7 +64,7 @@ meta_n()
 #> 5 study_2 intervention    23
 #> 6 study_3 intervention    42
 
-meta_n(k = 3)
+sim_n(k = 3)
 #> # A tibble: 6 x 3
 #>   study   group            n
 #>   <chr>   <chr>        <int>
@@ -77,7 +77,7 @@ meta_n(k = 3)
 
 # set k to a different value
 
-meta_n(k = 6) 
+sim_n(k = 6) 
 #> # A tibble: 12 x 3
 #>    study   group            n
 #>    <chr>   <chr>        <int>
@@ -99,7 +99,7 @@ Suppose we require data that mimics small cohorts, say as small as 3, and as lar
 
 ``` r
 # control upper and lower bounds
-meta_n(min_n = 3, max_n = 50)
+sim_n(min_n = 3, max_n = 50)
 #> # A tibble: 6 x 3
 #>   study   group            n
 #>   <chr>   <chr>        <int>
@@ -117,7 +117,7 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ``` r
 # small variation between sample sizes of studies
-meta_n(k = 2, prop = 0.05, max_n = 50)
+sim_n(k = 2, prop = 0.05, max_n = 50)
 #> # A tibble: 4 x 3
 #>   study   group            n
 #>   <chr>   <chr>        <int>
@@ -134,7 +134,7 @@ This is also useful for calculations that convert two measures to one, say, the 
 Consider four classrooms of children, who may have one or two away for illness.
 
 ``` r
-meta_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
+sim_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
   # from here I'm just relabelling the class variable for prettiness
   separate(study, into = c("remove", "class"), sep = "_") %>% 
   select(-remove) %>% 
@@ -203,7 +203,7 @@ sim_df(k = c(2, 5, 7)) %>% str(1)
 #>  $ id                     : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
 ```
 
-For the list-column of tibbles `n`, the `sim_df` function calls `meta_n` and generates a set of sample sizes based on the value in the column `k`.
+For the list-column of tibbles `n`, the `sim_df` function calls `sim_n` and generates a set of sample sizes based on the value in the column `k`.
 
 ``` r
 demo_k <- sim_df() 
