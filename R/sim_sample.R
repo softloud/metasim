@@ -3,7 +3,9 @@
 #' Given a distribution, parameters, sample size, generate a sample.
 #'
 #' @param n sample size
-#' @param rdist random sampling function, such as \code{\link{rnorm}} and \code{\link{rexp}}.
+#' @param tau between study error
+#' @param epsilon within study error
+#' @param rdist string indicating distribution, "norm", "lnorm", "exp", or "pareto"
 #' @param par list of parameter arguments
 #' @param control value of first parameter of distribution is determined by median ratio
 #' @param median_ratio ratio of population medians

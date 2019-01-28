@@ -10,7 +10,11 @@ sim_sample(n, tau, epsilon, rdist, par, control = TRUE,
 \arguments{
 \item{n}{sample size}
 
-\item{rdist}{random sampling function, such as \code{\link{rnorm}} and \code{\link{rexp}}.}
+\item{tau}{between study error}
+
+\item{epsilon}{within study error}
+
+\item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
 
 \item{par}{list of parameter arguments}
 

@@ -64,13 +64,13 @@ Given a specific $k$, generate a set of sample sizes.
 ```{r different k}
 
 # defaults to k = 3
-sim_n()
+sim_n() %>% knitr::kable()
 
-sim_n(k = 3)
+sim_n(k = 3) %>% knitr::kable()
 
 # set k to a different value
 
-sim_n(k = 6) 
+sim_n(k = 6) %>% knitr::kable()
 
 
 ```
@@ -79,7 +79,7 @@ Suppose we require data that mimics small cohorts, say as small as 3, and as lar
 
 ```{r small cohort}
 # control upper and lower bounds
-sim_n(min_n = 3, max_n = 50)
+sim_n(min_n = 3, max_n = 50) %>% knitr::kable()
  
 ```
 
@@ -89,7 +89,7 @@ Suppose we wish to mimic data for which the cohorts are almost exactly the same 
 
 ```{r prop}
 # small variation between sample sizes of studies
-sim_n(k = 2, prop = 0.05, max_n = 50)
+sim_n(k = 2, prop = 0.05, max_n = 50) %>% knitr::kable()
 
 ```
 
@@ -104,7 +104,7 @@ sim_n(k = 4, prop = 0.05, max_n = 30, wide = TRUE) %>%
   # from here I'm just relabelling the class variable for prettiness
   separate(study, into = c("remove", "class"), sep = "_") %>% 
   select(-remove) %>% 
-  mutate(class = letters[as.numeric(class)])
+  mutate(class = letters[as.numeric(class)]) %>% knitr::kable()
 ```
 
 
@@ -118,11 +118,11 @@ What I do always end up with is generating a dataset that summarises what I woul
 
 The `sim_df` takes user inputs for distributions, numbers of studies, between-study error $\tau$, within-study error $\varepsilon$, and the proportion $\rho$ of sample size we expect the sample sizes to different within study cohorts.
 
-```{r}
+```{r sim overview}
 # defaults
-sim_df()
+sim_df() 
 
-sim_df() %>%   str(1)
+sim_df() %>% str(1)
 
 # only consider small values of k
 sim_df(k = c(2, 5, 7)) %>% str(1)
@@ -130,7 +130,7 @@ sim_df(k = c(2, 5, 7)) %>% str(1)
 
 For the list-column of tibbles `n`, the `sim_df` function calls `sim_n` and generates a set of sample sizes based on the value in the column `k`.
 
-```{r}
+```{r sample sizes set}
 demo_k <- sim_df() 
 
 # the variable n is a list-column of tibbles
@@ -145,8 +145,62 @@ demo_k %>% pluck("k") %>% head(3)
 
 ```
 
+## simulating data
+
+Once we have established a set of sample sizes for a given distribution, with parameters, and so forth, I usually want to generate a sample for each of those `n`. We need to adjust the value of the sampled data based on the median ratio, and whether the `n` is from a control or intervention group.
+
+A random effect is added to account for the between study error $\tau$ and within study error $\varepsilon$. 
+
+For meta-analysis data, we work with summmary statistics, so we drop the sample and return tabulated summary stats. 
+
+```{r simulate a sample}
+sim_stats()  %>% knitr::kable()
+```
+
+## trial
+
+In a trial, we'd first want to simulate some data, for a given distribution, for this we use the `sim_stats` function discussed in the above section. 
+
+With the summary statistics, we then calculate an estimate of the effect or the variance of the effect. 
+
+1. simulate data
+2. calculate summary statistics
+3. **calculate estimates using summary statistics**
+4. calculate effects using estimates (difference, standardised, log-ratio)[^1]
+5. meta-analyse 
+6. return simulation results of interest
+
+[^1]: Ideally this would be configurable but let's hardcode it for now. 
 
 
+The first two steps are taken care of by the `sim_stats` function. The third step will by necessity be bespoke. 
 
+But the rest could be automated, assuming there are the same kinds of results. 
 
+step | input | output |
+-|-|-
+calculate estimates | summary statistics as produced by `sim_n` | summary stats
+calculate effects | summary stats | `effect` and `effect_se`
+meta-analyse | `effect` and `effect_se` | `rma` object 
+summary stats | `rma` object | some kind of `broom`ing script
+
+```{r}
+metatrial()
+```
+
+## summarising simulation results
+
+So, now we can put together some generic summarisations. Things I always want to do. Like calculate the coverage probability, confidence interval width, and bias. Most results here are mean values across all trials, the exceptions being `cp_` variables.  
+
+`metasim` calls `metatrial` many times and summarises the results.
+
+```{r}
+metasim()
+```
+
+## simulate over parameters
+
+```{r}
+# metasims is not working yet.
+```
 
