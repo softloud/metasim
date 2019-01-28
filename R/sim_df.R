@@ -2,7 +2,7 @@
 #'
 #'
 #' @param dist_tribble A \code{\link{tibble::tribble}} with one column for distribution, and one column for the parameters
-#' @inheritParams meta_n
+#' @inheritParams sim_n
 #' @inheritParams metasims
 #'
 #' @export
@@ -41,7 +41,7 @@ sim_df <- function(dist_tribble =
       parameters = purrr::map(distribution, "par")
     ) %>%
     dplyr::select(-distribution) %>%
-    dplyr::mutate(n = purrr::map2(k, prop, meta_n),
+    dplyr::mutate(n = purrr::map2(k, prop, sim_n),
                   id = paste0("sim_", seq(1, nrow(.)))) %>%
     dplyr::mutate(true_median = purrr::map2_dbl(rdist, parameters, density_fn, type = "q", x = 0.5)) %>%
     dplyr::select(

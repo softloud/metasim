@@ -4,14 +4,21 @@
 \alias{sim_stats}
 \title{simulate a meta-analysis dataset}
 \usage{
-sim_stats(n_df, sampling_fn = rnorm, fn_parameters = list(mean = 50, sd
-  = 0.2), between_study_variation = 0.4, within_study_variation = 0.2,
-  median_ratio = 1.2)
+sim_stats(n_df = sim_n(), rdist = "norm", par = list(mean = 50, sd =
+  0.2), tau = 0.4, epsilon = 0.2, median_ratio = 1.2)
 }
 \arguments{
 \item{n_df}{\code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.}
 
-\item{sample_fn}{}
+\item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
+
+\item{par}{list of parameter arguments}
+
+\item{tau}{between study error}
+
+\item{epsilon}{within study error}
+
+\item{median_ratio}{ratio of population medians}
 }
 \description{
 simulate a meta-analysis dataset

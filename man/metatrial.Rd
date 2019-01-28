@@ -6,7 +6,10 @@
 \usage{
 metatrial(between_study_variation = 0.6, within_study_variation = 0.3,
   median_ratio = 1.2, rdist = "norm", parameters = list(mean = 50, sd
-  = 0.2), n_df = meta_n(k = 3), true_effect = 50)
+  = 0.2), n_df = sim_n(k = 3), knha = TRUE, true_effect = 50)
+}
+\arguments{
+\item{knha}{Knapp-Hartung test instead of the default "z" test in `metafor::rma`.}
 }
 \description{
 one trial

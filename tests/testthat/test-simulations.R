@@ -134,6 +134,11 @@ test_that("effect_se works for various inputs", {
 
 # simulations -------------------------------------------------------------
 
+test_that("data simulation for studies", {
+
+
+})
+
 test_that("simulation on one row works", {
   expect_is(metatrial(), "data.frame")
   expect_equal(nrow(metatrial()), 2)
