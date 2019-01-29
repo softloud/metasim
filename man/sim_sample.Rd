@@ -4,15 +4,13 @@
 \alias{sim_sample}
 \title{Simulate a sample}
 \usage{
-sim_sample(n, tau, epsilon, rdist, par, control = TRUE,
-  median_ratio = 1.2)
+sim_sample(n = 18, tau = 0.2, rdist = "norm", par = list(mean = 20,
+  sd = 0.2), control = TRUE, median_ratio = 1.2)
 }
 \arguments{
 \item{n}{sample size}
 
 \item{tau}{between study error}
-
-\item{epsilon}{within study error}
 
 \item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
 
@@ -21,6 +19,8 @@ sim_sample(n, tau, epsilon, rdist, par, control = TRUE,
 \item{control}{value of first parameter of distribution is determined by median ratio}
 
 \item{median_ratio}{ratio of population medians}
+
+\item{epsilon}{within study error}
 }
 \description{
 Given a distribution, parameters, sample size, generate a sample.

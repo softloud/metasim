@@ -6,7 +6,6 @@
 #' @export
 
 metatrial <- function(between_study_variation = 0.6,
-                      within_study_variation = 0.3,
                       median_ratio = 1.2,
                       rdist = "norm",
                       parameters = list(mean = 50, sd = 0.2),
@@ -27,10 +26,9 @@ metatrial <- function(between_study_variation = 0.6,
                         rdist = rdist,
                         par = parameters,
                         tau = between_study_variation,
-                        epsilon = within_study_variation,
                         median_ratio = median_ratio,
                         ) %>%
-    dplyr::mutate(median_se = pmap_dbl(
+    dplyr::mutate(median_se = purrr::pmap_dbl(
       list(
         centre = median,
         spread = iqr,

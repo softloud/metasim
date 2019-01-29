@@ -11,7 +11,12 @@
 #' @param median_ratio ratio of population medians
 #' @export
 
-sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio = 1.2) {
+sim_sample <- function(n = 18,
+                       tau = 0.2,
+                       rdist = "norm",
+                       par = list(mean = 20, sd = 0.2),
+                       control = TRUE,
+                       median_ratio = 1.2) {
   # check inputs are valid
   assertthat::assert_that(length(par) <= 2,
                           msg = "haven't coded this for more than two parameters")
@@ -24,7 +29,7 @@ sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio
     par_1 <- if (control == FALSE) par[[1]] * median_ratio else par[[1]]
 
     # generate sample
-    return(rnorm(n, mean = par_1 * exp(tau + epsilon), sd = par[[2]]))
+    return(rnorm(n, mean = par_1 * exp(tau), sd = par[[2]]))
 
   } else if (rdist == "log-normal") {
 
@@ -32,7 +37,7 @@ sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio
     par_1 <- if (control == FALSE) par[[1]] + log(median_ratio) else par[[1]]
 
     # generate sample
-    return(rlnorm(n, par_1 + tau + epsilon, par[[2]]))
+    return(rlnorm(n, par_1 + tau , par[[2]]))
 
   } else if (rdist == "pareto") {
 
@@ -40,7 +45,7 @@ sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio
     par_1 <- if (control == FALSE) par[[1]] * median_ratio else par[[1]]
 
     # generate sample
-    return(actuar::rpareto2(n, par_1 * exp(tau + epsilon), par[[2]]))
+    return(actuar::rpareto2(n, par_1 * exp(tau), par[[2]]))
 
   } else if (rdist == "exponential") {
 
@@ -48,7 +53,7 @@ sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio
     par_1 <- if (control == FALSE) par[[1]]/median_ratio else par[[1]]
 
     # generate sample
-    return(rexp(n, par_1 * exp(tau + epsilon)))
+    return(rexp(n, par_1 * exp(tau)))
   }
 
 }
