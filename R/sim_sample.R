@@ -3,7 +3,7 @@
 #' Given a distribution, parameters, sample size, generate a sample.
 #'
 #' @param n sample size
-#' @param tau between study error
+#' @param this_study_error this study error
 #' @param epsilon within study error
 #' @param rdist string indicating distribution, "norm", "lnorm", "exp", or "pareto"
 #' @param par list of parameter arguments
@@ -12,7 +12,7 @@
 #' @export
 
 sim_sample <- function(n = 18,
-                       tau = 0.2,
+                       this_study_error = 0.2,
                        rdist = "norm",
                        par = list(mean = 20, sd = 0.2),
                        control = TRUE,
@@ -29,7 +29,7 @@ sim_sample <- function(n = 18,
     par_1 <- if (control == FALSE) par[[1]] * median_ratio else par[[1]]
 
     # generate sample
-    return(rnorm(n, mean = par_1 * exp(tau), sd = par[[2]]))
+    return(rnorm(n, mean = par_1 * exp(this_study_error), sd = par[[2]]))
 
   } else if (rdist == "log-normal") {
 
@@ -37,7 +37,7 @@ sim_sample <- function(n = 18,
     par_1 <- if (control == FALSE) par[[1]] + log(median_ratio) else par[[1]]
 
     # generate sample
-    return(rlnorm(n, par_1 + tau , par[[2]]))
+    return(rlnorm(n, par_1 + this_study_error , par[[2]]))
 
   } else if (rdist == "pareto") {
 
@@ -45,7 +45,7 @@ sim_sample <- function(n = 18,
     par_1 <- if (control == FALSE) par[[1]] * median_ratio else par[[1]]
 
     # generate sample
-    return(actuar::rpareto2(n, par_1 * exp(tau), par[[2]]))
+    return(actuar::rpareto2(n, par_1 * exp(this_study_error), par[[2]]))
 
   } else if (rdist == "exponential") {
 
@@ -53,7 +53,7 @@ sim_sample <- function(n = 18,
     par_1 <- if (control == FALSE) par[[1]]/median_ratio else par[[1]]
 
     # generate sample
-    return(rexp(n, par_1 * exp(tau)))
+    return(rexp(n, par_1 * exp(this_study_error)))
   }
 
 }

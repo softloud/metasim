@@ -14,8 +14,7 @@ sim_stats <- function(n_df = sim_n(),
 
   # generate study-level random effects
   tibble::tibble(
-    bn_study_error = abs(rnorm(nrow(n_df) / 2, 0, tau) / 2),
-    wn_study_error = abs(rnorm(nrow(n_df) / 2, 0, epsilon) / 2),
+    bn_study_error = rnorm(nrow(n_df) / 2, 0, tau) / 2,
     study = paste0("study_", seq(1, nrow(n_df) / 2))
   ) %>%
     # join to df
@@ -24,7 +23,7 @@ sim_stats <- function(n_df = sim_n(),
     control_indicator = group == "control" ,
            sample = purrr::pmap(
              list(n = n,
-                  tau = tau,
+                  tau = bn_study_error,
                   control = control_indicator),
              sim_sample,
              rdist = rdist,
