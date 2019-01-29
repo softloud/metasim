@@ -23,15 +23,6 @@ median_ratio <- runif(1, 0.5, 1.5)
 rdist <- "norm"
 parameters <- list(mean = 50, sd = 0.2)
 
-metadata <- metastats(meta_n(k = k)) %>%
-  mutate(
-    effect = map_dbl(summary_stats, "mean"),
-    effect_se = map_dbl(summary_stats, "var") / sqrt(n)
-  )
-
-simdf <- metadata %>%
-  metafor::rma(yi = effect, sei = effect_se, data = .)
-
 testdf <- sim_df(dist_tribble =
                    tibble::tribble(~ dist,  ~ par,
                                    "norm", list(mean = 50, sd = 0.2),
@@ -42,42 +33,35 @@ testdf <- sim_df(dist_tribble =
                  median_ratio = c(1, 1.2),
                  prop = 0.3)
 
-# check that testdf is non-empty
-
-
 # initialise simulations --------------------------------------------------
 
-
-
-test_that("different inputs parse in meta_n", {
+test_that("different inputs parse in sim_n", {
   # sanity check
-  expect_is(meta_n(), "data.frame")
+  expect_is(sim_n(), "data.frame")
   # check that we can specify the number of studies
-  expect_true(nrow(meta_n(k = 5)) == 10)
-  expect_true(nrow(meta_n(k = k)) == 2 * k)
+  expect_true(nrow(sim_n(k = 5)) == 10)
+  expect_true(nrow(sim_n(k = k)) == 2 * k)
 
   # check what the column names are
   # there are probably better tests for this
-  expect_true(sum(colnames(meta_n(k = k)) == c("study", "group", "n")) == 3)
-  expect_true(sum(unique(meta_n(k = k)$group) == c("control", "intervention")) == 2)
-  expect_true(length(unique(meta_n(k = k)$study)) == k)
+  expect_true(sum(colnames(sim_n(k = k)) == c("study", "group", "n")) == 3)
+  expect_true(sum(unique(sim_n(k = k)$group) == c("control", "intervention")) == 2)
+  expect_true(length(unique(sim_n(k = k)$study)) == k)
 
   # check the table is non-empty
   expect_gt(nrow(testdf), 0)
 })
 
-
-
 test_that("from user inputs, generate a simulation overview dataframe", {
   expect_is(testdf, "data.frame")
   expect_gt(nrow(testdf), 0)
-  expect_error(sim_df()) # default params not inherited
+  expect_is(sim_df(), "data.frame")
   expect_is(testdf %>% pluck("rdist"), "character")
   expect_is(testdf %>% pluck("n"), "list")
   expect_true("median_ratio" %in% colnames(testdf))
   expect_true("true_median" %in% colnames(testdf))
-  # expect_is(sim_df(prop = 0.4), "data.frame")
-  # expect_is(sim_df(prop = prop), "data.frame")
+  expect_is(sim_df(prop = 0.4), "data.frame")
+  expect_is(sim_df(prop = prop), "data.frame")
 
   # check the sample size dataset has control and intervention rows for k studies
   expect_is(testdf %>% pluck("n") %>% map_int(nrow) / 2, "numeric")
@@ -85,18 +69,15 @@ test_that("from user inputs, generate a simulation overview dataframe", {
                testdf %>% pluck("k") %>% as.integer())
   expect_gt(testdf %>% nrow(), 2)
 
-  # expect_is(sim_df(between_study_variation = 0.3), "data.frame")
+  expect_is(sim_df(between_study_variation = 0.3), "data.frame")
 
   expect_is(
     sim_df(
       dist_tribble =
         tibble::tribble(
-          ~ dist,
-          ~ par,
-          "norm",
-          list(mean = 50, sd = 0.2),
-          "exp",
-          list(rate = 2)
+          ~ dist, ~ par,
+          "norm", list(mean = 50, sd = 0.2),
+          "exp", list(rate = 2)
         ),
       k = k,
       between_study_variation = between_study_variation,
@@ -134,55 +115,49 @@ test_that("effect_se works for various inputs", {
 
 # simulations -------------------------------------------------------------
 
-test_that("data simulation for studies", {
+test_sample_norm <- sim_sample(10, 0, 0, "norm", list(mean = 20, sd = 1))
+test_sample_norm_another <- sim_sample(10, 0, 0, "norm", list(mean = 104, sd = 0.3))
+test_sample_pareto <- sim_sample(10, 0, 0, "pareto", list(1,2))
+
+test_that("samples are plausible",{
+  expect_is(test_sample_norm, "numeric")
+  expect_lt(test_sample_norm %>% mean(), 50)
+  expect_gt(test_sample_norm %>% mean(), 5)
+  expect_lt(test_sample_norm %>% mean(), 22)
+  expect_gt(test_sample_norm %>% mean(), 18)
+
+  expect_is(test_sample_norm_another, "numeric")
+  expect_lt(test_sample_norm_another %>% mean(), 200)
+  expect_gt(test_sample_norm_another %>% mean(), 5)
+  expect_lt(test_sample_norm_another %>% mean(), 106)
+  expect_gt(test_sample_norm_another %>% mean(), 102)
 
 
+  expect_is(test_sample_pareto, "numeric")
+  expect_lt(test_sample_pareto %>% mean(), 50)
+  expect_gt(test_sample_pareto %>% mean(), 0)
 })
+
 
 test_that("simulation on one row works", {
-  expect_is(metatrial(), "data.frame")
-  expect_equal(nrow(metatrial()), 2)
-  expect_is(metatrial(true_effect = 5), "data.frame")
-  # expect_is(metatrial(sampling_fn = actuar::rpareto2, fn_parameters = list(shape = 2, scale = 2)), "data.frame")
-
-  # test simulation
-  expect_is(metasim(), "data.frame")
-  expect_gt(metasim() %>% length(), 2)
-  expect_is(metasim(median_ratio = 1), "data.frame")
-  expect_is(metasim(median_ratio = median_ratio), "data.frame")
-  expect_is(metasim(between_study_variation = between_study_variation),
-            "data.frame")
-  expect_is(metasim(within_study_variation = within_study_variation),
-            "data.frame")
-
-  # expect_is(purrr::pmap(
-  #   list(
-  #     between_study_variation = between_study_variation,
-  #     within_study_variation = within_study_variation,
-  #     median_ratio = median_ratio,
-  #     rdist = rdist,
-  #     n_df = n,
-  #     parameters = parameters,
-  #     true_effect = 50,
-  #     id = id
-  #   ),
-  #   metasim,
-  #   trial_fn = metatrial,
-  #   trials = trials
-  # ),
-  # "data.frame")
-
-  # test trial returns
-  expect_is(trial_returns(simdf, true_effect = 1), "data.frame")
-  expect_is(trial_returns(simdf, true_effect = 1) %>% mutate(test = "a"),
-            "data.frame")
-
-  # check simualation id is parsed
-  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
-
+  # expect_is(metatrial(), "data.frame")
+  # expect_equal(nrow(metatrial()), 3)
+  # expect_is(metatrial(true_effect = 5), "data.frame")
+  # expect_is(metatrial(rdist = "pareto", parameters = list(shape = 2, scale = 2)), "data.frame")
+  #
+  # # test simulation
+  # expect_is(metasim(), "data.frame")
+  # expect_gt(metasim() %>% length(), 2)
+  # expect_is(metasim(median_ratio = 1), "data.frame")
+  # expect_is(metasim(median_ratio = median_ratio), "data.frame")
+  # expect_is(metasim(between_study_variation = between_study_variation),
+  #           "data.frame")
+  # expect_is(metasim(within_study_variation = within_study_variation),
+  #           "data.frame")
+  #
+  # # check simualation id is parsed
+  # expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
 })
-
-
 
 test_that("metasimulation runs as I think it does", {
   # expect_is(metasims(), "data.frame")
@@ -193,60 +168,5 @@ test_that("metasimulation runs as I think it does", {
   # expect_true("median_ratio" %in% colnames(metasims()))
 })
 
-
-
 # trials ------------------------------------------------------------------
 
-test_that("meta-analyses run", {
-  # check the sample dataset is what I think it is
-  expect_is(metadata, 'data.frame')
-  expect_true(sum(colnames(metadata) == "effect") == 1)
-
-  expect_gt(
-    metadata %>% filter(group == "control") %>%  metafor::rma(data = ., yi = effect, sei = effect_se) %>% length(),
-    20
-  )
-
-  # check returns
-  expect_is(
-    metadata %>% filter(group == "control") %>%  metafor::rma(data = ., yi = effect, sei = effect_se) %>% trial_returns(true_effect = 1),
-    "data.frame"
-  )
-  expect_is(
-    metadata %>% filter(group == "control") %>% metafor::rma(data = ., yi = effect, sei = effect_se) %>% trial_returns(true_effect = 1),
-    "data.frame"
-  )
-  expect_gt(
-    metadata %>% filter(group == "control") %>% metafor::rma(data = ., yi = effect, sei = effect_se) %>% trial_returns(true_effect = 1) %>% length(),
-    3
-  )
-  expect_is(
-    metadata %>% filter(group == "control") %>% metafor::rma(data = ., yi = effect, sei = effect_se) %>% trial_returns(true_effect = 1) %>% length(),
-    "integer"
-  )
-
-  expect_true(sum("effect_se" %in% colnames(metadata)) ==  1)
-  expect_true(sum("effect" %in% colnames(metadata)) == 1)
-
-  expect_gt(length(trial_m(metadata, true_effect = 1)), 1)
-
-  # m tests
-
-  expect_is(trial_m(metadata, true_effect = 1), "data.frame")
-  expect_gt(metadata %>% trial_m(true_effect = 1) %>% length(), 3)
-  expect_true("ci_lb" %in% names(trial_m(metadata, true_effect = 1)))
-  expect_true("ci_ub" %in% names(trial_m(metadata, true_effect = 1)))
-  expect_true("in_ci" %in% names(trial_m(metadata, true_effect = 1)))
-
-  # md tests
-
-  expect_is(trial_md(metadata, true_effect = 1), "data.frame")
-  expect_is(metadata %>% group_by(study) %>% summarise(md = diff(effect)),
-            "data.frame")
-  expect_is(metadata %>% group_by(study) %>% summarise(md = diff(effect), se = sqrt(sum(effect_se)) /
-                                                         2),
-            "data.frame")
-  expect_gt(metadata %>% trial_md(true_effect = 1) %>% length(), 3)
-
-  # expect_is(trial_lr(metadata), "list")
-})

@@ -9,6 +9,12 @@ metatrial(between_study_variation = 0.6, within_study_variation = 0.3,
   = 0.2), n_df = sim_n(k = 3), knha = TRUE, true_effect = 50)
 }
 \arguments{
+\item{median_ratio}{ratio of population medians}
+
+\item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
+
+\item{n_df}{\code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.}
+
 \item{knha}{Knapp-Hartung test instead of the default "z" test in `metafor::rma`.}
 }
 \description{

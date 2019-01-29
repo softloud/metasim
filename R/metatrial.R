@@ -1,6 +1,6 @@
 #' one trial
 #'
-#' @inheritParams metastats
+#' @inheritParams sim_stats
 #' @param knha Knapp-Hartung test instead of the default "z" test in `metafor::rma`.
 #'
 #' @export
@@ -23,13 +23,14 @@ metatrial <- function(between_study_variation = 0.6,
 
 
   # simulate data
-  metadata <- sim_stats(tau = between_study_variation,
-                        epsilon = within_study_variation,
-                        median_ratio = median_ratio,
+  metadata <- sim_stats(n_df = n_df,
                         rdist = rdist,
                         par = parameters,
-                        n_df = n_df) %>%
-    mutate(median_se = pmap_dbl(
+                        tau = between_study_variation,
+                        epsilon = within_study_variation,
+                        median_ratio = median_ratio,
+                        ) %>%
+    dplyr::mutate(median_se = pmap_dbl(
       list(
         centre = median,
         spread = iqr,
@@ -64,7 +65,7 @@ metatrial <- function(between_study_variation = 0.6,
       select(-n, -group) %>%
       rename(effect = median,
              effect_se = median_se) %>%
-      mutate(effect_type = "m"),
+      dplyr::mutate(effect_type = "m"),
     md = tibble(
       study = paste0("study_", seq(1, nrow(control))),
       effect = abs(intervention$median - control$median),
@@ -79,8 +80,9 @@ metatrial <- function(between_study_variation = 0.6,
           intervention$median_se ^ 2 / intervention$median ^ 2
       ),
       effect_type = "lr"
-    )) %>% # bind_rows() %>%
-    map(function(ma_df){
+    )) %>%
+    purrr::map(function(ma_df){
+      # default to Knapp-Hartung test
       if (knha == TRUE) test = "knha" else test = "z"
       metafor::rma(test = test, data = ma_df, yi = effect, sei = effect_se)
     }) %>%  {
@@ -93,7 +95,7 @@ metatrial <- function(between_study_variation = 0.6,
         effect_type = names(.)
       )
     } %>%
-    full_join(true_effect, by = "effect_type") %>%
-    mutate(in_ci = ci_lb < true_effect & true_effect < ci_ub)
+    dplyr::full_join(true_effect, by = "effect_type") %>%
+    dplyr::mutate(in_ci = ci_lb < true_effect & true_effect < ci_ub)
 
   }

@@ -9,6 +9,7 @@
 #' @param par list of parameter arguments
 #' @param control value of first parameter of distribution is determined by median ratio
 #' @param median_ratio ratio of population medians
+#' @export
 
 sim_sample <- function(n, tau, epsilon, rdist, par, control = TRUE, median_ratio = 1.2) {
   # check inputs are valid
