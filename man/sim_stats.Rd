@@ -14,8 +14,6 @@ sim_stats(n_df = sim_n(), rdist = "norm", par = list(mean = 50, sd =
 
 \item{par}{list of parameter arguments}
 
-\item{tau}{between study error}
-
 \item{epsilon}{within study error}
 
 \item{median_ratio}{ratio of population medians}

@@ -15,13 +15,20 @@ sim_stats <- function(n_df = sim_n(),
   # generate study-level random effects
   tibble::tibble(
     bn_study_error = rnorm(nrow(n_df) / 2, 0, tau) / 2,
-    wn_study_error = rnorm(nrow(n_df) / 2, 0, epsilon) / 2,
     study = paste0("study_", seq(1, nrow(n_df) / 2))
   ) %>%
     # join to df
     dplyr::full_join(n_df, by = "study") %>%
-    dplyr::mutate(control_indicator = group == "control",
-           sample = purrr::pmap(list(n = n, tau = tau, epsilon = epsilon, control = control_indicator), sim_sample, rdist = rdist, par = par, median_ratio = median_ratio),
+    dplyr::mutate(
+    control_indicator = group == "control" ,
+           sample = purrr::pmap(
+             list(n = n,
+                  tau = bn_study_error,
+                  control = control_indicator),
+             sim_sample,
+             rdist = rdist,
+             par = par,
+             median_ratio = median_ratio),
            min = purrr::map_dbl(sample, min),
            max = purrr::map_dbl(sample, max),
            mean = purrr::map_dbl(sample, mean),
@@ -29,7 +36,8 @@ sim_stats <- function(n_df = sim_n(),
            first_q = purrr::map_dbl(sample, quantile, 0.25),
            median = purrr::map_dbl(sample, quantile, 0.5),
            third_q = purrr::map_dbl(sample, quantile, 0.75),
-           iqr = third_q - first_q) %>%
-    dplyr::select(-sample) # remove the sample and return the summary stats
+           iqr = third_q - first_q)
+#  %>%
+  # dplyr::select(-sample) # remove the sample and return the summary stats
 
   }

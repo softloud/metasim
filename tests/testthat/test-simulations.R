@@ -132,7 +132,6 @@ test_that("samples are plausible",{
   expect_lt(test_sample_norm_another %>% mean(), 106)
   expect_gt(test_sample_norm_another %>% mean(), 102)
 
-
   expect_is(test_sample_pareto, "numeric")
   expect_lt(test_sample_pareto %>% mean(), 50)
   expect_gt(test_sample_pareto %>% mean(), 0)
