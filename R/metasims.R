@@ -30,8 +30,8 @@ metasims <- function(dist_tribble =
   # %>%
     rap::rap(
       sim_results = list() ~ metasim(
-        between_study_variation = between_study_variation,
-        within_study_variation = within_study_variation,
+        tau = between_study_variation,
+        # within_study_variation = within_study_variation,
         median_ratio = median_ratio,
         rdist = rdist,
         n_df = n,
