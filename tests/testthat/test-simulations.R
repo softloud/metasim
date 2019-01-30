@@ -11,6 +11,9 @@ set.seed(38)
 # k studies
 
 # row level
+big <- runif(2, 1, 101)
+small <- runif(2, 0, 1)
+
 k <- sample(c(3, 7, 50), 1)
 trials <- 10
 n <- sample(seq(20, 200), 1)
@@ -18,20 +21,23 @@ spread <- runif(1, 0.5, 1.5)
 centre <- runif(1, 20, 70)
 prop <- runif(1, 0.1, 0.9)
 between_study_variation <- runif(1, 0.2, 1.5)
+tau <- runif(1, 0.1, 0.8)
 within_study_variation <- runif(1, 0.2, 1.5)
 median_ratio <- runif(1, 0.5, 1.5)
 rdist <- "norm"
 parameters <- list(mean = 50, sd = 0.2)
 
-testdf <- sim_df(dist_tribble =
-                   tibble::tribble(~ dist,  ~ par,
-                                   "norm", list(mean = 50, sd = 0.2),
-                                   "exp", list(rate = 2)),
-                 k = c(3, 7, 50),
-                 between_study_variation = seq(0, 0.4, 0.2),
-                 within_study_variation = seq(0, 0.4, 0.2),
-                 median_ratio = c(1, 1.2),
-                 prop = 0.3)
+testdf <- sim_df(
+  dist_tribble =
+    tibble::tribble(~ dist,  ~ par,
+                    "norm", list(mean = 50, sd = 0.2),
+                    "exp", list(rate = 2)),
+  k = c(3, 7, 50),
+  between_study_variation = seq(0, 0.4, 0.2),
+  within_study_variation = seq(0, 0.4, 0.2),
+  median_ratio = c(1, 1.2),
+  prop = 0.3
+)
 
 # initialise simulations --------------------------------------------------
 
@@ -89,7 +95,8 @@ test_that("from user inputs, generate a simulation overview dataframe", {
   )
 
   # check that simulation id is unique
-  expect_equal(testdf %>% pluck("id") %>% unique() %>% length(), testdf %>% nrow())
+  expect_equal(testdf %>% pluck("id") %>% unique() %>% length(),
+               testdf %>% nrow())
 })
 
 
@@ -115,11 +122,13 @@ test_that("effect_se works for various inputs", {
 
 # simulations -------------------------------------------------------------
 
-test_sample_norm <- sim_sample(10, 0, 0, "norm", list(mean = 20, sd = 1))
-test_sample_norm_another <- sim_sample(10, 0, 0, "norm", list(mean = 104, sd = 0.3))
-test_sample_pareto <- sim_sample(10, 0, 0, "pareto", list(1,2))
+test_sample_norm <-
+  sim_sample(10, 0, "norm", list(mean = 20, sd = 1))
+test_sample_norm_another <-
+  sim_sample(10, 0, "norm", list(mean = 104, sd = 0.3))
+test_sample_pareto <- sim_sample(10, 0, "pareto", list(1, 2))
 
-test_that("samples are plausible",{
+test_that("samples are plausible", {
   expect_is(test_sample_norm, "numeric")
   expect_lt(test_sample_norm %>% mean(), 50)
   expect_gt(test_sample_norm %>% mean(), 5)
@@ -135,37 +144,81 @@ test_that("samples are plausible",{
   expect_is(test_sample_pareto, "numeric")
   expect_lt(test_sample_pareto %>% mean(), 50)
   expect_gt(test_sample_pareto %>% mean(), 0)
+
+  # test the exponetial
+  expect_is(sim_sample(rdist = "norm", par = list(mean = 437, sd = 0.7)),
+            "numeric")
+  expect_is(sim_sample(rdist = "exp", par = list(rate = 2)), "numeric")
+  expect_is(sim_sample(rdist = "lnorm", par = list(meanlog = 49, sd = 0.2)),
+            "numeric")
+
+  expect_gt(sim_sample(rdist = "norm", par = list(mean = 437, sd = 0.7)) %>% length, 2)
+  expect_gt(sim_sample(rdist = "exp", par = list(rate = 2)) %>% length, 2)
+  expect_gt(sim_sample(rdist = "lnorm", par = list(meanlog = 49, sd = 0.2)) %>% length,
+            2)
+  expect_gt(sim_sample(rdist = "norm", par = list(mean = 437, sd = 0.7)) %>%
+              unique %>% length, 2)
+  expect_gt(sim_sample(rdist = "exp", par = list(rate = 2)) %>%
+              unique %>% length, 2)
+  expect_gt(sim_sample(rdist = "lnorm", par = list(meanlog = 49, sd = 0.2)) %>%
+              unique %>% length, 2)
+
+  expect_is(sim_sample(rdist = "lnorm",
+                       par = list(meanlog = big[[1]], sd = small[1])),
+            "numeric")
+
+  expect_gt(sim_sample(rdist = "lnorm",
+                       par = list(meanlog = big[[1]], sd = small[1])) %>%
+              length, 2)
 })
 
-
-test_that("simulation on one row works", {
-  # expect_is(metatrial(), "data.frame")
-  # expect_equal(nrow(metatrial()), 3)
-  # expect_is(metatrial(true_effect = 5), "data.frame")
-  # expect_is(metatrial(rdist = "pareto", parameters = list(shape = 2, scale = 2)), "data.frame")
-  #
-  # # test simulation
-  # expect_is(metasim(), "data.frame")
-  # expect_gt(metasim() %>% length(), 2)
-  # expect_is(metasim(median_ratio = 1), "data.frame")
-  # expect_is(metasim(median_ratio = median_ratio), "data.frame")
-  # expect_is(metasim(between_study_variation = between_study_variation),
-  #           "data.frame")
-  # expect_is(metasim(within_study_variation = within_study_variation),
-  #           "data.frame")
-  #
-  # # check simualation id is parsed
-  # expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+test_that("one trial for one simulation", {
+  expect_is(metatrial(), "data.frame")
+  expect_equal(nrow(metatrial()), 3)
+  expect_is(metatrial(true_effect = 5), "data.frame")
+  expect_is(metatrial(rdist = "pareto",
+                      parameters = list(shape = 2, scale = 2)),
+            "data.frame")
+  expect_is(metatrial(
+    rdist = "pareto",
+    parameters = list(shape = round(big[[1]]), round(big[[2]]))
+  ),
+  "data.frame")
+  expect_is(metatrial(rdist = "norm",
+                      parameters = list(mean = big[[1]], sd = 2)),
+            "data.frame")
+  expect_is(metatrial(rdist = "exp",
+                      parameters = list(rate = round(big[[1]]))),
+            "data.frame")
+  expect_is(metatrial(rdist = "lnorm",
+                      parameters = list(mean = 3, sd = 1)),
+                "data.frame")
 })
 
-test_that("metasimulation runs as I think it does", {
-  # expect_is(metasims(), "data.frame")
+test_that("simulation runs as I think it does", {
+  # test simulation
 
+  expect_is(metasim(), "data.frame")
+  expect_gt(metasim() %>% length(), 2)
+  expect_is(metasim(rdist = "norm", par = list(mean = 67, sd = 0.25)), "data.frame")
+  expect_is(metasim(rdist = "pareto", par = list(shape = 2, scale = 3)), "data.frame")
+  #expect_is(metasim(rdist = "lnorm", par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
+  expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
+  expect_is(metasim(median_ratio = 1.3), "data.frame")
+  expect_is(metasim(median_ratio = median_ratio), "data.frame")
+  expect_is(metasim(tau = tau), "data.frame")
+
+  expect_gt(metasim(trials = 100) %>%
+              pluck("cp") %>%
+              mean(), 0.9)
+
+  # all simulations
+
+  # check simualation id is parsed
+  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+  expect_is(metasims(), "data.frame")
   # expect_true(nrow(metasims()) > 0)
   # expect_true("k" %in% colnames(metasims()))
   # expect_true("sim" %in% colnames(metasims()))
   # expect_true("median_ratio" %in% colnames(metasims()))
 })
-
-# trials ------------------------------------------------------------------
-

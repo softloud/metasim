@@ -16,7 +16,7 @@ metasim <- function(
   trials = 4
 ) {
   purrr::rerun(.n = trials, trial_fn(...)) %>%
-    dplyr::bind_rows() %>%
+    dplyr::bind_rows()  %>%
     dplyr::group_by(effect_type) %>%
     dplyr::summarise(ci_width = mean(ci_ub - ci_lb),
               ci_lb = mean(ci_lb),
