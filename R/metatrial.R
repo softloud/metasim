@@ -1,4 +1,22 @@
-rma_safely <- purrr::safely(metafor::rma)
+
+
+# could not get this to play nice
+# rma_safely <- purrr::safely(metafor::rma)
+
+# emily's fabulous contribution
+
+try_rma <- function(code, silent = FALSE) {
+  tryCatch(
+    code,
+    error = function(c) {
+      msg <- conditionMessage(c)
+      if (!silent)
+        message(c)
+      invisible(structure(msg, class = "try-error"))
+    }
+  )
+}
+
 
 #' one trial
 #'
@@ -43,7 +61,14 @@ metatrial <- function(tau = 0.6,
       ),
       .f = varameta::effect_se
     )) %>%
-    dplyr::select(-min,-max,-mean,-sd,-first_q,-third_q,-iqr,-control_indicator) %>%
+    dplyr::select(-min,
+                  -max,
+                  -mean,
+                  -sd,
+                  -first_q,
+                  -third_q,
+                  -iqr,
+                  -control_indicator) %>%
     dplyr::arrange(study, group)
 
   # split simulated data into two dfs for easier calculations
@@ -56,7 +81,7 @@ metatrial <- function(tau = 0.6,
   # meta-analyse the effects of interest
   results <- list(
     m = control %>%
-      dplyr::select(-n,-group) %>%
+      dplyr::select(-n, -group) %>%
       dplyr::rename(effect = median,
                     effect_se = median_se) %>%
       dplyr::mutate(effect_type = "m"),
@@ -76,43 +101,42 @@ metatrial <- function(tau = 0.6,
       effect_type = "lr"
     )
   ) %>%
+    # default to Knapp-Hartung test
     purrr::map(function(ma_df) {
-      # default to Knapp-Hartung test
       if (knha == TRUE)
         test = "knha"
       else
         test = "z"
 
-      # rma_safely(
-      #   test = test,
-      #   data = ma_df,
-      #   yi = effect,
-      #   sei = effect_se
-      # ) %>% pluck("results")
+      try_rma(metafor::rma(
+        test = test,
+        data = ma_df,
+        yi = effect,
+        sei = effect_se
+      ))
 
       ## metafor::rma(test = test, data = ma_df, yi = effect, sei = effect_se)
-      metafor::rma(test = test, data = ma_df, yi = effect, sei = effect_se)
+    })
 
-      })
 
-  # if (!is.null(results)) {
-  #   results %>%
-  #     {
-  #       tibble::tibble(
-  #         ci_lb = purrr::map_dbl(., "ci.lb"),
-  #         ci_ub = purrr::map_dbl(., "ci.ub"),
-  #         i2 = purrr::map_dbl(., "I2"),
-  #         tau2 = purrr::map_dbl(., "tau2"),
-  #         b = purrr::map_dbl(., "b"),
-  #         effect_type = names(.)
-  #       )
-  #     } %>%
-  #     dplyr::full_join(true_effect, by = "effect_type") %>%
-  #     dplyr::mutate(in_ci = ci_lb < true_effect &
-  #                     true_effect < ci_ub)} else {
-  #     results
-  #   }
-
-    results
-
+  if (class(results) != "try-error") {
+    {
+      results %>%
+        tibble::tibble(
+          ci_lb = purrr::map_dbl(., "ci.lb"),
+          ci_ub = purrr::map_dbl(., "ci.ub"),
+          i2 = purrr::map_dbl(., "I2"),
+          tau2 = purrr::map_dbl(., "tau2"),
+          b = purrr::map_dbl(., "b"),
+          effect_type = names(.)
+        )
+    } %>%
+      dplyr::full_join(true_effect, by = "effect_type") %>%
+      dplyr::mutate(in_ci = ci_lb < true_effect &
+                      true_effect < ci_ub)
+  } else {
+    NULL
   }
+
+
+}
