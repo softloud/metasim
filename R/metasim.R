@@ -22,7 +22,7 @@ metasim <- function(
               ci_lb = mean(ci_lb),
               ci_ub = mean(ci_ub),
               tau2 = mean(tau2),
-              i2 = mean(i2),
+              # i2 = mean(i2),
               cp_sum = sum(in_ci),
               cp_length = length(in_ci),
               cp = sum(in_ci) / length(in_ci)) %>%
