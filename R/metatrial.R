@@ -22,39 +22,38 @@ metatrial <- function(tau = 0.6,
     )
   )
 
-
   # simulate data
-  metadata <- sim_stats(
-    n_df = n_df,
-    rdist = rdist,
-    par = parameters,
-    tau = tau,
-    median_ratio = median_ratio
-  )  %>%
-    dplyr::mutate(median_se = purrr::pmap_dbl(
-      list(
-        centre = median,
-        spread = iqr,
-        n = n,
-        centre_type = "median",
-        spread_type = "iqr"
-      ),
-      .f = varameta::effect_se
-    ))
+  metadata <- toss(
+    sim_stats(
+      n_df = n_df,
+      rdist = rdist,
+      par = parameters,
+      tau = tau,
+      median_ratio = median_ratio
+    )
+  )
 
-  # make sure median and estimated standard error are numeric
-  if (!is.numeric(metadata$median) |
-      !is.numeric(metadata$median_se) |
-      !all(metadata$median > 0) |  # and positive
-      !all(metadata$median_se > 0) | # and a dataframe
-      nrow(metadata) == 0 |
-      is.null(nrow(metadata))
-      ) {
+  if (is.null(metadata)) {
     results <- NULL
   } else {
     groups <- metadata %>%
-      dplyr::select(-min,-max,-mean,-sd,
-                    -first_q,-third_q,-iqr,-control_indicator) %>%
+      dplyr::mutate(median_se = purrr::pmap_dbl(
+        list(
+          centre = median,
+          spread = iqr,
+          n = n,
+          centre_type = "median",
+          spread_type = "iqr"
+        ),
+        .f = varameta::effect_se
+      )) %>%
+      dplyr::select(-min,
+                    -max,
+                    -mean,
+                    -sd,-first_q,
+                    -third_q,
+                    -iqr,
+                    -control_indicator) %>%
       dplyr::arrange(study, group)
 
     # split simulated data into two dfs for easier calculations
@@ -67,7 +66,7 @@ metatrial <- function(tau = 0.6,
     # meta-analyse the effects of interest
     models <- list(
       m = control %>%
-        dplyr::select(-n,-group) %>%
+        dplyr::select(-n, -group) %>%
         dplyr::rename(effect = median,
                       effect_se = median_se) %>%
         dplyr::mutate(effect_type = "m"),
@@ -102,8 +101,8 @@ metatrial <- function(tau = 0.6,
         ))
       })
 
-    # check if the
-    if (class(models) == "try-error") {
+    # check that models produced a non-empty list
+    if (any(models %>% map_dbl(length) < 2)) {
       results <- NULL
     } else {
       results <- models %>% {
@@ -112,7 +111,7 @@ metatrial <- function(tau = 0.6,
           ci_ub = purrr::map_dbl(., "ci.ub"),
           # i2 = purrr::map_dbl(., "I2"),
           tau2 = purrr::map_dbl(., "tau2"),
-          b = purrr::map_dbl(., "b"),
+          effect = purrr::map_dbl(., "b"),
           effect_type = names(.)
         )
       } %>%
@@ -120,9 +119,8 @@ metatrial <- function(tau = 0.6,
         dplyr::mutate(in_ci = ci_lb <= true_effect &
                         true_effect <= ci_ub)
     }
-  }
 
+  }
   return(results)
 
-  # metadata
 }

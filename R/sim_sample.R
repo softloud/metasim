@@ -22,6 +22,17 @@ sim_sample <- function(n = 18,
                           msg = "haven't coded this for more than two parameters")
   assertthat::assert_that(rdist %in% c("exp", "norm", "lnorm", "pareto"),
                           msg = "choose exp, norm, lnorm, and pareto")
+  assertthat::assert_that(is.numeric(n),
+                          length(n) == 1,
+                          round(n) == n,
+                          msg = "n argument requires an integer")
+  assertthat::assert_that(is.numeric(this_study_error),
+                          length(this_study_error) == 1,
+                          msg = "this_study_error should requires a number")
+  assertthat::assert_that(is.logical(control),
+                          msg = "control argument needs to be a logical indicating if in control group")
+  assertthat::assert_that(is.numeric(median_ratio),
+                          msg = "median_ratio needs to be a numeric")
 
   if (rdist == "norm") {
     # set value of first parameter to ensure median ratio

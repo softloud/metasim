@@ -4,6 +4,7 @@ library(metasim)
 library(tidyverse)
 
 # for reproducibility
+
 # set.seed(38)
 
 # testing parameters ------------------------------------------------------
@@ -41,7 +42,7 @@ testdf <- sim_df(
 
 # initialise simulations --------------------------------------------------
 
-test_that("different inputs parse in sim_n", {
+test_that("different inpuGts parse in sim_n", {
   # sanity check
   expect_is(sim_n(), "data.frame")
   # check that we can specify the number of studies
@@ -220,11 +221,11 @@ test_that("simulation can handle more trials", {
   expect_gt(metasim(trials = 10) %>% nrow(), 2)
   expect_is(metasim(trials = 100), "data.frame")
   expect_gt(metasim(trials = 100) %>% nrow(), 2)
-  # expect_is(metasim(trials = 1000), "data.frame")
-  # expect_gt(metasim(trials = 1000) %>% nrow(), 2)
+  expect_is(metasim(trials = 1000), "data.frame")
+  expect_gt(metasim(trials = 1000) %>% nrow(), 2)
 })
 
-test_that("simulation runs over other inputs", {
+test_that("simulation runs metjover other inputs", {
   # test simulation
   # expect_is(metasim(rdist = "norm",
   #                   par = list(mean = 67, sd = 0.25)), "data.frame")
