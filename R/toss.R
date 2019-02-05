@@ -9,13 +9,25 @@
 #' \code{\link{metatrial}} and metasim functions.
 
 toss <- function(code, silent = FALSE) {
+  # tryCatch(
+  #   code,
+  #   error = function(c) { # message c is the error message
+  #     msg <- conditionMessage(c)
+  #     if (!silent)
+  #       message(c)
+  #     invisible(structure(msg, class = "try-error"))
+  #   }
+  # )
   tryCatch(
-    code,
-    error = function(c) {
-      msg <- conditionMessage(c)
-      if (!silent)
-        message(c)
-      invisible(structure(msg, class = "try-error"))
+    expr = {
+      code
+    },
+    error = function(e) {
+      NULL
+    },
+    warning = function(w) {
+      NULL
     }
+
   )
 }

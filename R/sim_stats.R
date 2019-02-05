@@ -42,7 +42,7 @@ sim_stats <- function(n_df = sim_n(),
     # join to df
     dplyr::full_join(n_df, by = "study") %>%
     dplyr::mutate(control_indicator = group == "control" ,
-                  sample = toss(
+                  sample =
                     purrr::pmap(
                       list(
                         n = n,
@@ -54,7 +54,7 @@ sim_stats <- function(n_df = sim_n(),
                       par = par,
                       median_ratio = median_ratio
                     )
-                  ))
+                  )
 
   if (!is.data.frame(samples) | nrow(samples) <= 1) {
     summary_stats <- NULL
