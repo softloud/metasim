@@ -65,7 +65,7 @@ sim_sample <- function(n = 18,
       par[[1]]
 
     # generate sample
-    return(rexp(n, par_1 * exp(this_study_error)))
+    return(toss(rexp(n, par_1 * exp(this_study_error))))
   }
 
 }
