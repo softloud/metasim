@@ -1,11 +1,7 @@
 Package: metasim
-Title: What the Package Does (One Line, Title Case)
+Title: Simulate Meta-Analytic Data
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com")
+Authors@R: person("Charles", "Gray", email = "charlestigray@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 License: What license it uses
 Encoding: UTF-8
@@ -14,4 +10,4 @@ Suggests:
     testthat
 RoxygenNote: 6.1.1.9000
 Imports: 
-    magrittr
+    magrittr, dplyr, purrr, assertthat, metafor, tibble, tidyr, testthat

@@ -5,6 +5,10 @@
 #' @inheritParams sim_n
 #' @inheritParams metasims
 #'
+#' @import purrr
+#' @import tibble
+#' @import dplyr
+#'
 #' @export
 
 

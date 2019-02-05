@@ -3,6 +3,10 @@
 #' @inheritParams sim_stats
 #' @param knha Knapp-Hartung test instead of the default "z" test in `metafor::rma`.
 #'
+#' @import metafor
+#' @import purrr
+#' @import tibble
+#' @import dplyr
 #' @export
 
 metatrial <- function(tau = 0.6,

@@ -5,6 +5,7 @@
 #' @param within_study_variation epsilon
 #' @param prop proportion of sample size we expect to cohorts to vary by most of the time
 #'
+#' @import tibble
 #' @export
 
 metasims <- function(dist_tribble =

@@ -2,6 +2,8 @@
 #'
 #' should broom this
 #'
+#' @import dplyr
+#' @import tibble
 #' @export
 
 trial_returns <- function(rem, true_effect) {

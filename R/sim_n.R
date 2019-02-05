@@ -7,6 +7,11 @@
 #' @param max_n upper bound for sample sizes, defaults to 200
 #' @param prop proportion of n we expect
 #'
+#' @import dplyr
+#' @import purrr
+#' @import tibble
+#' @import tidyr
+#'
 #' @export
 
 sim_n <- function(k = 3,

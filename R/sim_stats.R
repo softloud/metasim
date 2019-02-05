@@ -4,6 +4,10 @@
 #' such as output by \code{\link{meta_n}}.
 #' @inheritParams sim_sample
 #'
+#' @importFrom assertthat assert_that
+#' @import tibble
+#' @import purrr
+#' @import dplyr
 #' @export
 
 sim_stats <- function(n_df = sim_n(),
