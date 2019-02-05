@@ -4,7 +4,8 @@ library(metasim)
 library(tidyverse)
 
 # for reproducibility
-set.seed(38)
+
+# set.seed(38)
 
 # testing parameters ------------------------------------------------------
 
@@ -41,7 +42,7 @@ testdf <- sim_df(
 
 # initialise simulations --------------------------------------------------
 
-test_that("different inputs parse in sim_n", {
+test_that("different inpuGts parse in sim_n", {
   # sanity check
   expect_is(sim_n(), "data.frame")
   # check that we can specify the number of studies
@@ -81,9 +82,12 @@ test_that("from user inputs, generate a simulation overview dataframe", {
     sim_df(
       dist_tribble =
         tibble::tribble(
-          ~ dist, ~ par,
-          "norm", list(mean = 50, sd = 0.2),
-          "exp", list(rate = 2)
+          ~ dist,
+          ~ par,
+          "norm",
+          list(mean = 50, sd = 0.2),
+          "exp",
+          list(rate = 2)
         ),
       k = k,
       between_study_variation = between_study_variation,
@@ -100,22 +104,37 @@ test_that("from user inputs, generate a simulation overview dataframe", {
 })
 
 
-test_that("effect_se works for various inputs", {
-  expect_is(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  ), "numeric")
-  expect_true(length(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  )) == 1)
-  expect_true(effect_se(
-    centre = centre,
-    spread = spread,
-    n = n
-  ) > 0)
+
+# test sampling -----------------------------------------------------------
+
+test_that("sim stats gives non-empty dataframe",{
+  expect_is(sim_stats(), "data.frame")
+  expect_gt(sim_stats() %>% nrow(), 2)
+
+  # test distributions
+
+  # norm
+  expect_is(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)), "data.frame")
+  expect_gt(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
+ expect_is(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
+  expect_gt(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
+
+  # lnorm
+  expect_is(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)), "data.frame")
+  expect_gt(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
+  expect_is(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
+  expect_gt(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
+
+  # exp
+  expect_is(sim_stats(rdist = "exp", par = list(rate = 3)), "data.frame")
+  expect_gt(sim_stats(rdist = "exp", par = list(rate = 3)) %>% nrow(), 2)
+  expect_is(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))), "data.frame")
+  expect_gt(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))) %>% nrow(), 2)
+
+  # pareto
+  expect_is(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)), "data.frame")
+  expect_gt(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)) %>% nrow(), 2)
+
 
 })
 
@@ -142,7 +161,7 @@ test_that("samples are plausible", {
   expect_gt(test_sample_norm_another %>% mean(), 102)
 
   expect_is(test_sample_pareto, "numeric")
-  expect_lt(test_sample_pareto %>% mean(), 50)
+  expect_lt(test_sample_pareto %>% mean(), 100)
   expect_gt(test_sample_pareto %>% mean(), 0)
 
   # test the exponetial
@@ -192,31 +211,51 @@ test_that("one trial for one simulation", {
             "data.frame")
   expect_is(metatrial(rdist = "lnorm",
                       parameters = list(mean = 3, sd = 1)),
-                "data.frame")
+            "data.frame")
 })
 
-test_that("simulation runs as I think it does", {
-  # test simulation
-
+test_that("simulation can handle more trials", {
   expect_is(metasim(), "data.frame")
-  expect_gt(metasim() %>% length(), 2)
-  expect_is(metasim(rdist = "norm", par = list(mean = 67, sd = 0.25)), "data.frame")
-  expect_is(metasim(rdist = "pareto", par = list(shape = 2, scale = 3)), "data.frame")
-  #expect_is(metasim(rdist = "lnorm", par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
-  expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
-  expect_is(metasim(median_ratio = 1.3), "data.frame")
-  expect_is(metasim(median_ratio = median_ratio), "data.frame")
-  expect_is(metasim(tau = tau), "data.frame")
+  expect_gt(metasim() %>% nrow(), 2)
+  expect_is(metasim(trials = 10), "data.frame")
+  expect_gt(metasim(trials = 10) %>% nrow(), 2)
+  expect_is(metasim(trials = 100), "data.frame")
+  expect_gt(metasim(trials = 100) %>% nrow(), 2)
+  expect_is(metasim(trials = 1000), "data.frame")
+  expect_gt(metasim(trials = 1000) %>% nrow(), 2)
+})
 
-  expect_gt(metasim(trials = 100) %>%
-              pluck("cp") %>%
-              mean(), 0.9)
+test_that("simulation runs metjover other inputs", {
+  # test simulation
+  # expect_is(metasim(rdist = "norm",
+  #                   par = list(mean = 67, sd = 0.25)), "data.frame")
+  # expect_is(metasim(rdist = "pareto",
+  #                   par = list(shape = 2, scale = 3)), "data.frame")
+  # expect_is(metasim(rdist = "lnorm",
+  #                   par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
+  # expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
+  # expect_is(metasim(median_ratio = 1), "data.frame")
+  # expect_is(metasim(median_ratio = 1.3), "data.frame")
+  # expect_is(metasim(median_ratio = median_ratio), "data.frame")
+
+  # expect_is(metasim(tau = 0), "data.frame")
+  # expect_is(metasim(tau = tau), "data.frame")
+
+  # check that coverage probability is above 0.9.
+  # expect_gt(metasim(trials = 100) %>%
+  #           pluck("cp") %>%
+  #           mean(), 0.9)
+  # expect_lt(metasim(trials = 100) %>%
+  #             pluck("cp") %>%
+  #             mean(), 1.0000001)
 
   # all simulations
 
   # check simualation id is parsed
-  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
-  expect_is(metasims(), "data.frame")
+
+  # expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+
+  # expect_is(metasims(), "data.frame")
   # expect_true(nrow(metasims()) > 0)
   # expect_true("k" %in% colnames(metasims()))
   # expect_true("sim" %in% colnames(metasims()))

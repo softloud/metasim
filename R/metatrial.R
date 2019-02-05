@@ -1,23 +1,3 @@
-
-
-# could not get this to play nice
-# rma_safely <- purrr::safely(metafor::rma)
-
-# emily's fabulous contribution
-
-try_rma <- function(code, silent = FALSE) {
-  tryCatch(
-    code,
-    error = function(c) {
-      msg <- conditionMessage(c)
-      if (!silent)
-        message(c)
-      invisible(structure(msg, class = "try-error"))
-    }
-  )
-}
-
-
 #' one trial
 #'
 #' @inheritParams sim_stats
@@ -42,101 +22,105 @@ metatrial <- function(tau = 0.6,
     )
   )
 
-
   # simulate data
-  metadata <- sim_stats(
-    n_df = n_df,
-    rdist = rdist,
-    par = parameters,
-    tau = tau,
-    median_ratio = median_ratio,
-  ) %>%
-    dplyr::mutate(median_se = purrr::pmap_dbl(
-      list(
-        centre = median,
-        spread = iqr,
-        n = n,
-        centre_type = "median",
-        spread_type = "iqr"
-      ),
-      .f = varameta::effect_se
-    )) %>%
-    dplyr::select(-min,
-                  -max,
-                  -mean,
-                  -sd,
-                  -first_q,
-                  -third_q,
-                  -iqr,
-                  -control_indicator) %>%
-    dplyr::arrange(study, group)
-
-  # split simulated data into two dfs for easier calculations
-  control <- metadata %>%
-    dplyr::filter(group == "control")
-
-  intervention <- metadata %>%
-    dplyr::filter(group == "intervention")
-
-  # meta-analyse the effects of interest
-  results <- list(
-    m = control %>%
-      dplyr::select(-n, -group) %>%
-      dplyr::rename(effect = median,
-                    effect_se = median_se) %>%
-      dplyr::mutate(effect_type = "m"),
-    md = tibble::tibble(
-      study = paste0("study_", seq(1, nrow(control))),
-      effect = abs(intervention$median - control$median),
-      effect_se = sqrt(control$median_se ^ 2 + intervention$median_se ^ 2),
-      effect_type = "md"
-    ),
-    lr = tibble::tibble(
-      study = paste0("study_", seq(1, nrow(control))),
-      effect = log(intervention$median / control$median),
-      effect_se = sqrt(
-        control$median_se ^ 2 / control$median ^ 2 +
-          intervention$median_se ^ 2 / intervention$median ^ 2
-      ),
-      effect_type = "lr"
+  metadata <- toss(
+    sim_stats(
+      n_df = n_df,
+      rdist = rdist,
+      par = parameters,
+      tau = tau,
+      median_ratio = median_ratio
     )
-  ) %>%
-    # default to Knapp-Hartung test
-    purrr::map(function(ma_df) {
-      if (knha == TRUE)
-        test = "knha"
-      else
-        test = "z"
+  )
 
-      try_rma(metafor::rma(
-        test = test,
-        data = ma_df,
-        yi = effect,
-        sei = effect_se
-      ))
+  if (is.null(metadata)) {
+    results <- NULL
+  } else {
+    groups <- metadata %>%
+      dplyr::mutate(median_se = purrr::pmap_dbl(
+        list(
+          centre = median,
+          spread = iqr,
+          n = n,
+          centre_type = "median",
+          spread_type = "iqr"
+        ),
+        .f = varameta::effect_se
+      )) %>%
+      dplyr::select(-min,
+                    -max,
+                    -mean,
+                    -sd,-first_q,
+                    -third_q,
+                    -iqr,
+                    -control_indicator) %>%
+      dplyr::arrange(study, group)
 
-      ## metafor::rma(test = test, data = ma_df, yi = effect, sei = effect_se)
-    })
+    # split simulated data into two dfs for easier calculations
+    control <- groups %>%
+      dplyr::filter(group == "control")
 
+    intervention <- groups %>%
+      dplyr::filter(group == "intervention")
 
-  if (class(results) != "try-error") {
-    {
-      results %>%
+    # meta-analyse the effects of interest
+    models <- list(
+      m = control %>%
+        dplyr::select(-n, -group) %>%
+        dplyr::rename(effect = median,
+                      effect_se = median_se) %>%
+        dplyr::mutate(effect_type = "m"),
+      md = tibble::tibble(
+        study = paste0("study_", seq(1, nrow(control))),
+        effect = abs(intervention$median - control$median),
+        effect_se = sqrt(control$median_se ^ 2 + intervention$median_se ^ 2),
+        effect_type = "md"
+      ),
+      lr = tibble::tibble(
+        study = paste0("study_", seq(1, nrow(control))),
+        effect = log(intervention$median / control$median),
+        effect_se = sqrt(
+          control$median_se ^ 2 / control$median ^ 2 +
+            intervention$median_se ^ 2 / intervention$median ^ 2
+        ),
+        effect_type = "lr"
+      )
+    ) %>%
+      purrr::map(function(ma_df) {
+        if (knha == TRUE)
+          # default to Knapp-Hartung test
+          test = "knha"
+        else
+          test = "z"
+
+        toss(metafor::rma(
+          test = test,
+          data = ma_df,
+          yi = effect,
+          sei = effect_se
+        ))
+      })
+
+    # check that models produced a non-empty list
+    if (any(models %>% map_dbl(length) < 2)) {
+      results <- NULL
+    } else {
+      results <- models %>% {
         tibble::tibble(
           ci_lb = purrr::map_dbl(., "ci.lb"),
           ci_ub = purrr::map_dbl(., "ci.ub"),
-          i2 = purrr::map_dbl(., "I2"),
+          # i2 = purrr::map_dbl(., "I2"),
           tau2 = purrr::map_dbl(., "tau2"),
-          b = purrr::map_dbl(., "b"),
+          effect = purrr::map_dbl(., "b"),
           effect_type = names(.)
         )
-    } %>%
-      dplyr::full_join(true_effect, by = "effect_type") %>%
-      dplyr::mutate(in_ci = ci_lb < true_effect &
-                      true_effect < ci_ub)
-  } else {
-    NULL
-  }
+      } %>%
+        dplyr::full_join(true_effect, by = "effect_type") %>%
+        dplyr::mutate(in_ci = ci_lb <= true_effect &
+                        true_effect <= ci_ub)
+    }
 
+  }
+  return(results)
 
 }

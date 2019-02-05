@@ -5,16 +5,15 @@
 \title{simulate a meta-analysis dataset}
 \usage{
 sim_stats(n_df = sim_n(), rdist = "norm", par = list(mean = 50, sd =
-  0.2), tau = 0.4, epsilon = 0.2, median_ratio = 1.2)
+  0.2), tau = 0.4, median_ratio = 1.2)
 }
 \arguments{
-\item{n_df}{\code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.}
+\item{n_df}{\code{data.frame} of sample sizes,
+such as output by \code{\link{meta_n}}.}
 
 \item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
 
 \item{par}{list of parameter arguments}
-
-\item{epsilon}{within study error}
 
 \item{median_ratio}{ratio of population medians}
 }
