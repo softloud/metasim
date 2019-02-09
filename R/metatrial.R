@@ -102,7 +102,7 @@ metatrial <- function(tau = 0.6,
       })
 
     # check that models produced a non-empty list
-    if (any(models %>% map_dbl(length) < 2)) {
+    if (any(models %>% purrr::map_dbl(length) < 2)) {
       results <- NULL
     } else {
       results <- models %>% {
