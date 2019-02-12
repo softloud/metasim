@@ -102,14 +102,14 @@ metatrial <- function(tau = 0.6,
       })
 
     # check that models produced a non-empty list
-    if (any(models %>% map_dbl(length) < 2)) {
+    if (any(models %>% purrr::map_dbl(length) < 2)) {
       results <- NULL
     } else {
       results <- models %>% {
         tibble::tibble(
           ci_lb = purrr::map_dbl(., "ci.lb"),
           ci_ub = purrr::map_dbl(., "ci.ub"),
-          # i2 = purrr::map_dbl(., "I2"),
+          i2 = purrr::map_dbl(., "I2"),
           tau2 = purrr::map_dbl(., "tau2"),
           effect = purrr::map_dbl(., "b"),
           effect_type = names(.)
@@ -117,10 +117,9 @@ metatrial <- function(tau = 0.6,
       } %>%
         dplyr::full_join(true_effect, by = "effect_type") %>%
         dplyr::mutate(in_ci = ci_lb <= true_effect &
-                        true_effect <= ci_ub)
-    }
+                        true_effect <= ci_ub,
+                      bias = (true_effect - effect) / true_effect)
+      }}
 
-  }
   return(results)
-
 }
