@@ -7,6 +7,8 @@
 #'
 #' This function (hopefully) will toss away crappy stuff from the
 #' \code{\link{metatrial}} and metasim functions.
+#'
+#' @export
 
 toss <- function(code, silent = FALSE) {
   # tryCatch(

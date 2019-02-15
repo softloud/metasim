@@ -17,7 +17,7 @@ metatrial <- function(tau = 0.6,
     effect_type = c("m", "md", "lr"),
     true_effect = c(
       true_effect,
-      true_effect * median_ratio - true_effect,
+      abs(true_effect * median_ratio - true_effect),
       log(median_ratio)
     )
   )
@@ -65,17 +65,23 @@ metatrial <- function(tau = 0.6,
 
     # meta-analyse the effects of interest
     models <- list(
+
+      # median
       m = control %>%
         dplyr::select(-n, -group) %>%
         dplyr::rename(effect = median,
                       effect_se = median_se) %>%
         dplyr::mutate(effect_type = "m"),
+
+      # difference of medians
       md = tibble::tibble(
         study = paste0("study_", seq(1, nrow(control))),
         effect = abs(intervention$median - control$median),
         effect_se = sqrt(control$median_se ^ 2 + intervention$median_se ^ 2),
         effect_type = "md"
       ),
+
+      # log-ratio of medians
       lr = tibble::tibble(
         study = paste0("study_", seq(1, nrow(control))),
         effect = log(intervention$median / control$median),
@@ -109,7 +115,7 @@ metatrial <- function(tau = 0.6,
         tibble::tibble(
           ci_lb = purrr::map_dbl(., "ci.lb"),
           ci_ub = purrr::map_dbl(., "ci.ub"),
-          # i2 = purrr::map_dbl(., "I2"),
+          i2 = purrr::map_dbl(., "I2"),
           tau2 = purrr::map_dbl(., "tau2"),
           effect = purrr::map_dbl(., "b"),
           effect_type = names(.)
@@ -117,10 +123,9 @@ metatrial <- function(tau = 0.6,
       } %>%
         dplyr::full_join(true_effect, by = "effect_type") %>%
         dplyr::mutate(in_ci = ci_lb <= true_effect &
-                        true_effect <= ci_ub)
-    }
+                        true_effect <= ci_ub,
+                      bias = true_effect - effect)
+      }}
 
-  }
   return(results)
-
 }
