@@ -21,33 +21,26 @@ results_df <- metasims()
 ```
 
 ```{r}
-
-results_df %>% group_by(effect_type) %>% skimr::skim()
-```
-
-
-
-```{r}
 results_df %>% 
   ggplot(aes(x = rdist, y = cp)) +
-  geom_point(position = "jitter", aes(colour = bias))
+  theme(text = element_text(angle = 60)) +  geom_point(position = "jitter", aes(colour = bias))
 
 ```
 
 ```{r}
 results_df %>% 
-  filter(effect_type != "md") %>% 
+  # filter(effect_type != "md") %>% 
   ggplot(aes(x = bias, y = cp)) +
   geom_point(alpha = 0.4, aes(colour = rdist)) +
-  facet_grid(median_ratio ~ effect_type)
+  theme(text = element_text(angle = 60)) +  facet_grid(median_ratio ~ effect_type)
 
 ```
 
-```{r eval=FALSE}
+```{r }
 results_df %>% 
-  filter(effect_type != "md", 
-           rdist == "pareto") %>% 
-  ggplot(aes(x = parameters, y = cp)) +
+  # filter(effect_type != "md", 
+           # rdist == "pareto") %>% 
+  ggplot(aes(x = rdist, y = cp)) +
   geom_hline(yintercept = 0.95, linetype = "dashed") +
   geom_point(aes(size = bias, 
                  colour = ci_width,
@@ -58,4 +51,4 @@ results_df %>%
 
 
 ```
-]
+

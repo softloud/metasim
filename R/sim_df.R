@@ -43,7 +43,7 @@ sim_df <- function(dist_tribble =
     dplyr::mutate(n = purrr::map2(k, prop, sim_n),
                   id = paste0("sim_", seq(1, nrow(.))))  %>%
     dplyr::mutate(true_median =
-                    map2_dbl(
+                    purrr::map2_dbl(
                       rdist,
                       parameters,
                       .f = function(rdist, parameters) {
@@ -57,21 +57,3 @@ sim_df <- function(dist_tribble =
                             x = 0.5
                           )}}))}
 
-                  #               dplyr::case_when(
-                  # rdist != "pareto" ~ purrr::map2_dbl(rdist, parameters, density_fn, type = "q", x = 0.5)),
-                  # rdist == "pareto" ~ purrr::map2_dbl(rdist, parameters, .f = function(x,y) {
-                  #     actuar::qpareto2(0.5, shape = parameters[[1]], scale = parameters[[2]])
-                  #   })) # %>%
-                  #   dplyr::select(
-                  #     k,
-                  #     between_study_variation,
-                  #     between_study_variation,
-                  #     median_ratio,
-                  #     rdist,
-                  #     parameters,
-                  #     n,
-                  #     true_median,
-                  #     id
-                  #   )
-
-# 1}

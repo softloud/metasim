@@ -50,9 +50,10 @@ metasims <- function(dist_tribble =
   # intialise results
   results <- vector("list", length = nrow(simpars))
 
-  #
-  for (i in 1:nrow(dist_tribble)) {
-    results[[i]] <- toss(
+  # loop through simuations
+  # this is possibly an application for rap::
+  for (i in 1:nrow(simpars)) {
+    results[[i]] <-  # toss(
       metasim(
         tau = simpars$between_study_variation[[i]],
         median_ratio = simpars$median_ratio[[i]],
@@ -64,41 +65,18 @@ metasims <- function(dist_tribble =
         id = simpars$id[[i]],
         trial_fn = metatrial,
         trials = trials
-      )
+      # )
     )
 
-    # cat(paste("trial ", i, " - so far, so good! \n"))
     setTxtProgressBar(pb, i)
   }
 
-  results_df <- results %>% bind_rows() %>%
-    full_join(simpars, by = "id")
+  # transform list of results to df with sim parameters
+  results_df <- results %>%
+    dplyr::bind_rows() %>%
+    dplyr::full_join(simpars, by = "id")
 
-
+  # output of function
   return(results_df)
-
-  # sim_df(
-  #   dist_tribble = dist_tribble,
-  #   k = k,
-  #   between_study_variation = between_study_variation,
-  #   within_study_variation = within_study_variation,
-  #   median_ratio = median_ratio,
-  #   prop = prop
-  # ) %>%
-  #   # apply(., 1, metasim, trials = trials, trial_fn = trial_fn)
-  # # %>%
-  #   rap::rap(
-  #     sim_results = list() ~ metasim(
-  #       tau = between_study_variation,
-  #       median_ratio = median_ratio,
-  #       rdist = rdist,
-  #       n_df = n,
-  #       parameters = parameters,
-  #       true_effect = true_median,
-  #       id = id,
-  #       trial_fn = metatrial,
-  #       trials = trials
-  #   ))
-
 
 }
