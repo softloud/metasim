@@ -13,7 +13,8 @@ metatrial(tau = 0.6, median_ratio = 1.2, rdist = "norm",
 
 \item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
 
-\item{n_df}{\code{data.frame} of sample sizes, such as output by \code{\link{meta_n}}.}
+\item{n_df}{\code{data.frame} of sample sizes,
+such as output by \code{\link{meta_n}}.}
 
 \item{knha}{Knapp-Hartung test instead of the default "z" test in `metafor::rma`.}
 }
