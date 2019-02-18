@@ -1,7 +1,8 @@
 #' one trial
 #'
 #' @inheritParams sim_stats
-#' @param knha Knapp-Hartung test instead of the default "z" test in `metafor::rma`.
+#' @param knha Knapp-Hartung test instead of the
+#' default "z" test in `metafor::rma`.
 #'
 #' @import metafor
 #' @import purrr
@@ -25,6 +26,12 @@ metatrial <- function(tau = 0.6,
       log(median_ratio)
     )
   )
+
+  # check that true effects are non-negative
+  assertthat::assert_that(all(true_effect$true_effect >= 0),
+                          msg =
+                            "haven't coded this for negative true effects yet")
+
 
   # simulate data
   metadata <- toss(
@@ -51,13 +58,8 @@ metatrial <- function(tau = 0.6,
         ),
         .f = varameta::effect_se
       )) %>%
-      dplyr::select(-min,
-                    -max,
-                    -mean,
-                    -sd,-first_q,
-                    -third_q,
-                    -iqr,
-                    -control_indicator) %>%
+      dplyr::select(-min,-max,-mean,-sd,
+                    -first_q,-third_q,-iqr,-control_indicator) %>%
       dplyr::arrange(study, group)
 
     # split simulated data into two dfs for easier calculations
@@ -69,10 +71,9 @@ metatrial <- function(tau = 0.6,
 
     # meta-analyse the effects of interest
     models <- list(
-
       # median
       m = control %>%
-        dplyr::select(-n, -group) %>%
+        dplyr::select(-n,-group) %>%
         dplyr::rename(effect = median,
                       effect_se = median_se) %>%
         dplyr::mutate(effect_type = "m"),
@@ -129,7 +130,8 @@ metatrial <- function(tau = 0.6,
         dplyr::mutate(in_ci = ci_lb <= true_effect &
                         true_effect <= ci_ub,
                       bias = true_effect - effect)
-      }}
+    }
+  }
 
   return(results)
 }

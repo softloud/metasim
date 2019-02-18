@@ -10,7 +10,8 @@
 #'
 #' @export
 
-toss <- function(code, silent = FALSE) {
+toss <- function(code, error_msg = NULL, warning_msg = NULL) {
+  # function(code, silent = FALSE) {
   # tryCatch(
   #   code,
   #   error = function(c) { # message c is the error message
@@ -25,10 +26,10 @@ toss <- function(code, silent = FALSE) {
       code
     },
     error = function(e) {
-      NULL
+      error_msg
     },
     warning = function(w) {
-      NULL
+      warning_msg
     }
 
   )

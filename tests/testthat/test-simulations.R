@@ -5,7 +5,7 @@ library(tidyverse)
 
 # for reproducibility
 
-# set.seed(38)
+# set.seed(38) # uncomment when sharing/reporting
 
 # testing parameters ------------------------------------------------------
 
@@ -187,73 +187,39 @@ test_that("samples are plausible", {
               length, 2)
 })
 
-test_that("one trial for one simulation", {
-  expect_is(metatrial(), "data.frame")
-  expect_equal(nrow(metatrial()), 3)
-  expect_is(metatrial(true_effect = 5), "data.frame")
-  expect_is(metatrial(rdist = "pareto",
-                      parameters = list(shape = 2, scale = 2)),
-            "data.frame")
-  expect_is(metatrial(
-    rdist = "pareto",
-    parameters = list(shape = round(big[[1]]), round(big[[2]]))
-  ),
-  "data.frame")
-  expect_is(metatrial(rdist = "norm",
-                      parameters = list(mean = big[[1]], sd = 2)),
-            "data.frame")
-  expect_is(metatrial(rdist = "exp",
-                      parameters = list(rate = round(big[[1]]))),
-            "data.frame")
-  expect_is(metatrial(rdist = "lnorm",
-                      parameters = list(mean = 3, sd = 1)),
-            "data.frame")
-})
-
-test_that("simulation can handle more trials", {
+test_that("simulation runs over other inputs", {
+  # test defaults work
   expect_is(metasim(), "data.frame")
   expect_gt(metasim() %>% nrow(), 2)
-  expect_is(metasim(trials = 10), "data.frame")
-  expect_gt(metasim(trials = 10) %>% nrow(), 2)
-  expect_is(metasim(trials = 100), "data.frame")
-  expect_gt(metasim(trials = 100) %>% nrow(), 2)
-  # expect_is(metasim(trials = 1000), "data.frame")
-  # expect_gt(metasim(trials = 1000) %>% nrow(), 2)
-})
-
-test_that("simulation runs metjover other inputs", {
   # test simulation
-  # expect_is(metasim(rdist = "norm",
-  #                   par = list(mean = 67, sd = 0.25)), "data.frame")
-  # expect_is(metasim(rdist = "pareto",
-  #                   par = list(shape = 2, scale = 3)), "data.frame")
-  # expect_is(metasim(rdist = "lnorm",
-  #                   par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
-  # expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
-  # expect_is(metasim(median_ratio = 1), "data.frame")
-  # expect_is(metasim(median_ratio = 1.3), "data.frame")
-  # expect_is(metasim(median_ratio = median_ratio), "data.frame")
+  expect_is(metasim(rdist = "norm",
+                    par = list(mean = 67, sd = 0.25)), "data.frame")
+  expect_is(metasim(rdist = "pareto",
+                    par = list(shape = 2, scale = 3)), "data.frame")
+  expect_is(metasim(rdist = "lnorm",
+                    par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
+  expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
+  expect_is(metasim(median_ratio = 1), "data.frame")
+  expect_is(metasim(median_ratio = 1.3), "data.frame")
+  expect_is(metasim(median_ratio = median_ratio), "data.frame")
 
-  # expect_is(metasim(tau = 0), "data.frame")
-  # expect_is(metasim(tau = tau), "data.frame")
+  expect_is(metasim(tau = 0), "data.frame")
+  expect_is(metasim(tau = tau), "data.frame")
 
   # check that coverage probability is above 0.9.
-  # expect_gt(metasim(trials = 100) %>%
-  #           pluck("cp") %>%
-  #           mean(), 0.9)
-  # expect_lt(metasim(trials = 100) %>%
-  #             pluck("cp") %>%
-  #             mean(), 1.0000001)
-
-  # all simulations
+  expect_gt(metasim(trials = 100) %>%
+            pluck("cp") %>%
+            mean(), 0.9)
+  expect_lt(metasim(trials = 100) %>%
+              pluck("cp") %>%
+              mean(), 1.0000001)
 
   # check simualation id is parsed
 
-  # expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
-
-  # expect_is(metasims(), "data.frame")
-  # expect_true(nrow(metasims()) > 0)
-  # expect_true("k" %in% colnames(metasims()))
-  # expect_true("sim" %in% colnames(metasims()))
-  # expect_true("median_ratio" %in% colnames(metasims()))
+  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+  expect_is(metasims(), "data.frame")
+  expect_true(nrow(metasims()) > 0)
+  expect_true("k" %in% colnames(metasims()))
+  expect_true("sim" %in% colnames(metasims()))
+  expect_true("median_ratio" %in% colnames(metasims()))
 })
