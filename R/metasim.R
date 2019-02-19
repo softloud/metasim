@@ -15,20 +15,24 @@ metasim <- function(
   trial_fn = metatrial,
   trials = 4
 ) {
-  return(purrr::rerun(.n = trials, trial_fn(...)) %>%
-    dplyr::bind_rows()  %>%
-    dplyr::group_by(effect_type) %>%
-    dplyr::summarise(ci_width =
-                       mean(ci_ub - ci_lb),
-              ci_lb = mean(ci_lb),
-              ci_ub = mean(ci_ub),
-              tau2 = mean(tau2),
-              # i2 = mean(i2),
-              bias = mean(bias),
-              cp_sum = sum(in_ci),
-              cp_length = length(in_ci),
-              cp = sum(in_ci) / length(in_ci)) %>%
-    dplyr::mutate(id = id))
+
+  results <- purrr::rerun(.n = trials, trial_fn(...))
+
+  results
+  # results %>%
+  #   dplyr::bind_rows()  %>%
+  #   dplyr::group_by(effect_type) %>%
+  #   dplyr::summarise(ci_width =
+  #                      mean(ci_ub - ci_lb),
+  #             ci_lb = mean(ci_lb),
+  #             ci_ub = mean(ci_ub),
+  #             tau2 = mean(tau2),
+  #             # i2 = mean(i2),
+  #             bias = mean(bias),
+  #             cp_sum = sum(in_ci),
+  #             cp_length = length(in_ci),
+  #             cp = sum(in_ci) / length(in_ci)) %>%
+  #   dplyr::mutate(id = id)
 
 
 
