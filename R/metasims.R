@@ -72,12 +72,14 @@ metasims <- function(dist_tribble =
     setTxtProgressBar(pb, i)
   }
 
-  # transform list of results to df with sim parameters
-  results_df <- results %>%
-    dplyr::bind_rows() %>%
-    dplyr::full_join(simpars, by = "id")
+  return(results)
 
-  # output of function
-  return(results_df)
+  # # transform list of results to df with sim parameters
+  # results_df <- results %>%
+  #   dplyr::bind_rows() %>%
+  #   dplyr::full_join(simpars, by = "id")
+  #
+  # # output of function
+  # return(results_df)
 
 }

@@ -15,7 +15,11 @@ metasim <- function(
   trial_fn = metatrial,
   trials = 4
 ) {
-  return(purrr::rerun(.n = trials, trial_fn(...)) %>%
+
+  results <- purrr::rerun(.n = trials, trial_fn(...))
+
+  results_summary <- results %>%
+    purrr::keep(is.data.frame) %>%
     dplyr::bind_rows()  %>%
     dplyr::group_by(effect_type) %>%
     dplyr::summarise(ci_width =
@@ -28,8 +32,16 @@ metasim <- function(
               cp_sum = sum(in_ci),
               cp_length = length(in_ci),
               cp = sum(in_ci) / length(in_ci)) %>%
-    dplyr::mutate(id = id))
+    dplyr::mutate(id = id)
 
+  errors <- results %>%
+    purrr::discard(is.data.frame)
 
+  return(
+    list(
+      results_summary = results_summary,
+      errors = errors
+    )
+  )
 
 }
