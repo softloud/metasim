@@ -18,22 +18,30 @@ metasim <- function(
 
   results <- purrr::rerun(.n = trials, trial_fn(...))
 
-  results
-  # results %>%
-  #   dplyr::bind_rows()  %>%
-  #   dplyr::group_by(effect_type) %>%
-  #   dplyr::summarise(ci_width =
-  #                      mean(ci_ub - ci_lb),
-  #             ci_lb = mean(ci_lb),
-  #             ci_ub = mean(ci_ub),
-  #             tau2 = mean(tau2),
-  #             # i2 = mean(i2),
-  #             bias = mean(bias),
-  #             cp_sum = sum(in_ci),
-  #             cp_length = length(in_ci),
-  #             cp = sum(in_ci) / length(in_ci)) %>%
-  #   dplyr::mutate(id = id)
+  results_summary <- results %>%
+    purrr::keep(is.data.frame) %>%
+    dplyr::bind_rows()  %>%
+    dplyr::group_by(effect_type) %>%
+    dplyr::summarise(ci_width =
+                       mean(ci_ub - ci_lb),
+              ci_lb = mean(ci_lb),
+              ci_ub = mean(ci_ub),
+              tau2 = mean(tau2),
+              # i2 = mean(i2),
+              bias = mean(bias),
+              cp_sum = sum(in_ci),
+              cp_length = length(in_ci),
+              cp = sum(in_ci) / length(in_ci)) %>%
+    dplyr::mutate(id = id)
 
+  errors <- results %>%
+    purrr::discard(is.data.frame)
 
+  return(
+    list(
+      results_summary = results_summary,
+      errors = errors
+    )
+  )
 
 }

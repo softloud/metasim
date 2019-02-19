@@ -8,6 +8,8 @@
 #' @import purrr
 #' @import tibble
 #' @import dplyr
+#' @import assertthat
+#'
 #' @export
 
 metatrial <- function(tau = 0.6,
@@ -17,6 +19,7 @@ metatrial <- function(tau = 0.6,
                       n_df = sim_n(k = 3),
                       knha = TRUE,
                       true_effect = 50) {
+
   # calculate true effects
   true_effect <-  tibble::tibble(
     effect_type = c("m", "md", "lr"),
@@ -43,6 +46,11 @@ metatrial <- function(tau = 0.6,
       median_ratio = median_ratio
     )
   )
+
+  # return error if sample couldn't be generated
+  # assertthat::assert_that(!is.data.frame(metadata),
+  #                          msg =
+  #                            "distribution and parameters failed to sample")
 
   if (is.null(metadata)) {
     results <- NULL
@@ -114,7 +122,7 @@ metatrial <- function(tau = 0.6,
 
     # check that models produced a non-empty list
     if (any(models %>% purrr::map_dbl(length) < 2)) {
-      results <- NULL
+      results <- "rma function failed on at least one model"
     } else {
       results <- models %>% {
         tibble::tibble(
