@@ -16,7 +16,8 @@ metatrial(tau = 0.6, median_ratio = 1.2, rdist = "norm",
 \item{n_df}{\code{data.frame} of sample sizes,
 such as output by \code{\link{meta_n}}.}
 
-\item{knha}{Knapp-Hartung test instead of the default "z" test in `metafor::rma`.}
+\item{knha}{Knapp-Hartung test instead of the
+default "z" test in `metafor::rma`.}
 }
 \description{
 one trial

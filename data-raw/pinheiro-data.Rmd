@@ -1,0 +1,70 @@
+---
+title: "Pinheiro Meta-analysis"
+author: "Charles T. Gray"
+date: "27 February 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r packages, message=FALSE}
+# packages
+library(tidyverse)
+```
+
+
+n_t for treatment or case group
+n_c for control or placebo group
+_d for the numeric (double) form 
+
+```{r}
+pinheiro_data <- tibble(
+  study = c("Catarino", "Dusse", "He", "Schjetlein", "Terao", "Bellart", "Heilmann"),
+  year = c(2008, 2003, 1997, 1997, 1991, 1998, 2007),
+  n_t = c(44, 43, 30, 200, 13, 12, 111),
+  m_t = c(448.5, 1263.8, 315.0, 1545.0, 347.87, 2090.0, 1623.60),
+  s_t = list(
+    iqr = c(313.0, 1091.3), 
+    sd = 411.9, 
+    range = c(145.0, 1150), 
+    sd = 849.5, 
+    sd = 460.5,
+    iqr = 1800.0,
+    iqr = 932.9),
+  n_c = c(42, 28, 24, 97, 80, 65, 33),
+  m_c = c(538.2, 1146.6, 183.0, 1390.0, 221.52, 545.0, 1149.0),
+  s_c = list(
+    iqr = c(391.2, 822.8),
+    sd = 311.2,
+    range = c(110.0, 340.0),
+    sd = 550.0,
+    sd = 179.9,
+    iqr = 225.0,
+    iqr = 456.0
+  ),
+  centre = c("median", "mean", "median", "mean", "mean", "median", "median"),
+  spread = c("iqr", "sd", "range", "sd", "sd", "iqr", "iqr")) %>% 
+  mutate(
+    s_t_d = map_dbl(s_t, .f = function(s) {
+      if (length(s) == 2) return(s[2] - s[1]) else return(s)
+    }),
+    s_c_d = map_dbl(s_c, .f = function(s) {
+      if (length(s) == 2) return(s[2] - s[1]) else return(s)
+    }) 
+  )
+
+# take a look
+pinheiro_data %>% knitr::kable()
+```
+
+## write data to lazy load datasets
+
+```{r}
+devtools::use_data(pinheiro_data, overwrite = TRUE)
+
+
+```
+

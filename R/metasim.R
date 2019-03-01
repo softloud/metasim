@@ -9,39 +9,28 @@
 #'
 #' @export
 
-metasim <- function(
-  ...,
-  id = "simulation1",
-  trial_fn = metatrial,
-  trials = 4
-) {
-
+metasim <- function(...,
+                    id = "simulation1",
+                    trial_fn = metatrial,
+                    trials = 4) {
   results <- purrr::rerun(.n = trials, trial_fn(...))
 
-  results_summary <- results %>%
-    purrr::keep(is.data.frame) %>%
-    dplyr::bind_rows()  %>%
-    dplyr::group_by(effect_type) %>%
-    dplyr::summarise(ci_width =
-                       mean(ci_ub - ci_lb),
-              ci_lb = mean(ci_lb),
-              ci_ub = mean(ci_ub),
-              tau2 = mean(tau2),
-              # i2 = mean(i2),
-              bias = mean(bias),
-              cp_sum = sum(in_ci),
-              cp_length = length(in_ci),
-              cp = sum(in_ci) / length(in_ci)) %>%
-    dplyr::mutate(id = id)
+  results_summary <- results  %>%
+    map_df("results")  %>%
+    dplyr::group_by(measure) %>%
+    dplyr::summarise(
+      tau2 = mean(tau2),
+      ci_width = mean(ci_ub - ci_lb),
+      bias = mean(bias),
+      coverage_count = sum(coverage),
+      successful_trials = length(coverage),
+      coverage = coverage_count / successful_trials
+    ) %>%
+    mutate(id = id)
 
-  errors <- results %>%
-    purrr::discard(is.data.frame)
+  errors <- results %>% map_df("errors") %>% mutate(id = id)
 
-  return(
-    list(
-      results_summary = results_summary,
-      errors = errors
-    )
-  )
+  return(list(results_summary = results_summary,
+              errors = errors))
 
 }
