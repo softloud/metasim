@@ -19,10 +19,9 @@ metatrial <- function(tau = 0.6,
                       n_df = sim_n(k = 3),
                       knha = TRUE,
                       true_effect = 50) {
-
   # calculate true effects
   true_effect <-  tibble::tibble(
-    effect_type = c("m", "md", "lr"),
+    measure = c("m", "md", "lr"),
     true_effect = c(
       true_effect,
       abs(true_effect * median_ratio - true_effect),
@@ -37,6 +36,7 @@ metatrial <- function(tau = 0.6,
 
 
   # simulate data
+  # todo: this is where a safely/collateral thing might be good
   metadata <- toss(
     sim_stats(
       n_df = n_df,
@@ -44,16 +44,20 @@ metatrial <- function(tau = 0.6,
       par = parameters,
       tau = tau,
       median_ratio = median_ratio
-    )
+    ),
+    error_msg = "sim_stats threw an error",
+    warning_msg = "sim_stats threw a warning"
   )
 
   # return error if sample couldn't be generated
-  # assertthat::assert_that(!is.data.frame(metadata),
-  #                          msg =
-  #                            "distribution and parameters failed to sample")
+  # Q: Why doesn't this assert work as I think it should?
+  # assertthat::assert_that(
+  #   is.null(metadata),
+  #   msg = "distribution and parameters failed to sample")
 
-  if (is.null(metadata)) {
-    results <- NULL
+  if (is.character(metadata)) {
+    # this is a hack to get around the above assert not working
+    results <- metadata
   } else {
     groups <- metadata %>%
       dplyr::mutate(median_se = purrr::pmap_dbl(
@@ -66,8 +70,7 @@ metatrial <- function(tau = 0.6,
         ),
         .f = varameta::effect_se
       )) %>%
-      dplyr::select(-min,-max,-mean,-sd,
-                    -first_q,-third_q,-iqr,-control_indicator) %>%
+      dplyr::select(-min,-max,-mean,-sd, -first_q,-third_q,-iqr) %>%
       dplyr::arrange(study, group)
 
     # split simulated data into two dfs for easier calculations
@@ -77,7 +80,7 @@ metatrial <- function(tau = 0.6,
     intervention <- groups %>%
       dplyr::filter(group == "intervention")
 
-    # meta-analyse the effects of interest
+    # calculate effects of interest
     models <- list(
       # median
       m = control %>%
@@ -104,42 +107,81 @@ metatrial <- function(tau = 0.6,
         ),
         effect_type = "lr"
       )
-    ) %>%
-      purrr::map(function(ma_df) {
-        if (knha == TRUE)
-          # default to Knapp-Hartung test
-          test = "knha"
-        else
-          test = "z"
+    )
 
-        toss(metafor::rma(
-          test = test,
-          data = ma_df,
-          yi = effect,
-          sei = effect_se
+    # meta-analyse with rma or fe
+    model_results <- models %>% {
+      tibble(measure = names(.),
+             rma = purrr::map(., function(ma_df) {
+               if (knha == TRUE)
+                 # default to Knapp-Hartung test
+                 test = "knha"
+               else
+                 test = "z"
+
+               toss(
+                 metafor::rma(
+                   test = test,
+                   data = ma_df,
+                   yi = effect,
+                   sei = effect_se
+                 ),
+                 error_msg = "metafor::rma reml threw an error",
+                 warning_msg = "metafor::rma reml threw a warning"
+               )
+             })) %>%
+        mutate(fe = if_else(
+          is.character(rma),
+          toss(
+            metafor::rma(
+              method = "FE",
+              test = test,
+              data = ma_df,
+              yi = effect,
+              sei = effect_se
+            ),
+            error_msg = "metafor::rma fe threw an error",
+            warning_msg = "metafor::rma fe threw a warning"
+          ),
+          "rma worked"
         ))
-      })
-
-    # check that models produced a non-empty list
-    if (any(models %>% purrr::map_dbl(length) < 2)) {
-      results <- "rma function failed on at least one model"
-    } else {
-      results <- models %>% {
-        tibble::tibble(
-          ci_lb = purrr::map_dbl(., "ci.lb"),
-          ci_ub = purrr::map_dbl(., "ci.ub"),
-          i2 = purrr::map_dbl(., "I2"),
-          tau2 = purrr::map_dbl(., "tau2"),
-          effect = purrr::map_dbl(., "b"),
-          effect_type = names(.)
-        )
-      } %>%
-        dplyr::full_join(true_effect, by = "effect_type") %>%
-        dplyr::mutate(in_ci = ci_lb <= true_effect &
-                        true_effect <= ci_ub,
-                      bias = true_effect - effect)
     }
+
+
+  # extract the models that ran
+  models <- model_results %>%
+    dplyr::filter(!(is.character(rma) & is.character(fe))) %>%
+    dplyr::mutate(results = map2(
+      rma,
+      fe,
+      .f =
+        function(rma, fe) {
+          if (is.list(rma))
+            return (rma)
+          else
+            return(fe)
+        }
+    ),) %>%
+    select(-rma, -fe)
+
+
+  # probably can join this into a pipe later
+  results <- models %>%
+    pluck("results") %>%
+    map_df(metabroom::tidy) %>%
+    mutate(
+      method = models %>% pluck("results") %>% map_chr("method"),
+      measure = models$measure
+    ) %>%
+    full_join(true_effect, by = "measure") %>%
+    mutate(coverage = ci_lb < true_effect & true_effect < ci_ub,
+           bias = true_effect - effect)
   }
 
-  return(results)
+  # extract errors
+  errors <- model_results %>%
+    dplyr::filter(is.character(rma) & is.character(fe))
+
+  return(list(results = results, errors = errors))
+
 }

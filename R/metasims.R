@@ -44,9 +44,9 @@ metasims <- function(dist_tribble =
             " simulations of ", trials, " trials\n"))
 
   # set progress bar
-  pb <- txtProgressBar(min = 0,
-                       max = nrow(simpars),
-                       style = 3)
+  # pb <- txtProgressBar(min = 0,
+  #                      max = nrow(simpars),
+  #                      style = 3)
 
   # intialise results
   results <- vector("list", length = nrow(simpars))
@@ -54,7 +54,7 @@ metasims <- function(dist_tribble =
   # loop through simuations
   # this is possibly an application for rap::
   for (i in 1:nrow(simpars)) {
-    results[[i]] <-  # toss(
+    results[[i]] <-
       metasim(
         tau = simpars$between_study_variation[[i]],
         median_ratio = simpars$median_ratio[[i]],
@@ -65,21 +65,20 @@ metasims <- function(dist_tribble =
         true_effect = simpars$true_median[[i]],
         id = simpars$id[[i]],
         trial_fn = metatrial,
-        trials = trials
-      # )
+        trials = trials      # )
     )
+    cat(paste("simulation", i, "\n"))
 
-    setTxtProgressBar(pb, i)
+    # setTxtProgressBar(pb, i)
   }
 
-  return(results)
+  # transform list of results to df with sim parameters
+  results_df <- results # %>%
+    # purrr::pluck("results_summary") %>%
+    # dplyr::bind_rows() %>%
+    # dplyr::full_join(simpars, by = "id")
 
-  # # transform list of results to df with sim parameters
-  # results_df <- results %>%
-  #   dplyr::bind_rows() %>%
-  #   dplyr::full_join(simpars, by = "id")
-  #
-  # # output of function
-  # return(results_df)
+  # output of function
+  return(results_df)
 
 }

@@ -4,9 +4,10 @@
 \alias{toss}
 \title{Toss away bad simulated data}
 \usage{
-toss(code, silent = FALSE)
+toss(code, error_msg = NULL, warning_msg = NULL)
 }
 \description{
-This function (hopefully) will toss away crappy stuff from the
-\code{\link{metatrial}} and metasim functions.
+This function returns a function's output if the function runs, or allows the
+user to customise the error and warning messages if the function throws
+either.
 }

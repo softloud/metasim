@@ -1,0 +1,41 @@
+---
+title: "meta-analysis toy examples"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+
+```{r messages=FALSE}
+# packages
+library(tidyverse)
+library(metafor)
+ 
+```
+
+
+These three examples come from `metafor::`'s [convergence documentation](http://www.metafor-project.org/doku.php/tips:convergence_problems_rma).
+
+```{r metafor convergent}
+
+
+metafor_converge = list(
+  convergent = data.frame(
+  yi = c(-0.47, -1.56, 0.18, 0.88, 0.74, 0.89, -0.05, 0.52, 2.08, 0.81),
+  vi = c(0.663, 0.660, 0.125, 0.068, 0.971, 0.094, 0.509, 0.887, 0.704, 0.556)
+),
+long_converge = data.frame(
+  yi = c(1.30, 1.94, 0.70, 0.36, 1.31, 0.46, 1.24, 0.71, 0.35, 0.77),
+  vi = c(0.640, 0.421, 0.992, 0.058, 0.756, 0.634, 0.79, 0.596, 0.457, 0.935)
+),
+adj_step = data.frame(
+  yi = c(0.38, 0.58, -0.90, 0.32, -0.15, -0.29, 1.13, 0.39, 0.45, 0.11),
+  vi = c(0.599, 0.431, 0.793, 0.599, 0.483, 0.478, 0.054, 0.453, 0.772, 0.216)
+))
+
+usethis::use_data(metafor_converge, overwrite = TRUE)
+
+```
+

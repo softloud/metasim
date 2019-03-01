@@ -1,26 +1,31 @@
-# could not get this to play nice
-# rma_safely <- purrr::safely(metafor::rma)
-#
-# one of emily's fabulous contributions, thank you, emily!
-
 #' Toss away bad simulated data
 #'
-#' This function (hopefully) will toss away crappy stuff from the
-#' \code{\link{metatrial}} and metasim functions.
+#' This function returns a function's output if the function runs, or allows the
+#' user to customise the error and warning messages if the function throws
+#' either.
+#'
+#' @example
+#'
+#' sum(c(1, 2, 3))
+#'
+#' # an element of wrong type will cause sum to throw an error
+#' \dontrun{
+#' sum(c(1, 2, "a"))
+#' }
+#'
+#' # toss returns function output if function runs
+#' toss(sum(c(1, 2, 3)))
+#'
+#' # toss returns NULL by default if function does not run
+#' toss(sum(c(1, 2, "a")))
+#'
+#' # toss allows you to customise the error message
+#' toss(sum(c(1, 2, "a")), error_msg = "the cake is a lie")
 #'
 #' @export
 
 toss <- function(code, error_msg = NULL, warning_msg = NULL) {
-  # function(code, silent = FALSE) {
-  # tryCatch(
-  #   code,
-  #   error = function(c) { # message c is the error message
-  #     msg <- conditionMessage(c)
-  #     if (!silent)
-  #       message(c)
-  #     invisible(structure(msg, class = "try-error"))
-  #   }
-  # )
+
   tryCatch(
     expr = {
       code
