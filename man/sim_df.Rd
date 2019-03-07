@@ -5,9 +5,10 @@
 \title{generate simulation parameter dataframe}
 \usage{
 sim_df(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
-  50, sd = 0.2), "exp", list(rate = 2)), k = c(3, 7, 50),
-  between_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
-  prop = 0.3)
+  67, sd = 0.3), "exp", list(rate = 3), "pareto", list(shape = 3, scale =
+  3), "pareto", list(shape = 2, scale = 1), "lnorm", list(mean = 44, sd =
+  0.3)), k = c(3, 7, 50), between_study_variation = seq(0, 0.4, 0.2),
+  median_ratio = c(1, 1.2), prop = 0.3)
 }
 \arguments{
 \item{dist_tribble}{A \code{\link{tibble::tribble}}

@@ -1,53 +1,42 @@
-#' one trial
-#'
-#' @inheritParams sim_stats
-#' @param knha Knapp-Hartung test instead of the
-#' default "z" test in `metafor::rma`.
-#'
-#' @import metafor
-#' @import purrr
-#' @import tibble
-#' @import dplyr
-#' @import assertthat
-#'
-#' @export
 
-metatrial <- function(tau = 0.6,
+
+unsafe_metatrial <- function(tau = 0.6,
                       median_ratio = 1.2,
                       rdist = "norm",
                       parameters = list(mean = 50, sd = 0.2),
                       n_df = sim_n(k = 3),
                       knha = TRUE,
                       true_effect = 50) {
+
   # calculate true effects
   true_effect <-  tibble::tibble(
     measure = c("m", "md", "lr"),
     true_effect = c(
       true_effect,
-      abs(true_effect * median_ratio - true_effect),
+      true_effect * median_ratio - true_effect,
       log(median_ratio)
     )
   )
 
   # check that true effects are non-negative
-  assertthat::assert_that(all(true_effect$true_effect >= 0),
-                          msg =
-                            "haven't coded this for negative true effects yet")
+  # assertthat::assert_that(all(true_effect$true_effect > 0),
+  #                         msg =
+  #                           "haven't coded this for negative true effects yet")
 
 
   # simulate data
   # todo: this is where a safely/collateral thing might be good
-  metadata <- toss(
-    sim_stats(
+  metadata <- sim_stats(
       n_df = n_df,
       rdist = rdist,
       par = parameters,
       tau = tau,
       median_ratio = median_ratio
-    ),
-    error_msg = "sim_stats threw an error",
-    warning_msg = "sim_stats threw a warning"
-  )
+    )
+
+  # assertthat::assert_that(metadata %>% nrow() > 2,
+  #                         msg = "metadata does not have 2 rows;
+  #                         failed to sample data.")
 
   # return error if sample couldn't be generated
   # Q: Why doesn't this assert work as I think it should?
@@ -55,10 +44,6 @@ metatrial <- function(tau = 0.6,
   #   is.null(metadata),
   #   msg = "distribution and parameters failed to sample")
 
-  if (is.character(metadata)) {
-    # this is a hack to get around the above assert not working
-    results <- metadata
-  } else {
     groups <- metadata %>%
       dplyr::mutate(median_se = purrr::pmap_dbl(
         list(
@@ -87,7 +72,8 @@ metatrial <- function(tau = 0.6,
         dplyr::select(-n,-group) %>%
         dplyr::rename(effect = median,
                       effect_se = median_se) %>%
-        dplyr::mutate(effect_type = "m"),
+        dplyr::mutate(effect_type = "m") %>%
+        select(-this_study_error),
 
       # difference of medians
       md = tibble::tibble(
@@ -146,10 +132,13 @@ metatrial <- function(tau = 0.6,
           "rma worked"
         ))
     }
-
-
-  # extract the models that ran
-  models <- model_results %>%
+  #
+  #   # assertthat::assert_that(is.data.frame(model_results),
+  #   #                         msg = "model_results failed to instantiate")
+  #
+  #
+  # # extract the models that ran
+  results_first <- model_results %>%
     dplyr::filter(!(is.character(rma) & is.character(fe))) %>%
     dplyr::mutate(results = map2(
       rma,
@@ -161,12 +150,11 @@ metatrial <- function(tau = 0.6,
           else
             return(fe)
         }
-    ),) %>%
+    )) %>%
     select(-rma, -fe)
 
-
-  # probably can join this into a pipe later
-  results <- models %>%
+   # probably can join this into a pipe later
+  results <- results_first %>%
     pluck("results") %>%
     map_df(metabroom::tidy) %>%
     mutate(
@@ -176,12 +164,26 @@ metatrial <- function(tau = 0.6,
     full_join(true_effect, by = "measure") %>%
     mutate(coverage = ci_lb < true_effect & true_effect < ci_ub,
            bias = true_effect - effect)
-  }
 
-  # extract errors
-  errors <- model_results %>%
+  ma_errors <- model_results %>%
     dplyr::filter(is.character(rma) & is.character(fe))
 
-  return(list(results = results, errors = errors))
-
+  return(list(results = results_first, ma_errors = "ma_errors"))
 }
+
+#' one trial
+#'
+#' @inheritParams sim_stats
+#' @param knha Knapp-Hartung test instead of the
+#' default "z" test in `metafor::rma`.
+#'
+#' @import metafor
+#' @import purrr
+#' @import tibble
+#' @import dplyr
+#' @import assertthat
+#'
+#' @export
+#'
+
+metatrial <- purrr::safely(unsafe_metatrial)

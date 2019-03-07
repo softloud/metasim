@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_stats.R
 \name{sim_stats}
 \alias{sim_stats}
-\title{simulate a meta-analysis dataset}
+\title{Simulate a meta-analysis dataset}
 \usage{
 sim_stats(n_df = sim_n(), wide = FALSE, rdist = "norm",
   par = list(mean = 50, sd = 0.2), tau_sq = 0.4, median_ratio = 1.2)
@@ -20,5 +20,5 @@ such as output by \code{\link{meta_n}}.}
 \item{median_ratio}{ratio of population medians}
 }
 \description{
-simulate a meta-analysis dataset
+Simulate a meta-analysis dataset
 }

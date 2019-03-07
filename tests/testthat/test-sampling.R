@@ -56,3 +56,36 @@ test_that("samples are plausible", {
                        par = list(meanlog = big[[1]], sd = small[1])) %>%
               length, 2)
 })
+
+
+  test_that("sim stats gives non-empty dataframe",{
+
+    expect_is(sim_stats(), "data.frame")
+    expect_gt(sim_stats() %>% nrow(), 2)
+
+    # test distributions
+
+    # norm
+    expect_is(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)), "data.frame")
+    expect_gt(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
+    expect_is(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
+    expect_gt(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
+
+    # lnorm
+    expect_is(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)), "data.frame")
+    expect_gt(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
+    expect_is(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
+    expect_gt(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
+
+    # exp
+    expect_is(sim_stats(rdist = "exp", par = list(rate = 3)), "data.frame")
+    expect_gt(sim_stats(rdist = "exp", par = list(rate = 3)) %>% nrow(), 2)
+    expect_is(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))), "data.frame")
+    expect_gt(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))) %>% nrow(), 2)
+
+    # pareto
+    expect_is(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)), "data.frame")
+    expect_gt(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)) %>% nrow(), 2)
+
+
+  })

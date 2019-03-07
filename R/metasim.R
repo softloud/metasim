@@ -16,21 +16,22 @@ metasim <- function(...,
   results <- purrr::rerun(.n = trials, trial_fn(...))
 
   results_summary <- results  %>%
-    map_df("results")  %>%
-    dplyr::group_by(measure) %>%
-    dplyr::summarise(
-      tau2 = mean(tau2),
-      ci_width = mean(ci_ub - ci_lb),
-      bias = mean(bias),
-      coverage_count = sum(coverage),
-      successful_trials = length(coverage),
-      coverage = coverage_count / successful_trials
-    ) %>%
-    mutate(id = id)
+     pluck("results")   # %>%
+    # keep(is.data.frame)
+    # dplyr::group_by(measure) %>%
+    # dplyr::summarise(
+    #   tau2 = mean(tau2),
+    #   ci_width = mean(ci_ub - ci_lb),
+    #   bias = mean(bias),
+    #   coverage_count = sum(coverage),
+    #   successful_trials = length(coverage),
+    #   coverage = coverage_count / successful_trials
+    # ) %>%
+    # mutate(id = id)
 
   errors <- results %>% map_df("errors") %>% mutate(id = id)
 
-  return(list(results_summary = results_summary,
+  return(list(results_summary = results,
               errors = errors))
 
 }

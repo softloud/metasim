@@ -1,4 +1,4 @@
-#' simulate a meta-analysis dataset
+#' Simulate a meta-analysis dataset
 #'
 #' @param n_df \code{data.frame} of sample sizes,
 #' such as output by \code{\link{meta_n}}.
@@ -107,5 +107,5 @@ sim_stats <- function(n_df = sim_n(),
       dplyr::select(-control, -intervention)
   }
 
-  return(summary_stats %>% arrange(study))
+  return(summary_stats %>% arrange(study, group))
 }
