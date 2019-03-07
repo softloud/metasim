@@ -4,7 +4,7 @@
 #' user to customise the error and warning messages if the function throws
 #' either.
 #'
-#' @example
+#' @examples
 #'
 #' sum(c(1, 2, 3))
 #'

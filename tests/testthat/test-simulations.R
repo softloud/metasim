@@ -24,7 +24,7 @@ prop <- runif(1, 0.1, 0.9)
 between_study_variation <- runif(1, 0.2, 1.5)
 tau <- runif(1, 0.1, 0.8)
 within_study_variation <- runif(1, 0.2, 1.5)
-median_ratio <- runif(1, 0.5, 1.5)
+median_ratio <- runif(1, 1, 2)
 rdist <- "norm"
 parameters <- list(mean = 50, sd = 0.2)
 
@@ -81,7 +81,8 @@ test_that("from user inputs, generate a simulation overview dataframe", {
     sim_df(
       dist_tribble =
         tibble::tribble(
-          ~ dist, ~ par,
+          ~ dist,
+          ~ par,
           "norm",
           list(mean = 50, sd = 0.2),
           "exp",
@@ -102,62 +103,49 @@ test_that("from user inputs, generate a simulation overview dataframe", {
 
 
 
-# test sampling -----------------------------------------------------------
-
-test_that("sim stats gives non-empty dataframe",{
-  expect_is(sim_stats(), "data.frame")
-  expect_gt(sim_stats() %>% nrow(), 2)
-
-  # test distributions
-
-  # norm
-  expect_is(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)), "data.frame")
-  expect_gt(sim_stats(rdist = "norm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
- expect_is(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
-  expect_gt(sim_stats(rdist = "norm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
-
-  # lnorm
-  expect_is(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)), "data.frame")
-  expect_gt(sim_stats(rdist = "lnorm", par = list(mean = 57, sd = 0.2)) %>% nrow(), 2)
-  expect_is(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])), "data.frame")
-  expect_gt(sim_stats(rdist = "lnorm", par = list(mean = big[[1]], sd = small[[1]])) %>% nrow(), 2)
-
-  # exp
-  expect_is(sim_stats(rdist = "exp", par = list(rate = 3)), "data.frame")
-  expect_gt(sim_stats(rdist = "exp", par = list(rate = 3)) %>% nrow(), 2)
-  expect_is(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))), "data.frame")
-  expect_gt(sim_stats(rdist = "exp", par = list(rate = round(big[[1]]))) %>% nrow(), 2)
-
-  # pareto
-  expect_is(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)), "data.frame")
-  expect_gt(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)) %>% nrow(), 2)
-
-
-})
+#
 
 
 # simulations -------------------------------------------------------------
 
 
 test_that("simulation runs over other inputs", {
-  # test defaults work
-  # expect_is(metasim(), "data.frame")
-  # expect_gt(metasim() %>% nrow(), 2)
-  # # test simulation
-  # expect_is(metasim(rdist = "norm",
-  #                   par = list(mean = 67, sd = 0.25)), "data.frame")
-  # expect_is(metasim(rdist = "pareto",
-  #                   par = list(shape = 2, scale = 3)), "data.frame")
-  # expect_is(metasim(rdist = "lnorm",
-  #                   par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
-  # expect_is(metasim(rdist = "exp", par = list(rate = 3)), "data.frame")
-  # expect_is(metasim(median_ratio = 1), "data.frame")
-  # expect_is(metasim(median_ratio = 1.3), "data.frame")
-  # expect_is(metasim(median_ratio = median_ratio), "data.frame")
-  #
-  # expect_is(metasim(tau = 0), "data.frame")
-  # expect_is(metasim(tau = tau), "data.frame")
-  #
+
+
+    # test defaults work
+  expect_is(metasim() %>% pluck("results_summary"), "data.frame")
+  expect_gt(metasim() %>% pluck("results_summary") %>% nrow(), 2)
+
+  # todo: problems
+
+  expect_error(metasim(
+    rdist = "pareto",
+    par = list(shape = 2, scale = 3) %>% pluck("results_summary")
+  ))
+  expect_error(metasim(
+    rdist = "lnorm",
+    par = list(meanlog = 67, sdlog = 0.25) %>%
+      pluck("results_summary")
+  ))
+
+  # test simulation
+
+  expect_is(metasim(rdist = "norm",
+                    par = list(mean = 67, sd = 0.25)), "list")
+  expect_is(metasim(rdist = "exp", par = list(rate = 3)) %>%
+              pluck("results_summary"),
+            "data.frame")
+  # test equal rataios
+  expect_is(metasim(median_ratio = 1) %>% pluck("results_summary"),
+            "data.frame")
+  expect_is(metasim(median_ratio = 1.3) %>% pluck("results_summary"),
+            "data.frame")
+  expect_is(metasim(median_ratio = median_ratio) %>% pluck("results_summary"),
+            "data.frame")
+  # test tau values
+  expect_is(metasim(tau = 0)%>% pluck("results_summary"), "data.frame")
+  expect_is(metasim(tau = tau) %>% pluck("results_summary"), "data.frame")
+
   # # check that coverage probability is above 0.9.
   # expect_gt(metasim(trials = 100) %>%
   #           pluck("cp") %>%
