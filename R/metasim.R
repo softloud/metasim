@@ -15,8 +15,8 @@ metasim <- function(...,
                     trials = 4) {
   results <- purrr::rerun(.n = trials, trial_fn(...))
 
-  results_summary <- results  %>%
-     pluck("results")   # %>%
+  results_summary <- results #  %>%
+    # purrr::map_df(1, "result", "results")   # %>%
     # keep(is.data.frame)
     # dplyr::group_by(measure) %>%
     # dplyr::summarise(
@@ -31,7 +31,8 @@ metasim <- function(...,
 
   errors <- results %>% map_df("errors") %>% mutate(id = id)
 
-  return(list(results_summary = results,
-              errors = errors))
+  return(list(results = results,
+              errors = errors,
+              results_summary = results_summary))
 
 }
