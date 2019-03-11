@@ -60,7 +60,7 @@ sim_stats <- function(n_df = sim_n(),
                       par = par,
                       median_ratio = median_ratio
                     )
-                  ) %>% select(-control_indicator)
+                  ) %>% dplyr::select(-control_indicator)
 
   if (!is.data.frame(samples) | nrow(samples) <= 1) {
     summary_stats <- NULL
@@ -107,5 +107,5 @@ sim_stats <- function(n_df = sim_n(),
       dplyr::select(-control, -intervention)
   }
 
-  return(summary_stats %>% arrange(study, group))
+  return(summary_stats %>% dplyr::arrange(study))
 }

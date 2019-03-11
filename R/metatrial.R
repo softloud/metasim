@@ -97,7 +97,7 @@ unsafe_metatrial <- function(tau = 0.6,
 
     # meta-analyse with rma or fe
     model_results <- models %>% {
-      tibble(measure = names(.),
+      tibble::tibble(measure = names(.),
              rma = purrr::map(., function(ma_df) {
                if (knha == TRUE)
                  # default to Knapp-Hartung test
@@ -116,7 +116,7 @@ unsafe_metatrial <- function(tau = 0.6,
                  warning_msg = "metafor::rma reml threw a warning"
                )
              })) %>%
-        mutate(fe = if_else(
+        dplyr::mutate(fe = if_else(
           is.character(rma),
           toss(
             metafor::rma(
@@ -151,15 +151,15 @@ unsafe_metatrial <- function(tau = 0.6,
             return(fe)
         }
     )) %>%
-    select(-rma, -fe)
+    dplyr::select(-rma, -fe)
 
    # probably can join this into a pipe later
   results <- results_first %>%
-    pluck("results") %>%
+    purrr::pluck("results") %>%
     map_df(metabroom::tidy) %>%
-    mutate(
-      method = models %>% pluck("results") %>% map_chr("method"),
-      measure = models$measure
+     mutate(
+      method = results_first %>% pluck("results") %>% map_chr("method"),
+      measure = results_first %>% pluck("measure")
     ) %>%
     full_join(true_effect, by = "measure") %>%
     mutate(coverage = ci_lb < true_effect & true_effect < ci_ub,
@@ -168,8 +168,12 @@ unsafe_metatrial <- function(tau = 0.6,
   ma_errors <- model_results %>%
     dplyr::filter(is.character(rma) & is.character(fe))
 
-  return(list(results = results_first, ma_errors = "ma_errors"))
+  return(list(results = results, ma_errors = ma_errors))
 }
+
+# then make it safe
+safely_metatrial <- purrr::safely(unsafe_metatrial)
+
 
 #' one trial
 #'
@@ -186,4 +190,13 @@ unsafe_metatrial <- function(tau = 0.6,
 #' @export
 #'
 
-metatrial <- purrr::safely(unsafe_metatrial)
+metatrial <- function(...){
+  safely_metatrial(...) %>% {
+    list(
+      results = pluck(., "result", "results"),
+      errors = list(
+        model = pluck(., "result", "ma_errors"),
+        safely = pluck(., "error")
+      )
+      )}
+}
