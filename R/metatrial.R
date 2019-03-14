@@ -1,6 +1,6 @@
 
 
-unsafe_metatrial <- function(tau = 0.6,
+unsafe_metatrial <- function(tau_sq = 0.6,
                       median_ratio = 1.2,
                       rdist = "norm",
                       parameters = list(mean = 50, sd = 0.2),
@@ -30,7 +30,7 @@ unsafe_metatrial <- function(tau = 0.6,
       n_df = n_df,
       rdist = rdist,
       par = parameters,
-      tau = tau,
+      tau_sq = tau,
       median_ratio = median_ratio
     )
 
