@@ -5,7 +5,7 @@
 \title{simulate over all}
 \usage{
 metasims(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
-  67, sd = 0.3), "exp", list(rate = 3)), k = c(3, 7, 50),
+  67, sd = 0.3), "exp", list(rate = 2)), k = c(3, 7, 50),
   between_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
   prop = 0.3, trials = 10, trial_fn = metatrial)
 }

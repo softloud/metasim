@@ -36,6 +36,13 @@ sim_sample <- function(n = 18,
   assertthat::assert_that(is.numeric(median_ratio),
                           msg = "median_ratio needs to be a numeric")
 
+  # set up sign for different arms
+  beta <- if (control == TRUE) {
+    -1
+  } else {
+    1
+  }
+
   if (rdist == "norm") {
     # set value of first parameter to ensure median ratio
     par_1 <-
@@ -45,7 +52,7 @@ sim_sample <- function(n = 18,
       par[[1]]
 
     # generate sample
-    return(rnorm(n, mean = par_1 * exp(this_study_error), sd = par[[2]]))
+    return(rnorm(n, mean = par_1 * exp(beta * this_study_error), sd = par[[2]]))
 
   } else if (rdist == "lnorm") {
     # set value of first parameter to ensure median ratio
@@ -56,29 +63,31 @@ sim_sample <- function(n = 18,
       par[[1]]
 
     # generate sample
-    return(rlnorm(n, par_1 + this_study_error , par[[2]]))
+    return(rlnorm(n, par_1 + beta * this_study_error , par[[2]]))
 
   } else if (rdist == "pareto") {
     # set value of first parameter to ensure median ratio
-    par_1 <-
-      if (control == FALSE)
-        par[[1]] * median_ratio
-    else
+    par_1 <- if (control == FALSE) {
+      par[[1]] * median_ratio
+    } else {
       par[[1]]
+    }
 
     # generate sample
-    return(actuar::rpareto2(n, par_1 * exp(this_study_error), par[[2]]))
+    return(actuar::rpareto2(n, par_1 * exp(beta * this_study_error), par[[2]]))
 
   } else if (rdist == "exp") {
     # set value of first parameter to ensure median ratio
-    par_1 <-
-      if (control == FALSE)
-        par[[1]] / median_ratio
-    else
+    par_1 <- if (control == FALSE) {
+      par[[1]] / median_ratio
+    } else {
       par[[1]]
+    }
 
     # generate sample
-    return(toss(rexp(n, par_1 * exp(this_study_error))))
+    return(toss(rexp(n, par_1 * exp(
+      beta * this_study_error
+    ))))
   }
 
 }

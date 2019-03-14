@@ -8,7 +8,7 @@ metatrial(...)
 }
 \arguments{
 \item{knha}{Knapp-Hartung test instead of the
-default "z" test in `metafor::rma`.}
+default "z" test in \code{metafor::rma}.}
 }
 \description{
 one trial
