@@ -7,12 +7,11 @@
 #'
 #' @import tibble
 #' @export
-
 metasims <- function(dist_tribble =
                        tibble::tribble(
                          ~ dist, ~ par,
                          "norm", list(mean = 67, sd = 0.3),
-                         "exp", list(rate = 3) #,
+                         "exp", list(rate = 2) #,
                          # "pareto" ,
                          # list(shape = 3, scale = 3),
                          # "pareto",
@@ -65,17 +64,20 @@ metasims <- function(dist_tribble =
         id = simpars$id[[i]],
         trial_fn = metatrial,
         trials = trials      # )
-    )
+    ) %>% pluck("results_summary")
     cat(paste("simulation", i, "\n"))
 
     # setTxtProgressBar(pb, i)
   }
 
   # transform list of results to df with sim parameters
-  results_df <- results # %>%
+  results_df <- simpars %>%
+    mutate(results = results)# %>%
     # purrr::pluck("results_summary") %>%
     # dplyr::bind_rows() %>%
     # dplyr::full_join(simpars, by = "id")
+
+
 
   # output of function
   return(results_df)

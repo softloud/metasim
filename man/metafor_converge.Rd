@@ -6,8 +6,8 @@
 \title{metafor convergence examples}
 \format{A dataframe.
 \describe{
-  \item{yi}{effect}
-  \item{vi}{variance of the effect}
+\item{yi}{effect}
+\item{vi}{variance of the effect}
 }}
 \source{
 {www.metafor-project.org/doku.php/tips:convergence_problems_rmaa}
