@@ -52,7 +52,11 @@ sim_sample <- function(n = 18,
       par[[1]]
 
     # generate sample
-    return(rnorm(n, mean = par_1 * exp(beta * this_study_error), sd = par[[2]]))
+    return(rnorm(
+      n,
+      mean = par_1 * exp(beta * this_study_error),
+      sd = par[[2]]
+    ))
 
   } else if (rdist == "lnorm") {
     # set value of first parameter to ensure median ratio
@@ -85,9 +89,7 @@ sim_sample <- function(n = 18,
     }
 
     # generate sample
-    return(toss(rexp(n, par_1 * exp(
-      beta * this_study_error
-    ))))
+    return(rexp(n, par_1 * exp(beta * this_study_error)))
   }
 
 }

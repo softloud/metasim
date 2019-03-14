@@ -17,7 +17,7 @@
 sim_df <- function(dist_tribble =
                      tibble::tribble(
                        ~ dist, ~ par,
-                       "norm", list(mean = 67, sd = 0.3)#,
+                       "norm", list(mean = 50, sd = 0.2)#,
                        # "exp",
                        # list(rate = 3)# ,
                        # "pareto",

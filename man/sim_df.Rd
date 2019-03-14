@@ -5,7 +5,7 @@
 \title{generate simulation parameter dataframe}
 \usage{
 sim_df(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
-  67, sd = 0.3)), k = c(3, 7, 20), between_study_variation = seq(0,
+  50, sd = 0.2)), k = c(3, 7, 20), between_study_variation = seq(0,
   0.4, 0.2), median_ratio = c(1, 1.2), prop = 0.3)
 }
 \arguments{
