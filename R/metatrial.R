@@ -25,12 +25,11 @@ unsafe_metatrial <- function(tau_sq = 0.6,
 
 
   # simulate data
-  # todo: this is where a safely/collateral thing might be good
   metadata <- sim_stats(
       n_df = n_df,
       rdist = rdist,
       par = parameters,
-      tau_sq = tau,
+      tau_sq = tau_sq,
       median_ratio = median_ratio
     )
 
