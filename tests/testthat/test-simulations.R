@@ -30,14 +30,15 @@ parameters <- list(mean = 50, sd = 0.2)
 
 testdf <- sim_df(
   dist_tribble =
-    tibble::tribble(~ dist,  ~ par,
-                    "norm", list(mean = 50, sd = 0.2),
-                    "exp", list(rate = 2)),
+    tibble::tribble( ~ dist,  ~ par,
+                     "norm", list(mean = 50, sd = 0.2),
+                     "exp", list(rate = 2)),
   k = c(3, 7, 20),
   between_study_variation = seq(0, 0.4, 0.2),
   median_ratio = c(1, 1.2),
   prop = 0.3
 )
+
 
 # initialise simulations --------------------------------------------------
 
@@ -110,9 +111,7 @@ test_that("from user inputs, generate a simulation overview dataframe", {
 
 
 test_that("simulation runs over other inputs", {
-
-
-    # test defaults work
+  # test defaults work
   expect_is(metasim() %>% pluck("results_summary"), "data.frame")
   expect_gt(metasim() %>% pluck("results_summary") %>% nrow(), 2)
 
@@ -143,7 +142,7 @@ test_that("simulation runs over other inputs", {
   expect_is(metasim(median_ratio = median_ratio) %>% pluck("results_summary"),
             "data.frame")
   # test tau values
-  expect_is(metasim(tau = 0)%>% pluck("results_summary"), "data.frame")
+  expect_is(metasim(tau = 0) %>% pluck("results_summary"), "data.frame")
   expect_is(metasim(tau = tau) %>% pluck("results_summary"), "data.frame")
 
   # # check that coverage probability is above 0.9.
