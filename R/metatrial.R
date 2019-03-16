@@ -10,10 +10,9 @@ unsafe_metatrial <- function(tau_sq = 0.6,
 
   # calculate true effects
   true_effect <-  tibble::tibble(
-    measure = c("m", "md", "lr"),
+    measure = c("m", "lr"),
     true_effect = c(
       true_effect,
-      true_effect * median_ratio - true_effect,
       log(median_ratio)
     )
   )
@@ -73,14 +72,6 @@ unsafe_metatrial <- function(tau_sq = 0.6,
                       effect_se = median_se) %>%
         dplyr::mutate(effect_type = "m") %>%
         select(-this_study_error),
-
-      # difference of medians
-      md = tibble::tibble(
-        study = paste0("study_", seq(1, nrow(control))),
-        effect = abs(intervention$median - control$median),
-        effect_se = sqrt(control$median_se ^ 2 + intervention$median_se ^ 2),
-        effect_type = "md"
-      ),
 
       # log-ratio of medians
       lr = tibble::tibble(
