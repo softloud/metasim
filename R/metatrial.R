@@ -1,201 +1,91 @@
-
-
-unsafe_metatrial <- function(tau_sq = 0.6,
-                      median_ratio = 1.2,
-                      rdist = "norm",
-                      parameters = list(mean = 50, sd = 0.2),
-                      n_df = sim_n(k = 3),
-                      knha = TRUE,
-                      true_effect = 50) {
-
-  # calculate true effects
-  true_effect <-  tibble::tibble(
-    measure = c("m", "md", "lr"),
-    true_effect = c(
-      true_effect,
-      true_effect * median_ratio - true_effect,
-      log(median_ratio)
-    )
-  )
-
-  # check that true effects are non-negative
-  # assertthat::assert_that(all(true_effect$true_effect > 0),
-  #                         msg =
-  #                           "haven't coded this for negative true effects yet")
-
-
-  # simulate data
-  metadata <- sim_stats(
-      n_df = n_df,
-      rdist = rdist,
-      par = parameters,
-      tau_sq = tau_sq,
-      median_ratio = median_ratio
-    )
-
-  # assertthat::assert_that(metadata %>% nrow() > 2,
-  #                         msg = "metadata does not have 2 rows;
-  #                         failed to sample data.")
-
-  # return error if sample couldn't be generated
-  # Q: Why doesn't this assert work as I think it should?
-  # assertthat::assert_that(
-  #   is.null(metadata),
-  #   msg = "distribution and parameters failed to sample")
-
-    groups <- metadata %>%
-      dplyr::mutate(median_se = purrr::pmap_dbl(
-        list(
-          centre = median,
-          spread = iqr,
-          n = n,
-          centre_type = "median",
-          spread_type = "iqr"
-        ),
-        .f = varameta::effect_se
-      )) %>%
-      dplyr::select(-min,-max,-mean,-sd, -first_q,-third_q,-iqr) %>%
-      dplyr::arrange(study, group)
-
-    # split simulated data into two dfs for easier calculations
-    control <- groups %>%
-      dplyr::filter(group == "control")
-
-    intervention <- groups %>%
-      dplyr::filter(group == "intervention")
-
-    # calculate effects of interest
-    models <- list(
-      # median
-      m = control %>%
-        dplyr::select(-n,-group) %>%
-        dplyr::rename(effect = median,
-                      effect_se = median_se) %>%
-        dplyr::mutate(effect_type = "m") %>%
-        select(-this_study_error),
-
-      # difference of medians
-      md = tibble::tibble(
-        study = paste0("study_", seq(1, nrow(control))),
-        effect = abs(intervention$median - control$median),
-        effect_se = sqrt(control$median_se ^ 2 + intervention$median_se ^ 2),
-        effect_type = "md"
-      ),
-
-      # log-ratio of medians
-      lr = tibble::tibble(
-        study = paste0("study_", seq(1, nrow(control))),
-        effect = log(intervention$median / control$median),
-        effect_se = sqrt(
-          control$median_se ^ 2 / control$median ^ 2 +
-            intervention$median_se ^ 2 / intervention$median ^ 2
-        ),
-        effect_type = "lr"
-      )
-    )
-
-    # meta-analyse with rma or fe
-    model_results <- models %>% {
-      tibble::tibble(measure = names(.),
-             rma = purrr::map(., function(ma_df) {
-               if (knha == TRUE)
-                 # default to Knapp-Hartung test
-                 test = "knha"
-               else
-                 test = "z"
-
-               toss(
-                 metafor::rma(
-                   test = test,
-                   data = ma_df,
-                   yi = effect,
-                   sei = effect_se
-                 ),
-                 error_msg = "metafor::rma reml threw an error",
-                 warning_msg = "metafor::rma reml threw a warning"
-               )
-             })) %>%
-        dplyr::mutate(fe = if_else(
-          is.character(rma),
-          toss(
-            metafor::rma(
-              method = "FE",
-              test = test,
-              data = ma_df,
-              yi = effect,
-              sei = effect_se
-            ),
-            error_msg = "metafor::rma fe threw an error",
-            warning_msg = "metafor::rma fe threw a warning"
-          ),
-          "rma worked"
-        ))
-    }
-  #
-  #   # assertthat::assert_that(is.data.frame(model_results),
-  #   #                         msg = "model_results failed to instantiate")
-  #
-  #
-  # # extract the models that ran
-  results_first <- model_results %>%
-    dplyr::filter(!(is.character(rma) & is.character(fe))) %>%
-    dplyr::mutate(results = map2(
-      rma,
-      fe,
-      .f =
-        function(rma, fe) {
-          if (is.list(rma))
-            return (rma)
-          else
-            return(fe)
-        }
-    )) %>%
-    dplyr::select(-rma, -fe)
-
-   # probably can join this into a pipe later
-  results <- results_first %>%
-    purrr::pluck("results") %>%
-    map_df(metabroom::tidy) %>%
-     mutate(
-      method = results_first %>% pluck("results") %>% map_chr("method"),
-      measure = results_first %>% pluck("measure")
-    ) %>%
-    full_join(true_effect, by = "measure") %>%
-    mutate(coverage = ci_lb < true_effect & true_effect < ci_ub,
-           bias = true_effect - effect)
-
-  ma_errors <- model_results %>%
-    dplyr::filter(is.character(rma) & is.character(fe))
-
-  return(list(results = results, ma_errors = ma_errors))
-}
-
-# then make it safe
-safely_metatrial <- purrr::safely(unsafe_metatrial)
-
-
-#' one trial
+#' Generate meta-analysis data and calculate estimator
 #'
+#' Simulate data based on simulation parameters and meta-analyse.
+#'
+#' @param true_effect The value of the control population median.
 #' @inheritParams sim_stats
-#' @param knha Knapp-Hartung test instead of the
-#' default "z" test in `metafor::rma`.
-#'
-#' @import metafor
-#' @import purrr
-#' @import tibble
-#' @import dplyr
-#' @import assertthat
+#' @param test "knha" or "z" for [metafor::rma].
 #'
 #' @export
-#'
 
-metatrial <- function(...){
-  safely_metatrial(...) %>% {
-    list(
-      results = pluck(., "result", "results"),
-      errors = list(
-        model = pluck(., "result", "ma_errors"),
-        safely = pluck(., "error")
-      )
-      )}
-}
+metatrial <- function(true_median = 50,
+                         tau_sq = 0.6,
+                         median_ratio = 1.2,
+                         rdist = "norm",
+                         parameters = list(mean = 50, sd = 0.2),
+                         n_df = sim_n(k = 3),
+                         knha = TRUE,
+                         true_effect = 50,
+                         test = "knha"
+                         ) {
+  # calculate true effects
+  true_effects <- tibble::tibble(measure = c("m", "lr"),
+                                 true_effect = c(true_median,
+                                                  log(median_ratio)))
+
+  # simualte data
+  metadata <- sim_stats(
+    n_df = n_df,
+    rdist = rdist,
+    par = parameters,
+    tau_sq = tau_sq,
+    median_ratio = median_ratio,
+    wide = TRUE
+  ) %>%
+    mutate(
+      median = median_c,
+      median_se = pmap_dbl(
+        list(
+          centre = median_c,
+          spread = iqr_c,
+          n = n_c
+        ),
+        varameta::effect_se,
+        centre_type = "median",
+        spread_type = "iqr"
+      ),
+      median_se_i = pmap_dbl(
+        list(
+          centre = median_i,
+          spread = iqr_i,
+          n = n_i
+        ),
+        varameta::effect_se,
+        centre_type = "median",
+        spread_type = "iqr"
+      ),
+      lr = log(median_i / median_c),
+      lr_se = sqrt(median_se^2 / median^2 + median_se_i / median_i^2)
+    ) %>%
+    select(study, median, median_se, lr, lr_se, median_se_i)
+
+  # meta-analyse
+  m_model <- metamodel(
+    y = metadata$median,
+    se = metadata$median_se
+  )
+
+  lr_model <- metamodel(
+    y = metadata$lr,
+    se = metadata$lr_se
+  )
+
+  # bind together into df of results
+  results <- list(
+    m_model,
+    lr_model
+  ) %>%
+    keep(is.data.frame) %>%
+    bind_rows() %>%
+    mutate(
+      measure = c("m", "lr")
+    ) %>%
+    full_join(true_effects, by = "measure") %>%
+    mutate(
+      coverage = ci_lb < true_effect & true_effect < ci_ub,
+      # can't scale bc log(1) = 0
+      bias = true_effect - effect
+    )
+
+  return(results)
+  }

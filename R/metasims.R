@@ -1,32 +1,32 @@
 #' simulate over all
 #'
 #' @param k Simulate for different numbers of studies.
-#' @param between_study_variation tau
-#' @param within_study_variation epsilon
-#' @param prop proportion of sample size we expect to cohorts to vary by most of the time
+#' @param between_study_variation Variance \eqn{tau^2} associated with the random effect \eqn{\gamma_k} describing the deviation of the \eqn{k)th study's results.
+#' @param prop Proportion of sample size we expect to cohorts to vary by most of the time
+#' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
 #'
 #' @import tibble
 #' @export
 metasims <- function(dist_tribble =
-                       tibble::tribble(
-                         ~ dist, ~ par,
-                         "norm", list(mean = 67, sd = 0.3),
-                         "exp", list(rate = 2) #,
-                         # "pareto" ,
-                         # list(shape = 3, scale = 3),
-                         # "pareto",
-                         # list(shape = 2, scale = 1),
-                         # "pareto",
-                         # list(shape = 0.5, scale = 1),
-                         # "lnorm",
-                         # list(mean = 44, sd = 0.3)
-                       ),
-                     k = c(3, 7, 50),
+                       tibble::tribble( ~ dist, ~ par,
+                                        #"norm", list(mean = 67, sd = 0.3),
+                                        "exp", list(rate = 2)),
+                     #,
+                     # "pareto" ,
+                     # list(shape = 3, scale = 3),
+                     # "pareto",
+                     # list(shape = 2, scale = 1),
+                     # "pareto",
+                     # list(shape = 0.5, scale = 1),
+                     # "lnorm",
+                     # list(mean = 44, sd = 0.3)),
+                     k = c(3, 7, 10),
                      between_study_variation = seq(0, 0.4, 0.2),
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
                      trials = 10,
                      trial_fn = metatrial) {
+  safe_trial_fn <- purrr::safely(trial_fn)
 
   # set up simulation parameters
   simpars <- sim_df(
@@ -37,9 +37,13 @@ metasims <- function(dist_tribble =
     prop = prop
   )
 
-  cat(paste("performing ",
-            nrow(simpars),
-            " simulations of ", trials, " trials\n"))
+  cat(paste(
+    "performing ",
+    nrow(simpars),
+    " simulations of ",
+    trials,
+    " trials\n"
+  ))
 
   # set progress bar
   # pb <- txtProgressBar(min = 0,
@@ -47,7 +51,8 @@ metasims <- function(dist_tribble =
   #                      style = 3)
 
   # intialise results
-  results <- vector("list", length = nrow(simpars))
+  results <-
+    vector("list", length = nrow(simpars))
 
   # loop through simuations
   # this is possibly an application for rap::
@@ -62,9 +67,9 @@ metasims <- function(dist_tribble =
         knha = TRUE,
         true_effect = simpars$true_median[[i]],
         id = simpars$id[[i]],
-        trial_fn = metatrial,
+        trial_fn = safe_trial_fn,
         trials = trials      # )
-    ) %>% pluck("results_summary")
+      ) %>% pluck("results_summary")
     cat(paste("simulation", i, "\n"))
 
     # setTxtProgressBar(pb, i)
@@ -72,10 +77,7 @@ metasims <- function(dist_tribble =
 
   # transform list of results to df with sim parameters
   results_df <- simpars %>%
-    mutate(results = results)# %>%
-    # purrr::pluck("results_summary") %>%
-    # dplyr::bind_rows() %>%
-    # dplyr::full_join(simpars, by = "id")
+    full_join(results, by = "id")
 
 
 

@@ -14,7 +14,7 @@ with one column for distribution, and one column for the parameters}
 
 \item{k}{number of studies, defaults to 3}
 
-\item{between_study_variation}{tau}
+\item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
 \item{prop}{proportion of n we expect}
 }
