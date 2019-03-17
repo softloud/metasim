@@ -16,15 +16,23 @@ metamodel <- function(
 ){
 
   # try a re model; may fail to converge.
-  rma <- try(metafor::rma(yi = y,  sei = se, test = test, data = data))
+  rma <- try(
+    metafor::rma(yi = y,  sei = se, test = test, data = data) %>%
+      metabroom::tidy() %>%
+      mutate(method = "REML")
+             )
 
 
   # return re if or calculate fe
   if (
-    "rma" %in% class(rma)
+    "data.frame" %in% class(rma)
   ) {
     rma
   } else {
-    try(metafor::rma(yi = y, sei = se, method = "FE", data = data))
+    try(
+      metafor::rma(yi = y, sei = se, method = "FE", data = data) %>%
+        metabroom::tidy() %>%
+        mutate(method = "FE")
+      )
   }
 }

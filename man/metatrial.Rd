@@ -2,14 +2,25 @@
 % Please edit documentation in R/metatrial.R
 \name{metatrial}
 \alias{metatrial}
-\title{one trial}
+\title{Generate meta-analysis data and calculate estimator}
 \usage{
-metatrial(...)
+metatrial(true_median = 50, tau_sq = 0.6, median_ratio = 1.2,
+  rdist = "norm", parameters = list(mean = 50, sd = 0.2),
+  n_df = sim_n(k = 3), knha = TRUE, true_effect = 50,
+  test = "knha")
 }
 \arguments{
-\item{knha}{Knapp-Hartung test instead of the
-default "z" test in \code{metafor::rma}.}
+\item{median_ratio}{ratio of population medians}
+
+\item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
+
+\item{n_df}{\code{data.frame} of sample sizes,
+such as output by \code{\link{meta_n}}.}
+
+\item{true_effect}{The value of the control population median.}
+
+\item{test}{"knha" or "z" for \link[metafor:rma]{metafor::rma}.}
 }
 \description{
-one trial
+Simulate data based on simulation parameters and meta-analyse.
 }

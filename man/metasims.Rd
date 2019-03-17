@@ -4,19 +4,17 @@
 \alias{metasims}
 \title{simulate over all}
 \usage{
-metasims(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
-  67, sd = 0.3), "exp", list(rate = 2)), k = c(3, 7, 50),
-  between_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
-  prop = 0.3, trials = 10, trial_fn = metatrial)
+metasims(dist_tribble = tibble::tribble(~dist, ~par, "exp", list(rate =
+  2)), k = c(3, 7, 10), between_study_variation = seq(0, 0.4, 0.2),
+  median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
+  trial_fn = metatrial)
 }
 \arguments{
 \item{k}{Simulate for different numbers of studies.}
 
-\item{between_study_variation}{tau}
+\item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
-\item{prop}{proportion of sample size we expect to cohorts to vary by most of the time}
-
-\item{within_study_variation}{epsilon}
+\item{prop}{Proportion of sample size we expect to cohorts to vary by most of the time}
 }
 \description{
 simulate over all
