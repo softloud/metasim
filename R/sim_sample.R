@@ -18,22 +18,22 @@ sim_sample <- function(n = 18,
                        control = TRUE,
                        median_ratio = 1.2) {
   # check inputs are valid
-  assertthat::assert_that(length(par) <= 2,
+  assert_that(length(par) <= 2,
                           msg = "haven't coded this
                           for more than two parameters")
-  assertthat::assert_that(rdist %in% c("exp", "norm", "lnorm", "pareto"),
+  assert_that(rdist %in% c("exp", "norm", "lnorm", "pareto"),
                           msg = "choose exp, norm, lnorm, and pareto")
-  assertthat::assert_that(is.numeric(n),
+  assert_that(is.numeric(n),
                           length(n) == 1,
                           round(n) == n,
                           msg = "n argument requires an integer")
-  assertthat::assert_that(is.numeric(this_study_error),
+  assert_that(is.numeric(this_study_error),
                           length(this_study_error) == 1,
                           msg = "this_study_error should requires a number")
-  assertthat::assert_that(is.logical(control),
+  assert_that(is.logical(control),
                           msg = "control argument needs to be a logical
                           indicating if in control group")
-  assertthat::assert_that(is.numeric(median_ratio),
+  assert_that(is.numeric(median_ratio),
                           msg = "median_ratio needs to be a numeric")
 
   # set up sign for different arms

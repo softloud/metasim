@@ -18,6 +18,7 @@ metatrial <- function(true_median = 50,
                          true_effect = 50,
                          test = "knha"
                          ) {
+
   # calculate true effects
   true_effects <- tibble::tibble(measure = c("m", "lr"),
                                  true_effect = c(true_median,

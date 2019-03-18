@@ -5,8 +5,8 @@
 \title{simulate over all}
 \usage{
 metasims(dist_tribble = tibble::tribble(~dist, ~par, "exp", list(rate =
-  2)), k = c(3, 7, 10), between_study_variation = seq(0, 0.4, 0.2),
-  median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
+  2)), k = c(3, 7, 10), between_study_variation = seq(from = 0, to =
+  0.4, by = 0.2), median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
   trial_fn = metatrial)
 }
 \arguments{

@@ -14,8 +14,9 @@ metasim <- function(...,
                     trial_fn = metatrial,
                     trials = 4) {
 
+  safe_trial_fn <- purrr::safely(trial_fn)
 
-  results <- purrr::rerun(.n = trials, trial_fn(...))
+  results <- purrr::rerun(.n = trials, safe_trial_fn(...))
 
   results_df <- results  %>%
     transpose() %>%
