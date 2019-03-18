@@ -63,7 +63,9 @@ sim_df <- function(dist_tribble =
                       parameters,
                       .f = function(rdist, parameters) {
                         if (rdist == "pareto") {
-                          actuar::qpareto2(0.5, shape = parameters[[1]], scale = parameters[[2]])
+                          actuar::qpareto2(0.5,
+                                           shape = parameters[[1]],
+                                           scale = parameters[[2]])
                         } else {
                           density_fn(
                             distribution = rdist,

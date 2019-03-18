@@ -17,7 +17,7 @@ metamodel <- function(
 
   # try a re model; may fail to converge.
   rma <- try(
-    metafor::rma(yi = y,  sei = se, test = test, data = data) %>%
+    rma(yi = y,  sei = se, test = test, data = data) %>%
       metabroom::tidy() %>%
       mutate(method = "REML")
              )
@@ -30,7 +30,7 @@ metamodel <- function(
     rma
   } else {
     try(
-      metafor::rma(yi = y, sei = se, method = "FE", data = data) %>%
+      rma(yi = y, sei = se, method = "FE", data = data) %>%
         metabroom::tidy() %>%
         mutate(method = "FE")
       )
