@@ -76,12 +76,13 @@ metasims <- function(dist_tribble =
   }
 
   # transform list of results to df with sim parameters
-  # results_df <- simpars %>% full_join(results, by = "id")
+  results_df <- simpars %>% full_join(results %>% bind_rows(), by = "id")
 
 
   # output of function
   return(
-    list(simpars, results)
+    results_df
+    # list(simpars, results)
   )
 
 }

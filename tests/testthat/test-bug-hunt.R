@@ -3,23 +3,15 @@ context("bug hunt")
 set.seed(38)
 
 library(tidyverse)
+library(metasim)
+
+test_that("metasim runs for different n", {
+  expect_is(metasim(), 'data.frame')
+  expect_is(metasim(trials = 100), "data.frame")
+  expect_is(metasim(trials = 1000), "data.frame")
+})
 
 
-test_that("rerun metatrial captures errors", {
-  # different values of n
-  expect_is(purrr::rerun(.n = 10, metatrial(
-  )) %>% bind_rows(),
-  "data.frame")
-
-  expect_is(purrr::rerun(.n = 100, metatrial(
-  )) %>% bind_rows(),
-  "data.frame")
-
-  expect_is(purrr::rerun(.n = 1000, metatrial(
-  )) %>% bind_rows(),
-  "data.frame")
-
-  })
 
 
 test_that("exponential is parsed throughout", {

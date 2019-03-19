@@ -37,11 +37,10 @@ metasim <- function(...,
     transpose() %>%
     purrr::pluck("error")
 
-  return( results_df)
-    # list(     # results = results,
-    #           errors = errors,
-    #           results_summary = results_df)
-    # )
+    list(
+              errors = errors,
+              results_summary = results_df
+    )
 
 
 }
