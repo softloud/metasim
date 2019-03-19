@@ -14,7 +14,12 @@ test_that("rerun metatrial captures errors", {
   expect_is(purrr::rerun(.n = 100, metatrial(
   )) %>% bind_rows(),
   "data.frame")
-})
+
+  expect_is(purrr::rerun(.n = 1000, metatrial(
+  )) %>% bind_rows(),
+  "data.frame")
+
+  })
 
 
 test_that("exponential is parsed throughout", {
@@ -37,7 +42,8 @@ test_that("exponential is parsed throughout", {
   # check sim
   expect_is(purrr::rerun(.n = 10, metatrial(
     rdist = "exp",
-    parameters = list(rate = 3)
+    parameters = list(rate = 3),
+    true_median = log(2) / 3
   )) %>% bind_rows(), "data.frame")
 
 })
