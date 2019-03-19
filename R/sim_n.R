@@ -28,18 +28,21 @@ sim_n <- function(k = 3,
         study_n,
         study_n_sd,
         .f = function(study_n, study_n_sd) {
-          rnorm(1, study_n, study_n_sd) %>% round() %>% as.integer()
+          rnorm(1, study_n, study_n_sd) %>% round() %>% abs() %>% as.integer()
         }
       ),
       intervention = purrr::map2_int(
         study_n,
         study_n_sd,
         .f = function(study_n, study_n_sd) {
-          rnorm(1, study_n, study_n_sd) %>% round() %>% as.integer()
+          rnorm(1, study_n, study_n_sd) %>% round() %>% abs() %>% as.integer()
         }
       )
     ) %>%
-    dplyr::select(-study_n,-study_n_sd)
+    dplyr::select(-study_n,-study_n_sd) %>%
+    mutate(control = map(control, n_check),
+           intervention = map(intervention, n_check)
+           )
 
   if (wide == FALSE) {
     return(n_df %>%

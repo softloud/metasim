@@ -3,6 +3,7 @@ context("bug hunt")
 set.seed(38)
 
 library(tidyverse)
+library(metasim)
 
 test_that("metasim runs for different n", {
   expect_is(metasim(), 'data.frame')
