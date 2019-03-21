@@ -8,26 +8,28 @@
 #' @export
 
 metasims <- function(dist_tribble =
-                       tibble::tribble(~ dist, ~ par,
-                                       #"norm", list(mean = 67, sd = 0.3),
-                                       "exp", list(rate = 2)),
-                     #,
-                     # "pareto" ,
-                     # list(shape = 3, scale = 3),
-                     # "pareto",
-                     # list(shape = 2, scale = 1),
-                     # "pareto",
-                     # list(shape = 0.5, scale = 1),
-                     # "lnorm",
-                     # list(mean = 44, sd = 0.3)),
+                       tibble::tribble(
+                         ~ dist,
+                         ~ par,
+                         "norm",
+                         list(mean = 67, sd = 0.3),
+                         "exp",
+                         list(rate = 2),
+                         "pareto" ,
+                         list(shape = 3, scale = 3),
+                         "pareto",
+                         list(shape = 2, scale = 1),
+                         "pareto",
+                         list(shape = 0.5, scale = 1),
+                         "lnorm",
+                         list(mean = 44, sd = 0.3)
+                       ),
                      k = c(3, 7, 10),
                      between_study_variation = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
                      trials = 10,
                      trial_fn = metatrial) {
-
-
   # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = dist_tribble,
@@ -37,18 +39,18 @@ metasims <- function(dist_tribble =
     prop = prop
   )
 
-  cat(paste(
-    "performing ",
-    nrow(simpars),
-    " simulations of ",
-    trials,
-    " trials\n"
-  ))
+  # cat(paste(
+  #   "performing ",
+  #   nrow(simpars),
+  #   " simulations of ",
+  #   trials,
+  #   " trials\n"
+  # ))
 
   # set progress bar
-  # pb <- txtProgressBar(min = 0,
-  #                      max = nrow(simpars),
-  #                      style = 3)
+  pb <- txtProgressBar(min = 0,
+                       max = nrow(simpars),
+                       style = 3)
 
   # intialise results
   results <-
@@ -57,8 +59,8 @@ metasims <- function(dist_tribble =
   # loop through simuations
   # this is possibly an application for rap::
   for (i in 1:nrow(simpars)) {
-    results[[i]] <-
-      metasim(
+    suppressMessages({
+      results[[i]] <-  metasim(
         tau_sq = simpars$between_study_variation[[i]],
         median_ratio = simpars$median_ratio[[i]],
         rdist = simpars$rdist[[i]],
@@ -70,19 +72,22 @@ metasims <- function(dist_tribble =
         trial_fn = trial_fn,
         trials = trials
       ) %>% pluck("results_summary")
-    cat(paste("simulation", i, "\n"))
 
-    # setTxtProgressBar(pb, i)
+    })
+
+    # cat(paste("simulation", i, "\n"))
+
+
+    setTxtProgressBar(pb, i)
   }
 
   # transform list of results to df with sim parameters
-  results_df <- simpars %>% full_join(results %>% bind_rows(), by = "id")
+  results_df <-
+    simpars %>% full_join(results %>% bind_rows(), by = "id")
 
 
   # output of function
-  return(
-    results_df
-    # list(simpars, results)
-  )
+  return(results_df)
+  # list(simpars, results))
 
 }
