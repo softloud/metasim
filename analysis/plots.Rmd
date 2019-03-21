@@ -34,7 +34,7 @@ Here we will make use of the `metasim::` package to generate some data.
 
 ```{r simulate meta-analysis data, warning=FALSE, output=FALSE, message=FALSE}
 
-meta_data <- metasims()
+meta_data <- metasims(probar = FALSE, trials = 2)
 
 ```
 

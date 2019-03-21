@@ -10,7 +10,7 @@ metasims(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
   scale = 1), "lnorm", list(mean = 44, sd = 0.3)), k = c(3, 7, 10),
   between_study_variation = seq(from = 0, to = 0.4, by = 0.2),
   median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
-  trial_fn = metatrial)
+  trial_fn = metatrial, probar = TRUE)
 }
 \arguments{
 \item{k}{Simulate for different numbers of studies.}
@@ -18,6 +18,8 @@ metasims(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
 \item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
 \item{prop}{Proportion of sample size we expect to cohorts to vary by most of the time}
+
+\item{probar}{Turn progress bar on and off.}
 }
 \description{
 simulate over all
