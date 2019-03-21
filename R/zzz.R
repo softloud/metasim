@@ -9,3 +9,8 @@ NULL
 
 #' @export
 magrittr::`%>%`
+
+#' @export
+metafor::rma
+metafor::forest
+

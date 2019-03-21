@@ -19,7 +19,8 @@ metamodel <- function(
   rma <- try(
     rma(yi = y,  sei = se, test = test, data = data) %>%
       metabroom::tidy() %>%
-      mutate(method = "REML")
+      mutate(method = "REML"),
+    silent = TRUE
              )
 
 

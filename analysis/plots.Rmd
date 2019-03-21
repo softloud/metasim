@@ -1,0 +1,52 @@
+---
+title: "plots for paper"
+author: "Charles T. Gray"
+date: "21/03/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE, progress = FALSE)
+```
+
+
+
+The `varameta::` package proposes an alternative estimator for the variance of the sample median. This document generates the plots used in the paper associated with that estimator.
+
+## preamble
+
+```{r load packages, message=FALSE}
+# packages used in this document
+library(tidyverse)
+library(metasim)
+
+```
+
+```{r reproducibility}
+# set seed for reproducibility
+set.seed(38)
+```
+
+
+## meta-analysis simulations
+
+Here we will make use of the `metasim::` package to generate some data.
+
+```{r simulate meta-analysis data, warning=FALSE, output=FALSE, message=FALSE}
+
+meta_data <- metasims()
+
+```
+
+```{r ma scatterplot}
+meta_data %>%
+  mutate(median_ratio = as.character(median_ratio)) %>% 
+  ggplot(aes(x = rdist, y = coverage)) +
+  geom_point(aes(shape = median_ratio, colour = median_ratio), position = "jitter", alpha = 0.7) +
+  facet_grid(k ~ between_study_variation) +
+  hrbrthemes::scale_colour_ft()
+
+
+```
+
+
