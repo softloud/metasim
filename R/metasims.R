@@ -4,6 +4,7 @@
 #' @param between_study_variation Variance \eqn{\tau^2} associated with the random effect \eqn{\gamma_k} describing the deviation of the \eqn{k)th results.
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of the time
 #' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
+#' @param probar Turn progress bar on and off. 
 #'
 #' @export
 
@@ -29,7 +30,8 @@ metasims <- function(dist_tribble =
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
                      trials = 10,
-                     trial_fn = metatrial) {
+                     trial_fn = metatrial, 
+                     probar = TRUE) {
   # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = dist_tribble,
@@ -77,8 +79,9 @@ metasims <- function(dist_tribble =
 
     # cat(paste("simulation", i, "\n"))
 
-
+    if(isTRUE(probar)){
     setTxtProgressBar(pb, i)
+      }
   }
 
   # transform list of results to df with sim parameters
