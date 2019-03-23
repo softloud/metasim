@@ -1,0 +1,35 @@
+---
+title: "default simulation parameters"
+author: "Charles T. Gray"
+date: "21/03/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+These data will be used as the default distibrutional parameter sets for simulations.
+
+```{r }
+
+default_parameters <- 
+  tibble::tribble(
+  ~dist,   ~par, 
+  "norm",   list(mean = 67, sd = 0.3), 
+  "exp",    list(rate = 2), 
+  "pareto", list(shape = 3, scale = 3), 
+  "pareto", list(shape = 2, scale = 1), 
+  "pareto", list(shape = 0.5, scale = 1), 
+  "lnorm",  list(mean = 44, sd = 0.3)
+  )
+
+
+```
+
+```{r}
+usethis::use_data(default_parameters)
+
+```
+

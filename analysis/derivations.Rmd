@@ -1,0 +1,30 @@
+---
+title: "derivations"
+author: "Charles T. Gray"
+date: "23/03/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\section{how these data were simulated}
+
+We wish to simulate...
+
+Let $j \in \{C, I\}$ where $C$ denotes the control arm of a study, and $I$ denotes the associated intervention group for that study. 
+
+Let $k \in \{1, \dots, K\}$ denote the $k$th study of $K$ studies.
+
+Let $i \in \{1, \dots n_{jk} \}$ denote the $i$th observation of a sample of size $n_{jk}$ from the $j$th arm of the $k$th study.
+
+We assume log-ratio $\log(\nu_{Ik}/\nu_{Ck})$ of the $k$th study's intervention and control groups can be thought of in terms of the sum of the true log-ratio $\log(\nu_I/\nu_C)$, some deviation $\gamma_k \sim N(0, \tau^2)$ associated with the $k$th study, and sampling error $\varepsilon_k \sim n(0, \sigma^2)$. 
+
+We assume the variance of the error terms $\tau^2$ and $\sigma^2$ are fixed and that all but the first parameter of the distribtuion are common, for all $j$ and $k$.
+
+We fix the true ratio $\rho$ of medians, as we wish to compare the performance of the estimator for both groups. And we choose distribution parameters for the control group.
+
+In order to simulate $x_{jki} \in \{1, \dots, n_{jk}\}$ observations, we require the first parameter for the control and interventions for the $j$th arm of the $k$th study. 
+
+\section{how the parameters were approximated in the estimator}

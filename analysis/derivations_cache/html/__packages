@@ -1,6 +1,8 @@
 base
 RevoUtilsMath
+goodshirt
 RevoUtils
+metasim
 tidyverse
 ggplot2
 tibble
@@ -10,5 +12,4 @@ purrr
 dplyr
 stringr
 forcats
-metasim
 patchwork

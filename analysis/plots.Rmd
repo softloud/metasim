@@ -2,7 +2,12 @@
 title: "plots for paper"
 author: "Charles T. Gray"
 date: "21/03/2019"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+params: 
+  trials: 100
 ---
 
 ```{r setup, include=FALSE}
@@ -19,6 +24,7 @@ The `varameta::` package proposes an alternative estimator for the variance of t
 # packages used in this document
 library(tidyverse)
 library(metasim)
+library(patchwork)
 
 ```
 
@@ -28,23 +34,120 @@ set.seed(38)
 ```
 
 
+In this document, we will make use of the `metasim::` package to generate some data.
+
+
 ## meta-analysis simulations
 
-Here we will make use of the `metasim::` package to generate some data.
 
 ```{r simulate meta-analysis data, warning=FALSE, output=FALSE, message=FALSE}
 
-meta_data <- metasims(probar = FALSE, trials = 2)
+meta_data <- metasims(probar = FALSE, trials = params$trials)
 
 ```
 
 ```{r ma scatterplot}
-meta_data %>%
-  mutate(median_ratio = as.character(median_ratio)) %>% 
-  ggplot(aes(x = rdist, y = coverage)) +
-  geom_point(aes(shape = median_ratio, colour = median_ratio), position = "jitter", alpha = 0.7) +
-  facet_grid(k ~ between_study_variation) +
-  hrbrthemes::scale_colour_ft()
+ma_plot <- function(data, measure = "all") {
+  df <- if (measure != "all") {
+  data %>%
+    filter(measure == measure)    
+  } else {
+    data
+  }
+  
+df  %>%
+    mutate(
+      median_ratio = as.character(median_ratio),
+      distribution = map_chr(rdist, dist_name),
+      measure = map_chr(measure, function(x) {
+        if (x == "m")
+          "median"
+        else
+          "log-ratio of medians"
+      })
+    ) %>%
+    ggplot(aes(x = distribution, y = coverage)) +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1),
+          plot.caption = element_text(hjust = 0)) +
+    labs(x = "Distribution",
+         y = "Coverage",
+         caption = str_wrap("Coverage denotes the proportion of confidence intervals
+         produced by meta-analyses of the samples that contain the true
+         median. "))  
+}
+  
+cap_text <- "Simulation results for various distributions "
+
+```
+
+## median simulation plot
+
+```{r}
+
+meta_data %>% 
+ma_plot(measure = "m") +   
+  geom_point(
+      aes(colour = distribution, shape = distribution),
+      position = "jitter",
+      alpha = 0.6
+    ) +
+    facet_grid(k ~ between_study_variation) +
+  scale_shape_discrete(name = "Distribution") +
+  hrbrthemes::scale_colour_ipsum(name = "Distribution") +
+  labs(title = str_wrap("Simulation results for estimating the variance of the sample median"))
+  
+
+```
+
+## log-ratio of medians simulation
+
+
+```{r}
+meta_data %>% 
+ma_plot(measure = "lr") +
+  geom_point(
+      aes(shape = median_ratio, colour = median_ratio),
+      position = "jitter",
+      alpha = 0.6
+    )  +
+      facet_grid(k ~ between_study_variation) +
+    scale_shape_discrete(name = "Median Ratio") +
+    hrbrthemes::scale_colour_ft(name = "Median Ratio") +
+  labs(title = str_wrap("Simulation results for estimating the variance of the log-ratio of sample medians"))
+```
+
+## distribution details
+
+The `metasim::` package was developed for the use-case of `varameta::`, and thus these simulations use the inbuilt default parameter set.
+
+```{r}
+default_parameters %>% 
+  knitr::kable()
+```
+
+
+
+## single-study simulations
+
+Although these results will be presented first in the paper, computationally this is a special use-case of `metasims` where `k = 1`.
+
+```{r}
+ss_data <- metasims(k = 1, trials = params$trials, probar = FALSE)
+
+```
+
+
+```{r}
+ss_data %>% 
+  ma_plot() +
+  geom_point(position = "jitter",
+      aes(colour = distribution, shape = distribution),
+      alpha = 0.6) +
+  facet_grid(measure ~ between_study_variation) +
+  scale_shape_discrete(name = "Distribution") +
+  hrbrthemes::scale_colour_ipsum(name = "Distribution") +
+  labs(title = str_wrap("Simulation results for estimating the variance of the sample median"))
+  
 
 
 ```
