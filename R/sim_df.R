@@ -13,22 +13,7 @@
 #' @export
 
 
-
-sim_df <- function(dist_tribble =
-                     tibble::tribble(
-                       ~ dist, ~ par,
-                       "norm", list(mean = 50, sd = 0.2)#,
-                       # "exp",
-                       # list(rate = 3)# ,
-                       # "pareto",
-                       # list(shape = 3, scale = 3),
-                       # "pareto",
-                       # list(shape = 2, scale = 1),
-                       # # "pareto",
-                       # # list(shape = 0.5, scale = 1),
-                       # "lnorm",
-                       # list(mean = 44, sd = 0.3)
-                     ),
+sim_df <- function(dist_tribble = default_parameters,
                    k = c(3, 7, 20),
                    between_study_variation = seq(0, 0.4, 0.2),
                    median_ratio = c(1, 1.2),
@@ -57,7 +42,7 @@ sim_df <- function(dist_tribble =
     dplyr::select(-distribution) %>%
     dplyr::mutate(n = purrr::map2(k, prop, sim_n),
                   id = paste0("sim_", seq(1, nrow(.))))  %>%
-    dplyr::mutate(true_median =
+    dplyr::mutate(true_effect =
                     purrr::map2_dbl(
                       rdist,
                       parameters,

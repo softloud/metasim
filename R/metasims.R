@@ -17,21 +17,21 @@ metasims <- function(distributions =default_parameters,
                      trial_fn = metatrial,
                      probar = TRUE) {
   # set up simulation parameters
-    dist_tribble = distributions,
   simpars <- sim_df(
+    dist_tribble = distributions,
     k = k,
     between_study_variation = between_study_variation,
     median_ratio = median_ratio,
     prop = prop
   )
 
-  # cat(paste(
-  #   "performing ",
-  #   nrow(simpars),
-  #   " simulations of ",
-  #   trials,
-  #   " trials\n"
-  # ))
+  cat(paste(
+    "performing ",
+    nrow(simpars),
+    " simulations of ",
+    trials,
+    " trials\n"
+  ))
 
   # set progress bar
   if (isTRUE(probar)) {
@@ -47,7 +47,7 @@ metasims <- function(distributions =default_parameters,
   # loop through simuations
   # this is possibly an application for rap::
   for (i in 1:nrow(simpars)) {
-    suppressMessages({
+    suppressMessages({ # expect some rma models not to converge
       results[[i]] <-  metasim(
         tau_sq = simpars$between_study_variation[[i]],
         median_ratio = simpars$median_ratio[[i]],
@@ -55,7 +55,7 @@ metasims <- function(distributions =default_parameters,
         parameters = simpars$parameters[[i]],
         n_df = simpars$n[[i]],
         knha = TRUE,
-        true_median = simpars$true_median[[i]],
+        true_effect = simpars$true_effect[[i]],
         id = simpars$id[[i]],
         trial_fn = trial_fn,
         trials = trials
@@ -63,7 +63,7 @@ metasims <- function(distributions =default_parameters,
 
     })
 
-    # cat(paste("simulation", i, "\n"))
+    cat(paste("\nsimulation", i, "\n"))
 
     if (isTRUE(probar)) {
       setTxtProgressBar(pb, i)

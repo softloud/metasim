@@ -13,7 +13,6 @@ metasim <- function(...,
                     id = "simulation1",
                     trial_fn = metatrial,
                     trials = 4) {
-
   safe_trial_fn <- purrr::safely(trial_fn)
 
   results <- purrr::rerun(.n = trials, safe_trial_fn(...))
@@ -22,25 +21,23 @@ metasim <- function(...,
     transpose() %>%
     pluck("result") %>%
     keep(is.data.frame) %>%
+    keep( ~ nrow(.) >= 1) %>% # keep non-empty results
     bind_rows() %>%
-     dplyr::group_by(measure) %>%
-  dplyr::summarise(
-    tau2 = mean(tau2),
-    ci_width = mean(ci_ub - ci_lb),
-    bias = mean(bias),
-    coverage_count = sum(coverage),
-    successful_trials = length(coverage),
-    coverage = coverage_count / successful_trials
-  ) %>% mutate(id = id)
+    dplyr::group_by(measure) %>%
+    dplyr::summarise(
+      tau2 = mean(tau2),
+      ci_width = mean(ci_ub - ci_lb),
+      bias = mean(bias),
+      coverage_count = sum(coverage),
+      successful_trials = length(coverage),
+      coverage = coverage_count / successful_trials
+    ) %>% mutate(id = id)
 
   errors <- results %>%
     transpose() %>%
     purrr::pluck("error")
 
-    list(
-              errors = errors,
-              results_summary = results_df
-    )
-
+  list(errors = errors,
+       results_summary = results_df)
 
 }

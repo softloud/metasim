@@ -4,9 +4,9 @@
 \alias{sim_df}
 \title{generate simulation parameter dataframe}
 \usage{
-sim_df(dist_tribble = tibble::tribble(~dist, ~par, "norm", list(mean =
-  50, sd = 0.2)), k = c(3, 7, 20), between_study_variation = seq(0,
-  0.4, 0.2), median_ratio = c(1, 1.2), prop = 0.3)
+sim_df(dist_tribble = default_parameters, k = c(3, 7, 20),
+  between_study_variation = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2),
+  prop = 0.3)
 }
 \arguments{
 \item{dist_tribble}{A \code{\link{tibble::tribble}}

@@ -40,8 +40,8 @@ sim_n <- function(k = 3,
       )
     ) %>%
     dplyr::select(-study_n,-study_n_sd) %>%
-    mutate(control = map(control, n_check),
-           intervention = map(intervention, n_check)
+    mutate(control = map_dbl(control, n_check),
+           intervention = map_dbl(intervention, n_check)
            )
 
   if (wide == FALSE) {

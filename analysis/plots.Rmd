@@ -7,16 +7,24 @@ output:
     toc: true
     toc_float: true
 params: 
-  trials: 100
+  trials: 10
+  k: !r (c(3, 7, 10))
+  tau2: !r seq(0, 0.4, by = 0.2)
 ---
 
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = FALSE, progress = FALSE)
+knitr::opts_chunk$set(
+  echo = TRUE, 
+  cache = TRUE, 
+  progress = FALSE)
 ```
 
 
 
 The `varameta::` package proposes an alternative estimator for the variance of the sample median. This document generates the plots used in the paper associated with that estimator.
+
 
 ## preamble
 
@@ -24,7 +32,7 @@ The `varameta::` package proposes an alternative estimator for the variance of t
 # packages used in this document
 library(tidyverse)
 library(metasim)
-library(patchwork)
+library(latex2exp)
 
 ```
 
@@ -36,13 +44,35 @@ set.seed(38)
 
 In this document, we will make use of the `metasim::` package to generate some data.
 
+### caption text
+
+```{r caption text}
+caption_text <- paste0(
+            "Coverage denotes the proportion of ", 
+            params$trials,
+            " confidence intervals that contain the true median, or true log-ratio of medians, derived from random samples from exponential, log-normal, normal, and Pareto distributions. The vertical facets of the plot reflect simulation-level parameters for between-study variance $\\tau^2 \\in$ ",
+            paste(params$tau2, collapse = ", "),
+            " where simulations were performed with an assumption of no difference between the studies, aside from sampling error, $\\tau^2 = 0$, to a maximal between-study variance of $\\tau^2 =$ ",
+            max(params$tau2),
+            ".",
+            collapse = ""
+            ) 
+
+# check this comes out nice
+caption_text %>% knitr::asis_output()
+
+```
+
 
 ## meta-analysis simulations
 
 
 ```{r simulate meta-analysis data, warning=FALSE, output=FALSE, message=FALSE}
 
-meta_data <- metasims(probar = FALSE, trials = params$trials)
+meta_data <- metasims(
+  probar = FALSE, 
+  trials = params$trials,
+  k = params$k)
 
 ```
 
@@ -70,10 +100,8 @@ df  %>%
     theme(axis.text.x = element_text(angle = 35, hjust = 1),
           plot.caption = element_text(hjust = 0)) +
     labs(x = "Distribution",
-         y = "Coverage",
-         caption = str_wrap("Coverage denotes the proportion of confidence intervals
-         produced by meta-analyses of the samples that contain the true
-         median. "))  
+         y = "Coverage"
+        )  
 }
   
 cap_text <- "Simulation results for various distributions "
@@ -131,13 +159,20 @@ default_parameters %>%
 
 Although these results will be presented first in the paper, computationally this is a special use-case of `metasims` where `k = 1`.
 
-```{r}
-ss_data <- metasims(k = 1, trials = params$trials, probar = FALSE)
+```{r ss data}
+ss_data <- metasims(
+  k = 1, 
+  trials = params$trials, 
+  probar = FALSE)
 
 ```
 
+### single-study plot
 
-```{r}
+
+
+
+```{r ss plot}
 ss_data %>% 
   ma_plot() +
   geom_point(position = "jitter",
@@ -147,9 +182,7 @@ ss_data %>%
   scale_shape_discrete(name = "Distribution") +
   hrbrthemes::scale_colour_ipsum(name = "Distribution") +
   labs(title = str_wrap("Simulation results for estimating the variance of the sample median"))
-  
-
 
 ```
 
-
+Since I can't get $\LaTeX$ to play nice with `str_wrap`, I'll export the caption as text and the vis separately. 

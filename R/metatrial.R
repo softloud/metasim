@@ -2,6 +2,8 @@
 #'
 #' Simulate data based on simulation parameters and meta-analyse.
 #'
+#' NB: bias is effect - true effect.
+#'
 #' @param true_effect The value of the control population median.
 #' @inheritParams sim_stats
 #' @param test "knha" or "z" for [metafor::rma].
@@ -86,7 +88,7 @@ metatrial <- function(true_median = 50,
     mutate(
       coverage = ci_lb < true_effect & true_effect < ci_ub,
       # can't scale bc log(1) = 0
-      bias = true_effect - effect
+      bias = effect - true_effect
     )
 
   return(results)

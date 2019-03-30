@@ -24,3 +24,6 @@ such as output by \code{\link{meta_n}}.}
 \description{
 Simulate data based on simulation parameters and meta-analyse.
 }
+\details{
+NB: bias is effect - true effect.
+}
