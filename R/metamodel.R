@@ -18,7 +18,7 @@ metamodel <- function(
   # try a re model; may fail to converge.
   rma <- try(
     rma(yi = y,  sei = se, test = test, data = data) %>%
-      metabroom::tidy() %>%
+      tidy.rma.uni() %>%
       mutate(method = "REML"),
     silent = TRUE
              )
@@ -32,7 +32,7 @@ metamodel <- function(
   } else {
     try(
       rma(yi = y, sei = se, method = "FE", data = data) %>%
-        metabroom::tidy() %>%
+        tidy.rma.uni() %>%
         mutate(method = "FE")
       )
   }
