@@ -1,5 +1,6 @@
 #' @import dplyr
 #' @import purrr
+#' @import broom
 #' @importFrom metafor rma escalc forest
 #' @importFrom tibble tibble as_tibble
 #' @importFrom tidymeta tidy.rma.uni

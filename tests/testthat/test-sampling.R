@@ -6,11 +6,34 @@ library(metasim)
 big <- runif(3, 5, 100)
 small <- runif(3, 0.1, 0.9)
 
+
+# sample sizes ------------------------------------------------------------
+
+
+samples_sizes <- rerun(1000, sim_n(k = 10)) %>% bind_rows()
+
+test_that("sample sizes are positive", {
+  expect_equal(samples_sizes %>%
+                 filter(n < 0) %>%
+                 nrow(), 0)
+  expect_error(sim_n(min_n = -30))
+  expect_error(sim_n(min_n = -30, max_n = -100))
+  expect_error(sim_n(min_n= 50, max_n = 2))
+})
+
+
+
+# samples -----------------------------------------------------------------
+
+
+
 test_sample_norm <-
   sim_sample(10, 0, "norm", list(mean = 20, sd = 1))
 test_sample_norm_another <-
   sim_sample(10, 0, "norm", list(mean = 104, sd = 0.3))
 test_sample_pareto <- sim_sample(10, 0, "pareto", list(1, 2))
+
+
 
 test_that("samples are plausible", {
   expect_is(test_sample_norm, "numeric")

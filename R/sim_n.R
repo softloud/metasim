@@ -19,6 +19,13 @@ sim_n <- function(k = 3,
                    max_n = 200,
                    prop = 0.3,
                    wide = FALSE) {
+  assert_that(min_n > 0,
+              msg = "minimum sample size must be positive")
+  assert_that(max_n > 0,
+              msg = "maximum sample size must be positive")
+  assert_that(min_n <= max_n,
+              msg = "minimum sample size cannot exceed maximum sample size")
+
   n_df <- tibble::tibble(study = paste0("study_", seq(1, k)),
                          study_n = sample(seq(min_n, max_n),
                                           size = k, replace = TRUE)) %>%
@@ -28,18 +35,26 @@ sim_n <- function(k = 3,
         study_n,
         study_n_sd,
         .f = function(study_n, study_n_sd) {
-          rnorm(1, study_n, study_n_sd) %>% round() %>% abs() %>% as.integer()
+          # hien mentioned using a beta distribution instead
+          rnorm(1, study_n, study_n_sd) %>%
+            round() %>%
+            abs() %>%
+            as.integer()
         }
       ),
       intervention = purrr::map2_int(
         study_n,
         study_n_sd,
         .f = function(study_n, study_n_sd) {
-          rnorm(1, study_n, study_n_sd) %>% round() %>% abs() %>% as.integer()
+          rnorm(1, study_n, study_n_sd) %>%
+            round() %>%
+            abs() %>%
+            as.integer()
         }
       )
     ) %>%
     dplyr::select(-study_n,-study_n_sd) %>%
+    # lower bound sample sizes by 10
     mutate(control = map_dbl(control, n_check),
            intervention = map_dbl(intervention, n_check)
            )
@@ -52,7 +67,6 @@ sim_n <- function(k = 3,
   } else {
     return(n_df)
   }
-
 }
 
 
