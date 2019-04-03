@@ -18,11 +18,9 @@ metamodel <- function(
   # try a re model; may fail to converge.
   rma <- try(
     rma(yi = y,  sei = se, test = test, data = data) %>%
-      tidy.rma.uni() %>%
-      mutate(method = "REML"),
+      tidy_sim(),
     silent = TRUE
              )
-
 
   # return re if or calculate fe
   if (
@@ -32,8 +30,7 @@ metamodel <- function(
   } else {
     try(
       rma(yi = y, sei = se, method = "FE", data = data) %>%
-        tidy.rma.uni() %>%
-        mutate(method = "FE")
+        tidy_sim()
       )
   }
 }

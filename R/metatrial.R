@@ -78,7 +78,7 @@ metatrial <- function(true_median = 50,
   results <- list(
     m_model,
     lr_model
-  ) %>%
+  )  %>%
     keep(is.data.frame) %>%
     bind_rows() %>%
     mutate(
@@ -86,9 +86,9 @@ metatrial <- function(true_median = 50,
     ) %>%
     full_join(true_effects, by = "measure") %>%
     mutate(
-      coverage = ci_lb < true_effect & true_effect < ci_ub,
+      coverage = conf_low < true_effect & true_effect < conf_high,
       # can't scale bc log(1) = 0
-      bias = effect - true_effect
+      bias = estimate - true_effect
     )
 
   return(results)
