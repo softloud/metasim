@@ -26,7 +26,7 @@ metasims <- function(distributions =default_parameters,
   )
 
   cat(paste(
-    "performing ",
+    "\nperforming ",
     nrow(simpars),
     " simulations of ",
     trials,
@@ -59,11 +59,11 @@ metasims <- function(distributions =default_parameters,
         id = simpars$id[[i]],
         trial_fn = trial_fn,
         trials = trials
-      ) %>% pluck("results_summary")
+      ) %>% pluck("results")
 
     })
 
-    cat(paste("\nsimulation", i, "\n"))
+    # cat(paste("\nsimulation", i, "\n"))
 
     if (isTRUE(probar)) {
       setTxtProgressBar(pb, i)
@@ -72,7 +72,13 @@ metasims <- function(distributions =default_parameters,
 
   # transform list of results to df with sim parameters
   results_df <-
-    simpars %>% full_join(results %>% bind_rows(), by = "id")
+    simpars %>%
+    ungroup() %>%
+    mutate(id = as.character(id)) %>%
+    full_join(results %>%
+                bind_rows() %>%
+                mutate(id = as.character(id)),
+              by = "id")
 
 
   # output of function
