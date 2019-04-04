@@ -12,8 +12,7 @@ tidy_sim <- function(rma_model){
     bind_cols(
       rma_model %>%
         tidy() %>%
-        filter(study == "Overall",
-               type == "summary") %>%
+        filter(type == "summary") %>%
         select(conf.low, conf.high, std.error, std.error, estimate) %>%
         janitor::clean_names(),
       rma_model %>%

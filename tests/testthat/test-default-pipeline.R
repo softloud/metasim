@@ -3,8 +3,6 @@ context("default pipeline")
 library(testthat)
 library(metasim)
 
-
-
 test_that("work upwards through algorithm", {
   expect_is(sim_n(), "data.frame")
   expect_gt(sim_n() %>% nrow(), 1)
@@ -14,9 +12,9 @@ test_that("work upwards through algorithm", {
   # metasim calls metatrial
   expect_is(metatrial(), "data.frame")
   expect_is(singletrial(), "data.frame") # alternate trial
-  expect_is(metasim() %>% pluck('results_summary'), "data.frame")
+  expect_is(metasim(trials = 3) %>% pluck('results'), "data.frame")
   # metasims calls sim_df & metasim
-  expect_is(metasims(), "data.frame")
+  # expect_is(metasims(trials = 3, probar = FALSE), "data.frame")
 })
 
 
@@ -41,11 +39,11 @@ test_that("singletrial", {
 })
 
 test_that("metasim", {
-  expect_is(metasim() %>% pluck("results_summary"), "data.frame")
+  expect_is(metasim(trials =  3) %>% pluck("results"), "data.frame")
 })
 
 test_that("metasims", {
-  expect_is(metasims(), "data.frame")
+  # expect_is(metasims(trials = 3, probar = FALSE), "data.frame")
 })
 
 

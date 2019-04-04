@@ -25,16 +25,18 @@ metasims <- function(distributions =default_parameters,
     prop = prop
   )
 
-  cat(paste(
-    "\nperforming ",
-    nrow(simpars),
-    " simulations of ",
-    trials,
-    " trials\n"
-  ))
+
 
   # set progress bar
   if (isTRUE(probar)) {
+
+    cat(paste(
+      "\nperforming ",
+      nrow(simpars),
+      " simulations of ",
+      trials,
+      " trials\n"
+    ))
     pb <- txtProgressBar(min = 0,
                          max = nrow(simpars),
                          style = 3)
