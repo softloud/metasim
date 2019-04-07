@@ -1,0 +1,388 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%	Posterdown PDF class for LaTeX files	 08-JAN-2019
+%% %%	For any information please send an e-mail to:
+%% %%		brentthonre18@gmail.com (Brent Thorne)
+%% %%
+%% %%	Initial class provided by:
+%% %%		Brent Thorne
+%% %% Contributors: Shea Connell (SC)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[article,30pt,extrafontsizes]{memoir}
+
+%utf-8 seems to be important
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage{multicol}
+\RequirePackage{graphicx}
+\RequirePackage{lipsum}
+\RequirePackage{blindtext}
+\RequirePackage[svgnames,table]{xcolor}
+\RequirePackage{tikz}
+\RequirePackage[framemethod=tikz]{mdframed}
+\RequirePackage{color}
+\RequirePackage{geometry}
+\RequirePackage{adjmulticol}
+\RequirePackage[skins,most,listings,skins]{tcolorbox}
+
+%For kable extra package :)
+\RequirePackage{booktabs}
+\RequirePackage{longtable}
+\RequirePackage{array}
+\RequirePackage{multirow}
+\RequirePackage{wrapfig}
+\RequirePackage{float}
+\RequirePackage{colortbl}
+\RequirePackage{pdflscape}
+\RequirePackage{pagecolor}
+\RequirePackage{tabu}
+\RequirePackage{threeparttable}
+\RequirePackage{threeparttablex}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{makecell}
+\RequirePackage{wrapfig}
+
+%rof hyperrefs
+\RequirePackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcol,
+    citecolor=citecol,
+    filecolor=linkcol,
+    urlcolor=urlcol,
+}
+%For figure and table placement
+\RequirePackage{float}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+
+%%%%%%%%% COLOURS %%%%%%%%
+%Fill/ Line Colours
+\definecolor{titleboxbgcol}{HTML}{008080}
+\definecolor{titleboxbordercol}{HTML}{0b4545}
+\definecolor{columnlinecol}{HTML}{008080}
+\definecolor{bodybgcol}{HTML}{ffffff}
+\definecolor{sectitlebgcol}{HTML}{0b4545}
+\definecolor{sectitlebordercol}{HTML}{0b4545}
+% Text Colours
+\definecolor{titletextcol}{HTML}{ffffff}
+\definecolor{authortextcol}{HTML}{0b4545}
+\definecolor{affiliationtextcol}{HTML}{FFFFFF}
+\definecolor{sectitletextcol}{HTML}{ffffff}
+\definecolor{bodytextcol}{HTML}{000000}
+\definecolor{footnotetextcol}{HTML}{ffffff}
+\definecolor{citecol}{HTML}{CC0000}
+\definecolor{urlcol}{HTML}{008080}
+\definecolor{linkcol}{HTML}{008080}
+
+
+%Memoir spacing options
+%spacing between figure/ table and caption
+\setlength{\abovecaptionskip}{0.4in}
+\setlength{\belowcaptionskip}{0.2in}
+\captionnamefont{\footnotesize\sffamily\bfseries}
+\captiontitlefont{\footnotesize\sffamily}
+
+%define column options
+\setlength{\columnseprule}{0pt}
+\def\columnseprulecolor{\color{columnlinecol}}
+
+%define section title features
+\setsubsubsecheadstyle{\small\color{sectitletextcol}\textbf}% Set \section style
+\setsecnumformat{}
+\def\sectionmark#1{\markboth{#1}{#1}}
+
+%%%%%%%%%%%% TCOLORBOXES TO THE RESCUE %%%%%%%%%%%%%%%%%%%%
+%Title Box
+\newtcolorbox{topbox}{
+enhanced,
+colback=titleboxbgcol,
+colframe=titleboxbordercol,
+halign=center,
+boxrule=1cm,
+sharp corners=all,
+ overlay={
+    \node[anchor=south west]
+      at ([xshift=1in,yshift=1in]frame.south west)
+       {\includegraphics[width=3in]{Figures/posterdownlogo}};
+    \node[anchor=south east]
+      at ([xshift=-1in,yshift=1in]frame.south east)
+       {\includegraphics[width=3in]{Figures/posterdownlogo}};}
+
+}
+%Body Section Title Box
+\newtcolorbox{myboxstuff}[1][]{
+code={\parindent=0em},
+colframe=sectitlebordercol,
+nobeforeafter,
+left skip=0pt,
+valign=center,
+halign=center,
+fontupper=\Large\bfseries,
+colupper=sectitletextcol,
+boxrule=2mm,
+colback=sectitlebgcol,
+sharp corners=uphill, #1}
+\newcommand{\mybox}[1]{%
+\begin{myboxstuff}
+\strut #1
+\end{myboxstuff}%
+}
+\makeheadstyles{MyBox}{
+    \setsecheadstyle{\mybox}
+}
+\headstyles{MyBox}\makepagestyle{MyBox}
+%-----------------------------------------------------
+%Make sure that the page is empty of any preset items from memoir
+\thispagestyle{empty}
+
+%biblatex options
+\RequirePackage[sorting=none,backend=biber]{biblatex}
+\renewcommand*{\bibfont}{\small} %% SC
+\bibliography{MyLibrary}
+\defbibheading{bibliography}[\bibname]{%
+\setlength\bibitemsep{0.8\itemsep} %% SC
+\section*{#1}%
+\markboth{#1}{#1}}
+\AtBeginDocument{%
+  \renewcommand{\bibname}{References}
+}
+
+%Remove section numbering & set 2nd level header as first level
+%to avoid the automatic new page generated from memoir chapter
+%formatting
+\counterwithout{section}{chapter}
+\makechapterstyle{mydefault}{
+\addtocounter{secnumdepth}{2}
+\setsecheadstyle{\mybox}
+\setsubsecheadstyle{\itshape}
+\setsubsubsecheadstyle{\itshape}
+}
+
+%set the chapterstyle
+\chapterstyle{mydefault}
+
+%define column spacing
+\setlength\columnsep{0.5in}
+
+%spacing params
+\setlength\parindent{0em}
+\setlength\parskip{0em}
+\setlength\hangparas{0}
+
+%spacing after section head title
+\setaftersecskip{0em}
+\setbeforesecskip{1.5em}
+\setlength\textfloatsep{0in}
+\setlength\floatsep{0in}
+\setlength\intextsep{0in}
+
+\setstocksize{38in}{45in}
+\settrimmedsize{\stockheight}{\stockwidth}{*}
+\settypeblocksize{38in}{45in}{*}
+\setlrmargins{*}{*}{1}
+\setulmarginsandblock{2.5cm}{*}{*}
+\setmarginnotes{0em}{0cm}{0cm}
+\setlength{\footskip}{0cm}
+\setlength{\footnotesep}{0cm}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+\setlength{\trimtop}{0pt}
+\setlength{\trimedge}{0pt}
+\setlength{\uppermargin}{0pt}
+\checkandfixthelayout
+
+%Footnote to white
+\RequirePackage{footmisc}
+\def\footnotelayout{\centering\color{footnotetextcol}}
+
+% see https://stackoverflow.com/a/47122900
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+
+% choose font family
+\RequirePackage{palatino}
+
+% define the BODYBGCOL
+\newpagecolor{bodybgcol}
+
+%sets footnote to be white hopefully
+\renewcommand\footnoterule{}
+\renewcommand{\thempfootnote}{\footnotesize\color{footnotetextcol}{\arabic{mpfootnote}}}
+
+%-------------- Begin Document -------------------%
+\begin{document}
+
+%-------------- Title Box Start ------------------%
+%tcolorbox allows for pictures hopefully
+\begin{topbox}
+  \color{titletextcol}
+  \vspace{0.5in}
+  \Huge{\fontfamily{phv}\selectfont Using posterdown to generate reproducible
+conference posters via RMarkdown \textgreater{} Knitr \textgreater{}
+Markdown \textgreater{} Pandoc \textgreater{} Latex \textgreater{} PDF
+workflow}  \\[0.3in]  %% SC
+  \color{authortextcol} \Large{Author One\textsuperscript{1} Author Two\textsuperscript{2}} \\[0.2in] %% SC
+  \color{affiliationtextcol} \large{\textsuperscript{1}Department of Poster Layouts, University of Markdown;
+\textsuperscript{2}Deparment of Another Institution, Institution
+University} %% SC
+  \vspace{1cm}
+\end{topbox}
+%--------------- Title Box End -------------------%
+%----------------- Body Start --------------------%
+% Begin body of poster
+\begin{adjmulticols*}{4}{0.5in}{0.5in}
+\normalsize{  %% SC
+\color{bodytextcol}
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Welcome to \texttt{posterdown} ! This is my attempt to provide a
+semi-smooth workflow for those who wish to take their \texttt{RMarkdown}
+skills to the conference world. Many creature comforts from
+\texttt{RMarkdown} are available in this package such as
+\texttt{Markdown} section notation, figure captioning, and even
+citations like this one \autocite{holden_identifying_2012} The rest of
+this example poster will show how you can insert typical conference
+poster features into your own document.
+
+\hypertarget{study-site}{%
+\section{Study Site}\label{study-site}}
+
+Here is a map made to show the study site using \texttt{ggplot2},
+\texttt{ggspatial}, and \texttt{sf} and you can even reference this with
+a hyperlink, this will take you to \textbf{Figure \ref{mymapfig}}. Lorem
+ipsum dolor sit amet, \autocite{middleton_geological_nodate} consectetur
+adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+magna aliqua. \vspace{1cm}
+
+\hypertarget{objectives}{%
+\section{Objectives}\label{objectives}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Easy to use reproducible poster design.
+\item
+  Integration with \texttt{RMarkdown}.
+\item
+  Easy transition from \texttt{posterdown} to \texttt{thesisdown} or
+  \texttt{rticles}
+\end{enumerate}
+
+\lipsum[2]
+\lipsum[4]
+
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
+
+This package uses the same workflow approach as the \texttt{RMarkdown}
+you know and love. Basically it goes from RMarkdown \textgreater{} Knitr
+\textgreater{} Markdown \textgreater{} Pandoc \textgreater{} Latex
+\textgreater{} PDF.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+Usually you want to have a nice table displaying some important results
+that you have calcualated. In posterdown this is as easy as using the
+\texttt{kable} table formatting you are probably use to as per typical
+\texttt{RMarkdown} formatting. I suggesting checking out the
+\texttt{kableExtra} package and its in depth documentation on
+customizing these tables found
+\href{https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf}{here}.
+
+\vspace{1cm}
+
+\vspace{2cm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Here is some code for people}
+\CommentTok{# to look at and be in awe of!!!!}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(ggthemes)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data=}\NormalTok{iris,}
+       \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Sepal.Width,}
+           \DataTypeTok{y =}\NormalTok{ Sepal.Length,}
+           \DataTypeTok{colour =}\NormalTok{ Species)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_tufte}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\OtherTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\lipsum[1-2]
+
+\hypertarget{next-steps}{%
+\section{Next Steps}\label{next-steps}}
+
+There is still \textbf{A LOT} of work to do on this package which
+include (but are note limited to):
+
+\begin{itemize}
+\tightlist
+\item
+  Better softcoding for front end user options in YAML
+\item
+  Images in the title section for logo placement which is a common
+  attribut to posters as far as I have come to know.
+\item
+  Figure out compatiability with \texttt{natbib} which wasn't working
+  during the initial set up.
+\item
+  MUCH BETTER PACKAGE DOCUMENTATION. For example, there is nothing in
+  the README\ldots{}
+\item
+  Include References section only if initiated by the user like in
+  RMarkdown.
+\end{itemize}
+
+\small\printbibliography
+}
+\end{adjmulticols*}
+%------------------ Body End ---------------------%
+%end the poster
+\end{document}
+

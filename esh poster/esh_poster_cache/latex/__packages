@@ -1,0 +1,14 @@
+base
+RevoUtilsMath
+RevoUtils
+metasim
+kableExtra
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats

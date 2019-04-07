@@ -1,4 +1,4 @@
-context("default pipeline")
+context("default pipeline - currently skips metasims")
 
 library(testthat)
 library(metasim)
@@ -46,19 +46,5 @@ test_that("metasims", {
   # expect_is(metasims(trials = 3, probar = FALSE), "data.frame")
 })
 
-
-# test_that("work upwards through algorithm", {
-#   expect_is(sim_n(), "data.frame")
-#   expect_gt(sim_n() %>% nrow(), 1)
-#   # sim_df calls sim_n
-#   expect_is(sim_df(), "data.frame")
-#   expect_is(sim_stats(), "data.frame")
-#   # metasim calls metatrial
-#   expect_is(metatrial(), "data.frame")
-#   expect_is(singletrial(), "data.frame") # alternate trial
-#   expect_is(metasim() %>% pluck('results_summary'), "data.frame")
-#   # metasims calls sim_df & metasim
-#   expect_is(metasims(), "data.frame")
-# })
 
 

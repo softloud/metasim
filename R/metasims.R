@@ -1,26 +1,27 @@
 #' simulate over all
 #'
 #' @param k Simulate for different numbers of studies.
-#' @param between_study_variation Variance \eqn{\tau^2} associated with the random effect \eqn{\gamma_k} describing the deviation of the \eqn{k)th results.
+#' @param tau2_true Variance \eqn{\tau^2} associated with the random effect \eqn{\gamma_k} describing the deviation of the \eqn{k)th results.
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of the time
 #' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
 #' @param probar Turn progress bar on and off.
 #'
 #' @export
 
-metasims <- function(distributions =default_parameters,
+metasims <- function(distributions = default_parameters,
                      k = c(3, 7, 10),
-                     between_study_variation = seq(from = 0, to = 0.4, by = 0.2),
+                     tau2_true = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
                      trials = 10,
                      trial_fn = metatrial,
+                     beep = FALSE,
                      probar = TRUE) {
   # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = distributions,
     k = k,
-    between_study_variation = between_study_variation,
+    tau2 = tau2_true,
     median_ratio = median_ratio,
     prop = prop
   )
@@ -51,7 +52,7 @@ metasims <- function(distributions =default_parameters,
   for (i in 1:nrow(simpars)) {
     suppressMessages({ # expect some rma models not to converge
       results[[i]] <-  metasim(
-        tau_sq = simpars$between_study_variation[[i]],
+        tau_sq = simpars$tau2_true[[i]],
         median_ratio = simpars$median_ratio[[i]],
         rdist = simpars$rdist[[i]],
         parameters = simpars$parameters[[i]],
@@ -73,18 +74,21 @@ metasims <- function(distributions =default_parameters,
   }
 
   # transform list of results to df with sim parameters
-  results_df <-
-    simpars %>%
-    ungroup() %>%
+  results_df <- simpars %>%
+    ungroup()  %>%
     mutate(id = as.character(id)) %>%
     full_join(results %>%
                 bind_rows() %>%
                 mutate(id = as.character(id)),
               by = "id")
 
+  if (isTRUE(probar)) cat("\n")
+  if (isTRUE(beep)) beepr::beep("treasure")
 
   # output of function
-  return(results_df)
-  # list(simpars, results))
+  return( results_df)
+   # list(simpars, results))
+
+
 
 }

@@ -1,6 +1,6 @@
 #' @import dplyr
 #' @import purrr
-#' @import metabroom
+#' @import broom
 #' @importFrom metafor rma escalc forest
 #' @importFrom tibble tibble as_tibble
 #' @importFrom stats dist median quantile rexp rlnorm rnorm runif sd

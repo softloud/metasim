@@ -1,0 +1,48 @@
+---
+title: "testing data"
+author: "Charles T. Gray"
+date: "05/04/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+
+```{r}
+# for reproducibility
+# set.seed() todo: uncomment later
+
+big <- runif(2, 1, 101)
+small <- runif(2, 0, 1)
+
+k <- sample(c(3, 7, 50), 1)
+trials <- 10
+n <- sample(seq(20, 200), 1)
+spread <- runif(1, 0.5, 1.5)
+centre <- runif(1, 20, 70)
+prop <- runif(1, 0.1, 0.9)
+between_study_variation <- runif(1, 0.2, 1.5)
+tau <- runif(1, 0.1, 0.8)
+within_study_variation <- runif(1, 0.2, 1.5)
+median_ratio <- runif(1, 1, 2)
+rdist <- "norm"
+parameters <- list(mean = 50, sd = 0.2)
+
+testdf <- sim_df(
+  dist_tribble =
+    tibble::tribble( ~ dist,  ~ par,
+                     "norm", list(mean = 50, sd = 0.2),
+                     "exp", list(rate = 2)),
+  k = c(3, 7, 20),
+  between_study_variation = seq(0, 0.4, 0.2),
+  median_ratio = c(1, 1.2),
+  prop = 0.3
+)
+
+
+```
+
