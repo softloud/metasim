@@ -22,7 +22,7 @@ metasims <- function(distributions = default_parameters,
                      probar = TRUE) {
 
   #
-  if (isTRUE(singlestudy)) {
+  if (isTRUE(single_study)) {
     k <- 1
     tau2_true <- 0
   }
@@ -35,9 +35,6 @@ metasims <- function(distributions = default_parameters,
     median_ratio = median_ratio,
     prop = prop
   )
-
-
-
 
   # set progress bar
   if (isTRUE(probar)) {
