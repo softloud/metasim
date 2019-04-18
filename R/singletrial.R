@@ -66,11 +66,11 @@ singletrial <- function(
       )
     } %>%
     full_join(true_effects, by = "measure") %>%
-    mutate(ci_lb = effect - qnorm(0.975) * effect_se,
-           ci_ub = effect + qnorm(0.975) * effect_se,
-           coverage = ci_lb < true_effect & true_effect < ci_ub,
+    mutate(conf_low = effect - qnorm(0.975) * effect_se,
+           conf_high = effect + qnorm(0.975) * effect_se,
+           coverage = conf_low < true_effect & true_effect < conf_high,
            bias = effect - true_effect,
-           tau2 = 1)
+           tau_sq = 0)
 
   results
 

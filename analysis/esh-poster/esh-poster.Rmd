@@ -1,0 +1,255 @@
+---
+# PLEASE SEE THE README for in depth description github.com/brentthorne/posterdown
+#
+#---POSTER SIZE & DEFAULT FONT---#
+poster_height: "38in" # height in inches of poster
+poster_width: "45in" # width in inches of poster
+font_family: "palatino" # choose from typical latex fonts (example: "palatino")
+font_size: "30pt" #please see github.com/brentthorne/posterdown for compatible options.
+
+#---TITLE BOX OPTIONS---#
+#ESSENTIALS
+title: '\fontfamily{phv}\selectfont escaping batpigday'
+author: "Charles T. Gray^1^"
+affiliation: "^1^Department of Mathematics and Statistics, La Trobe University, Victoria, Australia"
+#STYLE & FORMATTING
+titlebox_bgcol: "008080"  #Colour of the Title Box background
+titlebox_bordercol: "0b4545" #Colour of the title Box border.
+titlebox_shape: "all"
+titlebox_borderwidth: "1cm"
+title_textcol: "ffffff" #colour of title text
+author_textcol: "0b4545" # Colour of author text
+affiliation_textcol: "FFFFFF" # Colour of affiliation text
+title_textsize: "Huge"         # Poster title fontsize
+author_textsize: "Large"       # Author list font size
+affiliation_textsize: "large"  # Affiliation font size
+#ADDING LOGOS
+logoleft_name: 'Figures/batpig'
+logoleft_width: '3in'
+logoleft_xshift: '1in'
+logoleft_yshift: '1in'
+logoright_name: 'Figures/batpig'
+logoright_width: '3in'
+logoright_xshift: '-1in'
+logoright_yshift: '1in'
+
+#---POSTER BODY OPTIONS---#
+body_bgcol: "ffffff" #colour of the poster main background
+body_textsize: "normalsize"    # Size of the main poster body text
+body_textcol: "000000" # Colour of main text in the body of poster
+column_numbers: 3 # Number of columns that the poster has
+column_margins: "0.5in" # Margin spacing for columns
+columnline_col: "008080" #colour 
+columnline_width: "0pt" #width of line between each column
+#SECTION TITLE STYLING
+sectitle_textcol: "ffffff" # Colour of the poster section titles
+sectitle_bgcol: "0b4545" # Colour of the section title box
+sectitle_bordercol: "0b4545" # Colour of the border around the section title box.
+sectitle_borderwidth: "2mm" # Thicknes of the section title box border
+sectitle_boxshape: "uphill" # Changes the shape of the section title box.
+
+#---BIBLIOGRAPHY OPTIONS---#
+bibliography: biblio # name of the .bib file used for referencing
+bibliography_spacing: 0.8 # sets the multiplier for line spacing of bibliography spacing (between 0 and 1)
+bibliography_textsize: "small"  # size of the bibliography text size (handy for one too many references!)
+
+#---OTHER---#
+cite_col: "CC0000" #colour of ciation elements
+url_col: "008080" #colour of url links
+link_col: "008080" #colour of other links within the poster
+footnote_textcol: "ffffff" # Colour of footnote text if used
+output: posterdown::posterdown_pdf
+---
+
+```{r chunk opts, include=FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  eval = TRUE,
+  message = FALSE,
+  echo = TRUE,
+  results = 'asis',
+  fig.height = 3.5,
+  fig.width = 4.5,
+  out.width = "100%",
+  warning = FALSE,
+  fig.align = 'center',
+  message = FALSE,
+  dev = 'cairo_pdf'
+)
+
+```
+
+<!--
+Bellow you will find typical RMarkdown syntax which should fill in the columns for the poster from top to bottom left to right. The more information you have the more will be filled. Please let me know if you have feedback at brentthorne18@gmail.com or at github.com/brentthorne/posterdown.
+ENJOY! XD
+-->
+
+# batpigday
+
+\begin{description}
+  \item[batpigday]{\emph{noun} The coding equivalent of groundhogday.}
+\end{description}
+
+# the problem
+
+***
+\begin{center}
+Simulating data is a bitch. 
+\end{center}
+***
+
+Debugging frequently dominates the time of students in mathematical science. 
+These students know how to solve equations, and next to nothing about code. 
+
+***
+
+New tools[@wickham_tidyverse:_2017] are emerging daily to enable researchers to avoid these timesink pitfalls. 
+
+These tools have lowered the programmatic barrier for researchers, but it still a learning curve. 
+
+***
+
+We consider a case study in meta-analysis.
+
+\begin{description}
+\item[meta-analysis] Statistical methodology for combining the results of several studies. 
+
+\end{description}
+
+# meta-analysis of medians
+
+Conventional meta-analytic tools, such as `metafor::rma`[@viechtbauer_conducting_2010], require an **effect** and a **variance** of that effect.
+
+***
+
+But what if the reported statistics are **median** and **interquartile** range? Existing estimators, such as [@wan_estimating_2014], estimate a mean and standard deviation.
+
+***
+
+To test our proposed estimator for the variance of the sample median, I found myself repeating tasks and checks in the algorithms. 
+
+***
+
+I tried to find a better way of debugging and writing simulations.
+
+This lead to: 
+
+1. a packaged analysis[@marwick_packaging_2018], `varameta::`*, which is built on 
+2. the simulation package for meta-analysis data, `metasim::`*. 
+
+(*in development)
+
+
+\begin{center}
+\textbf{coding is the easiest part of coding}
+\end{center}
+
+ - Modular code with functions rather than script
+ - Reproducibility is more than `set.seed()`
+ - Versioning and collaboration via Git
+ - Packaged analyses
+
+
+\columnbreak
+
+# escaping batpigday
+
+Generate sample sizes for $k$ studies. 
+
+
+```{r load metasim, echo=TRUE}
+library(tidyverse)
+library(metasim)
+```
+
+```{r output table, echo=FALSE}
+library(kableExtra)
+
+# table styling
+output_table <- function(df) {
+  df %>% 
+    janitor::adorn_rounding(skip_first_col = FALSE) %>% 
+  kable(align = "c", caption = NULL, booktabs = TRUE) %>% 
+  kable_styling(latex_options = c("striped","HOLD_position"),full_width = TRUE, font_size = 25)
+}
+ 
+```
+
+
+
+```{r n, echo=TRUE, eval=TRUE}
+# simulate 2 studies where most have at most 25
+sim_n(k = 2, min_n = 10, max_n = 25) %>% output_table()
+
+```
+
+```{r df}
+# generate simulation dataframe
+sim_df() %>% head(2) %>% select(-n) %>% output_table()
+```
+
+Each **row** of this dataframe represents a set of **simulation** parameters. Each simulation runs a **trial** function. 
+
+```{r trial}
+metatrial() %>% output_table()
+```
+        
+Each **simulation** reruns the trial function a given number of times.
+
+```{r test}
+metasim() %>% pluck("results") %>%
+  select(-coverage_count) %>% output_table()
+
+```
+
+For all **simulations**, run `metasim` over each row of the dataframe. 
+
+```{r metasims, eval=FALSE}
+sims <- metasims(trials = 100,
+         trial_fn = metatrial,
+         probar = FALSE) %>% 
+  filter(measure == "lr") 
+
+sims %>% 
+  select(id, k, rdist, coverage, ci_width, bias) %>% 
+  head() %>% 
+  output_table()
+
+```
+
+\columnbreak
+
+```{r plot sim results, eval=FALSE}
+# plot
+sims %>%
+  ggplot(aes(x = rdist, y = coverage)) +
+  geom_point(aes(colour = rdist), alpha = 0.4, position = "jitter") +
+  facet_grid(k ~ tau2_true) + theme(
+    axis.text.x = element_text(angle = 35, hjust = 1),
+    legend.position = "none",
+    plot.caption = element_text(hjust = 0)
+  ) +
+    hrbrthemes::scale_colour_ipsum() +
+  labs(x = "Distribution",
+       y = "Coverage")
+  
+
+
+```
+
+```{r echo=FALSE}
+
+ggsave("eshplot.png") 
+
+knitr::include_graphics("eshplot.png")
+```
+
+
+\vfill\null
+
+This poster was created with `posterdown::`@thorne_posterdown:_2019.
+
+<!--- Here you can set the size of the citation text as well as remove the "References" section if you choose not to have one for some reason :) -->
+\small\printbibliography
+
+

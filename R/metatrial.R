@@ -24,7 +24,7 @@ metatrial <- function(true_median = 50,
 
   # calculate true effects
   true_effects <- tibble::tibble(measure = c("m", "lr"),
-                                 true_effect = c(true_median,
+                                 true_effect = c(true_effect,
                                                   log(median_ratio)))
 
   # simualte data
@@ -88,7 +88,7 @@ metatrial <- function(true_median = 50,
     mutate(
       coverage = conf_low < true_effect & true_effect < conf_high,
       # can't scale bc log(1) = 0
-      bias = estimate - true_effect
+      bias = effect - true_effect
     )
 
   return(results)

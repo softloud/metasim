@@ -1,11 +1,11 @@
 #' simulate over all
 #'
 #' @param k Simulate for different numbers of studies.
-#' @param tau2_true Variance \eqn{\tau^2} associated with the random effect \eqn{\gamma_k} describing the deviation of the \eqn{k)th results.
-#' @param prop Proportion of sample size we expect to cohorts to vary by most of the time
+#' @param tau2_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
+#' @param prop Proportion of sample size we expect to cohorts to vary by most of
+#' the time
 #' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
 #' @param probar Turn progress bar on and off.
-#'
 #' @export
 
 metasims <- function(distributions = default_parameters,

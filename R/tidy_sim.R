@@ -8,16 +8,15 @@
 #'
 #' @export
 
-tidy_sim <- function(rma_model){
-    # bind_cols(
-    #   rma_model %>%
-    #     tidy() %>%
-    #     filter(type == "summary") %>%
-    #     select(conf.low, conf.high, std.error, std.error, estimate) %>% janitor::clean_names(),
-    #   rma_model %>%
-    #     glance() %>%
-    #     select(tau.squared, k, method, tau.squared.se, i.squared, h.squared, QE, QE_p, QM, QM_p) %>%
-    #     janitor::clean_names()
-
-
-          )}
+tidy_sim <- function(rma_model) {
+  rma_model %>%
+    {
+      tibble(
+        conf_low = pluck(., "ci.lb"),
+        conf_high = pluck(., "ci.ub"),
+        tau_sq = pluck(., "tau2"),
+        k = pluck(., "k"),
+        effect = pluck(., "beta") %>% as.numeric()
+      )
+    }
+}
