@@ -105,10 +105,10 @@ sharp corners=all,
  overlay={
     \node[anchor=south west]
       at ([xshift=1in,yshift=1in]frame.south west)
-       {\includegraphics[width=3in]{Figures/posterdownlogo}};
+       {\includegraphics[width=3in]{Figures/batpig}};
     \node[anchor=south east]
       at ([xshift=-1in,yshift=1in]frame.south east)
-       {\includegraphics[width=3in]{Figures/posterdownlogo}};}
+       {\includegraphics[width=3in]{Figures/batpig}};}
 
 }
 %Body Section Title Box
@@ -140,7 +140,7 @@ sharp corners=uphill, #1}
 %biblatex options
 \RequirePackage[sorting=none,backend=biber]{biblatex}
 \renewcommand*{\bibfont}{\small} %% SC
-\bibliography{MyLibrary}
+\bibliography{biblio}
 \defbibheading{bibliography}[\bibname]{%
 \setlength\bibitemsep{0.8\itemsep} %% SC
 \section*{#1}%
@@ -257,7 +257,7 @@ sharp corners=uphill, #1}
 \begin{topbox}
   \color{titletextcol}
   \vspace{0.5in}
-  \Huge{escaping batpigday}  \\[0.3in]  %% SC
+  \Huge{\fontfamily{phv}\selectfont escaping batpigday}  \\[0.3in]  %% SC
   \color{authortextcol} \Large{Charles T. Gray\textsuperscript{1}} \\[0.2in] %% SC
   \color{affiliationtextcol} \large{\textsuperscript{1}Department of Mathematics and Statistics, La Trobe
 University, Victoria, Australia} %% SC
@@ -273,59 +273,263 @@ University, Victoria, Australia} %% SC
 \section{batpigday}\label{batpigday}}
 
 \begin{description}
-\item[batpigday] \emph{noun} coding equivalent of groundhogday
+  \item[batpigday]{\emph{noun} The coding equivalent of groundhogday.}
 \end{description}
 
 \hypertarget{the-problem}{%
 \section{the problem}\label{the-problem}}
 
-Simulating data is a bitch.
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
 
-Why?
+\begin{center}
+Simulating data is a bitch. 
+\end{center}
 
-\vfill\null
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Debugging frequently dominates the time of students in mathematical
+science. These students know how to solve equations, and next to nothing
+about code.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+New tools\autocite{wickham_tidyverse:_2017} are emerging daily to enable
+researchers to avoid these timesink pitfalls.
+
+These tools have lowered the programmatic barrier for researchers, but
+it still a learning curve.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+We consider a case study in meta-analysis.
+
+\begin{description}
+\item[meta-analysis] Statistical methodology for combining the results of several studies. 
+
+\end{description}
+
+\hypertarget{meta-analysis-of-medians}{%
+\section{meta-analysis of medians}\label{meta-analysis-of-medians}}
+
+Conventional meta-analytic tools, such as
+\texttt{metafor::rma}\autocite{viechtbauer_conducting_2010}, require an
+\textbf{effect} and a \textbf{variance} of that effect.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+But what if the reported statistics are \textbf{median} and
+\textbf{interquartile} range? Existing estimators, such as
+\autocite{wan_estimating_2014}, estimate a mean and standard deviation.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+To test our proposed estimator for the variance of the sample median, I
+found myself repeating tasks and checks in the algorithms.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+I tried to find a better way of debugging and writing simulations.
+
+This lead to:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  a packaged analysis\autocite{marwick_packaging_2018},
+  \texttt{varameta::}*, which is built on
+\item
+  the simulation package for meta-analysis data, \texttt{metasim::}*.
+\end{enumerate}
+
+(*in development)
+
+\begin{center}
+\textbf{coding is the easiest part of coding}
+\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  Modular code with functions rather than script
+\item
+  Reproducibility is more than \texttt{set.seed()}
+\item
+  Versioning and collaboration via Git
+\item
+  Packaged analyses
+\end{itemize}
+
 \columnbreak
 
-\hypertarget{the-package}{%
-\section{the package}\label{the-package}}
+\hypertarget{escaping-batpigday}{%
+\section{escaping batpigday}\label{escaping-batpigday}}
 
-I wanted the package to be as modular as possible, so I could swap out
-components and use them in future simulations.
+Generate sample sizes for \(k\) studies.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# load package}
+\KeywordTok{library}\NormalTok{(tidyverse)}
 \KeywordTok{library}\NormalTok{(metasim)}
-
-\CommentTok{# generate a meta-analysis sample set}
-\KeywordTok{sim_n}\NormalTok{(}\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}llr@{}}
-\toprule
-study & group & n\tabularnewline
-\midrule
-\endhead
-study\_1 & control & 77\tabularnewline
-study\_2 & control & 190\tabularnewline
-study\_3 & control & 64\tabularnewline
-study\_1 & intervention & 73\tabularnewline
-study\_2 & intervention & 238\tabularnewline
-study\_3 & intervention & 72\tabularnewline
-\bottomrule
-\end{longtable}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# simulate 2 studies where most have at most 25}
+\KeywordTok{sim_n}\NormalTok{(}\DataTypeTok{k =} \DecValTok{2}\NormalTok{, }\DataTypeTok{min_n =} \DecValTok{10}\NormalTok{, }\DataTypeTok{max_n =} \DecValTok{25}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{output_table}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
 
-\vfill\null
+\rowcolors{2}{gray!6}{white}
+\begin{table}[H]
+
+\caption{\label{tab:n}}
+\centering
+\fontsize{25}{27}\selectfont
+\begin{tabu} to \linewidth {>{\centering}X>{\centering}X>{\centering}X}
+\hiderowcolors
+\toprule
+study & group & n\\
+\midrule
+\showrowcolors
+study\_1 & control & 18\\
+study\_2 & control & 15\\
+study\_1 & intervention & 14\\
+study\_2 & intervention & 15\\
+\bottomrule
+\end{tabu}
+\end{table}
+\rowcolors{2}{white}{white}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# generate simulation dataframe}
+\KeywordTok{sim_df}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{head}\NormalTok{(}\DecValTok{2}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{n) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{output_table}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\rowcolors{2}{gray!6}{white}
+\begin{table}[H]
+
+\caption{\label{tab:df}}
+\centering
+\fontsize{25}{27}\selectfont
+\begin{tabu} to \linewidth {>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X}
+\hiderowcolors
+\toprule
+k & tau2\_true & median\_ratio & prop & rdist & parameters & id & true\_effect\\
+\midrule
+\showrowcolors
+3 & 0 & 1 & 0.3 & norm & list(mean = 67, sd = 0.3) & sim\_1 & 67.0\\
+3 & 0 & 1 & 0.3 & exp & list(rate = 2) & sim\_2 & 0.3\\
+\bottomrule
+\end{tabu}
+\end{table}
+\rowcolors{2}{white}{white}
+
+Each \textbf{row} of this dataframe represents a set of
+\textbf{simulation} parameters. Each simulation runs a \textbf{trial}
+function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{metatrial}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{output_table}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\rowcolors{2}{gray!6}{white}
+\begin{table}[H]
+
+\caption{\label{tab:trial}}
+\centering
+\fontsize{25}{27}\selectfont
+\begin{tabu} to \linewidth {>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X}
+\hiderowcolors
+\toprule
+conf\_low & conf\_high & tau\_sq & k & effect & measure & true\_effect & coverage & bias\\
+\midrule
+\showrowcolors
+19.1 & 95.9 & 238.9 & 3 & 57.5 & m & 50.0 & TRUE & 7.5\\
+-1.3 & 1.2 & 0.3 & 3 & -0.1 & lr & 0.2 & TRUE & -0.2\\
+\bottomrule
+\end{tabu}
+\end{table}
+\rowcolors{2}{white}{white}
+
+Each \textbf{simulation} reruns the trial function a given number of
+times.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{metasim}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{pluck}\NormalTok{(}\StringTok{"results"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{coverage_count) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{output_table}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\rowcolors{2}{gray!6}{white}
+\begin{table}[H]
+
+\caption{\label{tab:test}}
+\centering
+\fontsize{25}{27}\selectfont
+\begin{tabu} to \linewidth {>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X>{\centering}X}
+\hiderowcolors
+\toprule
+measure & tau\_sq & ci\_width & bias & successful\_trials & coverage & id\\
+\midrule
+\showrowcolors
+lr & 0.5 & 3.6 & 0.0 & 4 & 1 & simulation1\\
+m & 388.9 & 94.1 & 3.4 & 4 & 1 & simulation1\\
+\bottomrule
+\end{tabu}
+\end{table}
+\rowcolors{2}{white}{white}
+
+For all \textbf{simulations}, run \texttt{metasim} over each row of the
+dataframe.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sims <-}\StringTok{ }\KeywordTok{metasims}\NormalTok{(}\DataTypeTok{trials =} \DecValTok{100}\NormalTok{,}
+         \DataTypeTok{trial_fn =}\NormalTok{ metatrial,}
+         \DataTypeTok{probar =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(measure }\OperatorTok{==}\StringTok{ "lr"}\NormalTok{) }
+
+\NormalTok{sims }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, k, rdist, coverage, ci_width, bias) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{head}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{output_table}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
 \columnbreak
 
-\hypertarget{the-maths}{%
-\section{the maths}\label{the-maths}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# plot}
+\NormalTok{sims }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ rdist, }\DataTypeTok{y =}\NormalTok{ coverage)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{colour =}\NormalTok{ rdist), }\DataTypeTok{alpha =} \FloatTok{0.4}\NormalTok{, }\DataTypeTok{position =} \StringTok{"jitter"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{facet_grid}\NormalTok{(k }\OperatorTok{~}\StringTok{ }\NormalTok{tau2_true) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}
+    \DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{35}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{),}
+    \DataTypeTok{legend.position =} \StringTok{"none"}\NormalTok{,}
+    \DataTypeTok{plot.caption =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust =} \DecValTok{0}\NormalTok{)}
+\NormalTok{  ) }\OperatorTok{+}
+\StringTok{    }\NormalTok{hrbrthemes}\OperatorTok{::}\KeywordTok{scale_colour_ipsum}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Distribution"}\NormalTok{,}
+       \DataTypeTok{y =} \StringTok{"Coverage"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
-\hypertarget{references}{%
-\section{references}\label{references}}
+\begin{center}\includegraphics[width=1\linewidth]{eshplot} \end{center}
 
 \vfill\null
+
+This poster was created with
+\texttt{posterdown::}\textcite{thorne_posterdown:_2019}.
+
+\small\printbibliography
 }
 \end{adjmulticols*}
 %------------------ Body End ---------------------%

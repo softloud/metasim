@@ -3,27 +3,19 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{tidy}
-\alias{glance}
-\alias{augment}
 \alias{\%>\%}
 \alias{rma}
 \alias{forest}
 \alias{escalc}
-\alias{dist_name}
 \alias{pluck}
-\title{todo: update this when these methods are integrated into broom::}
+\title{Objects exported from other packages}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dontpanic}{\code{\link[dontpanic]{dist_name}}}
-
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
-
-  \item{metabroom}{\code{\link[metabroom]{tidy}}, \code{\link[metabroom]{glance}}, \code{\link[metabroom]{augment}}}
 
   \item{metafor}{\code{\link[metafor]{rma}}, \code{\link[metafor]{forest}}, \code{\link[metafor]{escalc}}}
 

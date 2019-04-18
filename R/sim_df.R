@@ -15,7 +15,7 @@
 
 sim_df <- function(dist_tribble = default_parameters,
                    k = c(3, 7, 20),
-                   between_study_variation = seq(0, 0.4, 0.2),
+                   tau2 = seq(0, 0.4, 0.2),
                    median_ratio = c(1, 1.2),
                    prop = 0.3) {
   dist_tribble %>%
@@ -29,7 +29,7 @@ sim_df <- function(dist_tribble = default_parameters,
         list(
           distribution = .,
           k = k,
-          between_study_variation = between_study_variation,
+          tau2_true = tau2,
           median_ratio = median_ratio,
           prop = prop
         )

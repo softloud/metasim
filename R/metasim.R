@@ -24,7 +24,7 @@ metasim <- function(...,
     dplyr::group_by(measure) %>%
     clean_names() %>%
     dplyr::summarise(
-      tau_sq = mean(tau_squared),
+      tau_sq = mean(tau_sq),
       ci_width = mean(conf_high - conf_low),
       bias = mean(bias),
       coverage_count = sum(coverage),

@@ -1,0 +1,40 @@
+---
+title: "sampling sample sizes"
+author: "Charles T. Gray"
+date: "09/04/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+# arguments
+k = 3 # number of studies
+p_control = 0.5 # expected portion of n
+min_n = 10 # smallest possible cohort
+max_n = 50 # largest possible cohort
+p_deviance = 0.1 #    
+
+```
+
+
+```{r}
+# sample sizes
+# perhaps sample from a sequence to keep integers
+(n <- sample(seq(min_n, max_n), k, replace = TRUE))
+
+ 
+```
+
+
+```{r}
+
+# sample proportion of case group
+p <- rbeta()
+
+```
+
+
