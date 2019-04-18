@@ -1,5 +1,7 @@
 #' simulate over all
 #'
+#' @param distributions a dataframe with a `dist` column of R distributions, i.e., norm, exp, pareto, and a list-column `par` of parameter sets. Defaults to [default_parmetres]
+#' @param single_study When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.
 #' @param k Simulate for different numbers of studies.
 #' @param tau2_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of
@@ -9,6 +11,7 @@
 #' @export
 
 metasims <- function(distributions = default_parameters,
+                     single_study = FALSE,
                      k = c(3, 7, 10),
                      tau2_true = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
@@ -17,6 +20,13 @@ metasims <- function(distributions = default_parameters,
                      trial_fn = metatrial,
                      beep = FALSE,
                      probar = TRUE) {
+
+  #
+  if (isTRUE(singlestudy)) {
+    k <- 1
+    tau2_true <- 0
+  }
+
   # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = distributions,
@@ -25,6 +35,7 @@ metasims <- function(distributions = default_parameters,
     median_ratio = median_ratio,
     prop = prop
   )
+
 
 
 
