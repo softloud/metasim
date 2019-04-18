@@ -1,1 +1,4 @@
 .Rproj.user
+analysis/esh-poster/
+!analysis/esh-poster/*.Rmd
+!analysis/esh-poster/biblio.bib*

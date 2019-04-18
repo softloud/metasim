@@ -1,6 +1,7 @@
 #' @import dplyr
 #' @import purrr
 #' @importFrom metafor rma escalc forest
+#' @importFrom janitor clean_names
 #' @importFrom tibble tibble as_tibble
 #' @importFrom stats dist median quantile rexp rlnorm rnorm runif sd
 #' @importFrom varameta effect_se
@@ -23,3 +24,6 @@ metafor::escalc
 
 #' @export
 purrr::pluck
+
+#' @export
+janitor::clean_names

@@ -20,6 +20,7 @@ test_that("true effect arg", {
 
 test_that("effect ratio", {
   expect_is(singletrial(median_ratio = 1), "data.frame")
+  expect_gt(singletrial(median_ratio = 1) %>% nrow(), 1)
   expect_is(metasim(trial_fn = singletrial, median_ratio = 1) %>%
               pluck("results"),
             "data.frame")
@@ -28,7 +29,11 @@ test_that("effect ratio", {
       pluck("results"),
     "data.frame"
   )
-})
+  expect_is(metasim(trial_fn = singletrial, median_ratio = 1.2) %>%
+              pluck("results"),
+            "data.frame")
+
+  })
 
 test_that("distributions", {
   expect_is(singletrial(rdist = "pareto",
@@ -56,7 +61,8 @@ test_that("singletrial in sims", {
   expect_is(metasims(
     trial_fn = singletrial,
     probar = FALSE,
-    k = 1
+    k = 1,
+    tau2_true = 0
   ),
   "data.frame")
 })

@@ -4,6 +4,9 @@
 [![Travis build
 status](https://travis-ci.org/softloud/metasim.svg?branch=master)](https://travis-ci.org/softloud/metasim)
 
+[![Coverage
+status](https://codecov.io/gh/softloud/metasim/branch/master/graph/badge.svg)](https://codecov.io/github/softloud/metasim?branch=master)
+
 # metasim
 
 The goal of metasim is to simulate meta-analysis data.
@@ -41,8 +44,6 @@ devtools::install_github("softloud/metasim")
 ``` r
 # packages
 library(metasim)
-#> Warning: replacing previous import 'assertthat::has_name' by
-#> 'tibble::has_name' when loading 'metasim'
 library(tidyverse)
 
 # so these results are reproducible
@@ -192,53 +193,45 @@ different within study cohorts.
 ``` r
 # defaults
 sim_df() 
-#> # A tibble: 18 x 9
-#>        k between_study_v… median_ratio  prop rdist parameters n     id   
-#>    <dbl>            <dbl>        <dbl> <dbl> <chr> <list>     <lis> <chr>
-#>  1     3              0            1     0.3 norm  <list [2]> <tib… sim_1
-#>  2     7              0            1     0.3 norm  <list [2]> <tib… sim_2
-#>  3    20              0            1     0.3 norm  <list [2]> <tib… sim_3
-#>  4     3              0.2          1     0.3 norm  <list [2]> <tib… sim_4
-#>  5     7              0.2          1     0.3 norm  <list [2]> <tib… sim_5
-#>  6    20              0.2          1     0.3 norm  <list [2]> <tib… sim_6
-#>  7     3              0.4          1     0.3 norm  <list [2]> <tib… sim_7
-#>  8     7              0.4          1     0.3 norm  <list [2]> <tib… sim_8
-#>  9    20              0.4          1     0.3 norm  <list [2]> <tib… sim_9
-#> 10     3              0            1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 11     7              0            1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 12    20              0            1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 13     3              0.2          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 14     7              0.2          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 15    20              0.2          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 16     3              0.4          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 17     7              0.4          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> 18    20              0.4          1.2   0.3 norm  <list [2]> <tib… sim_…
-#> # … with 1 more variable: true_median <dbl>
+#> # A tibble: 108 x 9
+#>        k tau2_true median_ratio  prop rdist parameters n     id   
+#>    <dbl>     <dbl>        <dbl> <dbl> <chr> <list>     <lis> <chr>
+#>  1     3         0            1   0.3 norm  <list [2]> <tib… sim_1
+#>  2     3         0            1   0.3 exp   <list [1]> <tib… sim_2
+#>  3     3         0            1   0.3 pare… <list [2]> <tib… sim_3
+#>  4     3         0            1   0.3 pare… <list [2]> <tib… sim_4
+#>  5     3         0            1   0.3 pare… <list [2]> <tib… sim_5
+#>  6     3         0            1   0.3 lnorm <list [2]> <tib… sim_6
+#>  7     7         0            1   0.3 norm  <list [2]> <tib… sim_7
+#>  8     7         0            1   0.3 exp   <list [1]> <tib… sim_8
+#>  9     7         0            1   0.3 pare… <list [2]> <tib… sim_9
+#> 10     7         0            1   0.3 pare… <list [2]> <tib… sim_…
+#> # … with 98 more rows, and 1 more variable: true_effect <dbl>
 
 sim_df() %>% str(1)
-#> Classes 'tbl_df', 'tbl' and 'data.frame':    18 obs. of  9 variables:
-#>  $ k                      : num  3 7 20 3 7 20 3 7 20 3 ...
-#>  $ between_study_variation: num  0 0 0 0.2 0.2 0.2 0.4 0.4 0.4 0 ...
-#>  $ median_ratio           : num  1 1 1 1 1 1 1 1 1 1.2 ...
-#>  $ prop                   : num  0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 ...
-#>  $ rdist                  : chr  "norm" "norm" "norm" "norm" ...
-#>  $ parameters             :List of 18
-#>  $ n                      :List of 18
-#>  $ id                     : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
-#>  $ true_median            : num  67 67 67 67 67 67 67 67 67 67 ...
+#> Classes 'tbl_df', 'tbl' and 'data.frame':    108 obs. of  9 variables:
+#>  $ k           : num  3 3 3 3 3 3 7 7 7 7 ...
+#>  $ tau2_true   : num  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ median_ratio: num  1 1 1 1 1 1 1 1 1 1 ...
+#>  $ prop        : num  0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 ...
+#>  $ rdist       : chr  "norm" "exp" "pareto" "pareto" ...
+#>  $ parameters  :List of 108
+#>  $ n           :List of 108
+#>  $ id          : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
+#>  $ true_effect : num  67 0.347 0.78 0.414 3 ...
 
 # only consider small values of k
 sim_df(k = c(2, 5, 7)) %>% str(1)
-#> Classes 'tbl_df', 'tbl' and 'data.frame':    18 obs. of  9 variables:
-#>  $ k                      : num  2 5 7 2 5 7 2 5 7 2 ...
-#>  $ between_study_variation: num  0 0 0 0.2 0.2 0.2 0.4 0.4 0.4 0 ...
-#>  $ median_ratio           : num  1 1 1 1 1 1 1 1 1 1.2 ...
-#>  $ prop                   : num  0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 ...
-#>  $ rdist                  : chr  "norm" "norm" "norm" "norm" ...
-#>  $ parameters             :List of 18
-#>  $ n                      :List of 18
-#>  $ id                     : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
-#>  $ true_median            : num  67 67 67 67 67 67 67 67 67 67 ...
+#> Classes 'tbl_df', 'tbl' and 'data.frame':    108 obs. of  9 variables:
+#>  $ k           : num  2 2 2 2 2 2 5 5 5 5 ...
+#>  $ tau2_true   : num  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ median_ratio: num  1 1 1 1 1 1 1 1 1 1 ...
+#>  $ prop        : num  0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 ...
+#>  $ rdist       : chr  "norm" "exp" "pareto" "pareto" ...
+#>  $ parameters  :List of 108
+#>  $ n           :List of 108
+#>  $ id          : chr  "sim_1" "sim_2" "sim_3" "sim_4" ...
+#>  $ true_effect : num  67 0.347 0.78 0.414 3 ...
 ```
 
 For the list-column of tibbles `n`, the `sim_df` function calls `sim_n`
@@ -253,57 +246,44 @@ demo_k %>% pluck("n") %>% head(3)
 #> [[1]]
 #> # A tibble: 6 x 3
 #>   study   group            n
-#>   <chr>   <chr>        <int>
-#> 1 study_1 control         46
-#> 2 study_2 control        178
-#> 3 study_3 control        110
-#> 4 study_1 intervention    51
-#> 5 study_2 intervention   124
-#> 6 study_3 intervention    61
+#>   <chr>   <chr>        <dbl>
+#> 1 study_1 control         79
+#> 2 study_2 control        164
+#> 3 study_3 control        155
+#> 4 study_1 intervention    45
+#> 5 study_2 intervention   127
+#> 6 study_3 intervention   177
 #> 
 #> [[2]]
-#> # A tibble: 14 x 3
-#>    study   group            n
-#>    <chr>   <chr>        <int>
-#>  1 study_1 control          7
-#>  2 study_2 control         24
-#>  3 study_3 control        162
-#>  4 study_4 control        239
-#>  5 study_5 control         19
-#>  6 study_6 control        184
-#>  7 study_7 control        125
-#>  8 study_1 intervention     4
-#>  9 study_2 intervention    40
-#> 10 study_3 intervention   117
-#> 11 study_4 intervention   232
-#> 12 study_5 intervention    31
-#> 13 study_6 intervention    45
-#> 14 study_7 intervention   172
+#> # A tibble: 6 x 3
+#>   study   group            n
+#>   <chr>   <chr>        <dbl>
+#> 1 study_1 control         70
+#> 2 study_2 control        184
+#> 3 study_3 control         98
+#> 4 study_1 intervention    79
+#> 5 study_2 intervention   138
+#> 6 study_3 intervention   170
 #> 
 #> [[3]]
-#> # A tibble: 40 x 3
-#>    study    group       n
-#>    <chr>    <chr>   <int>
-#>  1 study_1  control    45
-#>  2 study_2  control   191
-#>  3 study_3  control   102
-#>  4 study_4  control   199
-#>  5 study_5  control   193
-#>  6 study_6  control    21
-#>  7 study_7  control    39
-#>  8 study_8  control    45
-#>  9 study_9  control    99
-#> 10 study_10 control    39
-#> # … with 30 more rows
+#> # A tibble: 6 x 3
+#>   study   group            n
+#>   <chr>   <chr>        <dbl>
+#> 1 study_1 control        195
+#> 2 study_2 control         91
+#> 3 study_3 control         78
+#> 4 study_1 intervention    78
+#> 5 study_2 intervention    31
+#> 6 study_3 intervention    52
 
 
 # compare the number of rows in the dataframe in the n column with the k value
 # divide by two because there are two rows for each study,
 # one for each group, control and intervention
 demo_k %>% pluck("n") %>% map_int(nrow) %>% head(3) / 2
-#> [1]  3  7 20
+#> [1] 3 3 3
 demo_k %>% pluck("k") %>% head(3)
-#> [1]  3  7 20
+#> [1] 3 3 3
 ```
 
 ## simulating data
@@ -327,12 +307,12 @@ sim_stats()  %>% knitr::kable()
 
 | this\_study\_error | study    | group        |   n |      min |      max |     mean |        sd | first\_q |   median | third\_q |       iqr |
 | -----------------: | :------- | :----------- | --: | -------: | -------: | -------: | --------: | -------: | -------: | -------: | --------: |
-|          0.4012801 | study\_1 | control      |  32 | 32.94933 | 33.75332 | 33.43390 | 0.1931430 | 33.30435 | 33.40224 | 33.59519 | 0.2908327 |
-|          0.4012801 | study\_1 | intervention |  25 | 89.23389 | 90.18812 | 89.66403 | 0.2674621 | 89.46491 | 89.65326 | 89.87055 | 0.4056447 |
-|        \-0.1717911 | study\_2 | control      | 162 | 58.89839 | 59.78051 | 59.38849 | 0.1730677 | 59.29269 | 59.40011 | 59.50348 | 0.2107853 |
-|        \-0.1717911 | study\_2 | intervention | 190 | 50.05789 | 51.07778 | 50.52452 | 0.1805773 | 50.39629 | 50.51469 | 50.63299 | 0.2367086 |
-|          0.0544281 | study\_3 | control      |  80 | 46.83805 | 47.85991 | 47.37630 | 0.2045542 | 47.27983 | 47.37593 | 47.50218 | 0.2223505 |
-|          0.0544281 | study\_3 | intervention |  90 | 62.89808 | 63.81617 | 63.39175 | 0.1914712 | 63.28966 | 63.37348 | 63.52904 | 0.2393868 |
+|        \-0.1340313 | study\_1 | control      | 197 | 56.65835 | 57.66129 | 57.19131 | 0.1895185 | 57.06155 | 57.20920 | 57.32117 | 0.2596229 |
+|        \-0.1340313 | study\_1 | intervention | 104 | 51.95953 | 53.02328 | 52.50215 | 0.1910127 | 52.38960 | 52.50954 | 52.63940 | 0.2498005 |
+|        \-0.2843719 | study\_2 | control      | 188 | 65.86379 | 66.94693 | 66.44225 | 0.2020039 | 66.32263 | 66.45260 | 66.56719 | 0.2445628 |
+|        \-0.2843719 | study\_2 | intervention | 127 | 44.60071 | 45.67585 | 45.16485 | 0.2075106 | 45.02813 | 45.19041 | 45.29744 | 0.2693061 |
+|        \-0.3709537 | study\_3 | control      | 196 | 72.04091 | 73.16230 | 72.47827 | 0.1935494 | 72.36590 | 72.48110 | 72.60956 | 0.2436504 |
+|        \-0.3709537 | study\_3 | intervention | 158 | 40.70510 | 41.87238 | 41.38953 | 0.2036729 | 41.25773 | 41.39994 | 41.53640 | 0.2786698 |
 
 ## trial
 
@@ -366,22 +346,12 @@ results.
 
 ``` r
 metatrial()
-#> $results
-#> # A tibble: 3 x 11
-#>   effect effect_se p_value  ci_lb ci_ub    tau2 method measure true_effect
-#>    <dbl>     <dbl>   <dbl>  <dbl> <dbl>   <dbl> <chr>  <chr>         <dbl>
-#> 1 37.7       2.75  0.00529 25.8   49.5  2.27e+1 REML   m            50    
-#> 2 42.9       8.32  0.0357   7.06  78.7  2.08e+2 REML   md           10    
-#> 3  0.760     0.143 0.0334   0.147  1.37 6.10e-2 REML   lr            0.182
-#> # … with 2 more variables: coverage <lgl>, bias <dbl>
-#> 
-#> $errors
-#> $errors$model
-#> # A tibble: 0 x 3
-#> # … with 3 variables: measure <chr>, rma <list>, fe <chr>
-#> 
-#> $errors$safely
-#> NULL
+#> # A tibble: 2 x 9
+#>   conf_low conf_high  tau_sq     k  effect measure true_effect coverage
+#>      <dbl>     <dbl>   <dbl> <int>   <dbl> <chr>         <dbl> <lgl>   
+#> 1    25.6      84.3  140.        3 54.9    m            50     TRUE    
+#> 2    -1.12      1.18   0.214     3  0.0284 lr            0.182 TRUE    
+#> # … with 1 more variable: bias <dbl>
 ```
 
 ## summarising simulation results
@@ -395,98 +365,15 @@ the exceptions being `cp_` variables.
 
 ``` r
 metasim()
-#> $results
-#> $results[[1]]
-#> $results[[1]]$results
-#> # A tibble: 3 x 11
-#>   effect effect_se p_value  ci_lb ci_ub    tau2 method measure true_effect
-#>    <dbl>     <dbl>   <dbl>  <dbl> <dbl>   <dbl> <chr>  <chr>         <dbl>
-#> 1 53.0       8.67   0.0258  15.7  90.3  225.    REML   m            50    
-#> 2 22.9      10.6    0.164  -22.8  68.7  339.    REML   md           10    
-#> 3  0.123     0.337  0.751   -1.33  1.57   0.340 REML   lr            0.182
-#> # … with 2 more variables: coverage <lgl>, bias <dbl>
-#> 
-#> $results[[1]]$errors
-#> $results[[1]]$errors$model
-#> # A tibble: 0 x 3
-#> # … with 3 variables: measure <chr>, rma <list>, fe <chr>
-#> 
-#> $results[[1]]$errors$safely
-#> NULL
-#> 
-#> 
-#> 
-#> $results[[2]]
-#> $results[[2]]$results
-#> # A tibble: 3 x 11
-#>   effect effect_se p_value   ci_lb  ci_ub    tau2 method measure
-#>    <dbl>     <dbl>   <dbl>   <dbl>  <dbl>   <dbl> <chr>  <chr>  
-#> 1 47.0       3.17  0.00452  33.4   60.6   3.01e+1 REML   m      
-#> 2 17.4       7.54  0.147   -15.0   49.9   1.71e+2 REML   md     
-#> 3  0.315     0.136 0.146    -0.268  0.899 5.52e-2 REML   lr     
-#> # … with 3 more variables: true_effect <dbl>, coverage <lgl>, bias <dbl>
-#> 
-#> $results[[2]]$errors
-#> $results[[2]]$errors$model
-#> # A tibble: 0 x 3
-#> # … with 3 variables: measure <chr>, rma <list>, fe <chr>
-#> 
-#> $results[[2]]$errors$safely
-#> NULL
-#> 
-#> 
-#> 
-#> $results[[3]]
-#> $results[[3]]$results
-#> # A tibble: 3 x 11
-#>   effect effect_se p_value   ci_lb ci_ub    tau2 method measure true_effect
-#>    <dbl>     <dbl>   <dbl>   <dbl> <dbl>   <dbl> <chr>  <chr>         <dbl>
-#> 1 42.2       4.40   0.0107  23.3   61.1   58.1   REML   m            50    
-#> 2 30.4      11.5    0.118  -19.0   79.8  396.    REML   md           10    
-#> 3  0.543     0.203  0.116   -0.330  1.42   0.124 REML   lr            0.182
-#> # … with 2 more variables: coverage <lgl>, bias <dbl>
-#> 
-#> $results[[3]]$errors
-#> $results[[3]]$errors$model
-#> # A tibble: 0 x 3
-#> # … with 3 variables: measure <chr>, rma <list>, fe <chr>
-#> 
-#> $results[[3]]$errors$safely
-#> NULL
-#> 
-#> 
-#> 
-#> $results[[4]]
-#> $results[[4]]$results
-#> # A tibble: 3 x 11
-#>   effect effect_se p_value   ci_lb  ci_ub    tau2 method measure
-#>    <dbl>     <dbl>   <dbl>   <dbl>  <dbl>   <dbl> <chr>  <chr>  
-#> 1 40.3       7.19   0.0303   9.39   71.3  1.55e+2 REML   m      
-#> 2 38.4      19.2    0.184  -44.3   121.   1.11e+3 REML   md     
-#> 3  0.672     0.336  0.183   -0.773   2.12 3.38e-1 REML   lr     
-#> # … with 3 more variables: true_effect <dbl>, coverage <lgl>, bias <dbl>
-#> 
-#> $results[[4]]$errors
-#> $results[[4]]$errors$model
-#> # A tibble: 0 x 3
-#> # … with 3 variables: measure <chr>, rma <list>, fe <chr>
-#> 
-#> $results[[4]]$errors$safely
-#> NULL
-#> 
-#> 
-#> 
-#> 
 #> $errors
 #> NULL
 #> 
-#> $results_summary
-#> # A tibble: 3 x 8
-#>   measure    tau2 ci_width    bias coverage_count successful_tria… coverage
-#>   <chr>     <dbl>    <dbl>   <dbl>          <int>            <int>    <dbl>
-#> 1 lr        0.214     2.18  -0.231              4                4        1
-#> 2 m       117.       50.4    4.38               4                4        1
-#> 3 md      504.      105.   -17.3                4                4        1
+#> $results
+#> # A tibble: 2 x 8
+#>   measure  tau_sq ci_width   bias coverage_count successful_tria… coverage
+#>   <chr>     <dbl>    <dbl>  <dbl>          <int>            <int>    <dbl>
+#> 1 lr        0.623     2.90  0.113              3                4     0.75
+#> 2 m       345.       70.0  -0.245              3                4     0.75
 #> # … with 1 more variable: id <chr>
 ```
 

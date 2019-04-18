@@ -22,7 +22,6 @@ metasim <- function(...,
     keep( ~ nrow(.) >= 1) %>% # keep non-empty results
     bind_rows() %>%
     dplyr::group_by(measure) %>%
-    clean_names() %>%
     dplyr::summarise(
       tau_sq = mean(tau_sq),
       ci_width = mean(conf_high - conf_low),
