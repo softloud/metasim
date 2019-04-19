@@ -27,8 +27,6 @@ metasims <- function(distributions = default_parameters,
     prop = prop
   )
 
-
-
   # set progress bar
   if (isTRUE(probar)) {
 
