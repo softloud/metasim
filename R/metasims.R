@@ -5,6 +5,7 @@
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of
 #' the time
 #' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
+#' @param beep Turn on beep alert when successfully finished.
 #' @param probar Turn progress bar on and off.
 #' @export
 

@@ -19,6 +19,8 @@ metasims(distributions = default_parameters, k = c(3, 7, 10),
 \item{prop}{Proportion of sample size we expect to cohorts to vary by most of
 the time}
 
+\item{beep}{Turn on beep alert when successfully finished.}
+
 \item{probar}{Turn progress bar on and off.}
 }
 \description{
