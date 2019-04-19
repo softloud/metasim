@@ -4,7 +4,7 @@
 \alias{metasim}
 \title{one row, one simulations}
 \usage{
-metasim(..., id = "simulation1", trial_fn = metatrial, trials = 4)
+metasim(..., id = "simulation1", trial_fn, trials = 4)
 }
 \arguments{
 \item{...}{\code{trial_fn} arguments}

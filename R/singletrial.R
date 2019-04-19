@@ -21,7 +21,7 @@ singletrial <- function(
                                  true_effect = c(true_median,
                                                  log(median_ratio)))
 
-  # simualte data
+  # simulate data
   ssdata <- sim_stats(
     n_df = n_df,
     rdist = rdist,
