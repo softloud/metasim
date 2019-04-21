@@ -7,18 +7,18 @@
 #' @export
 
 singletrial <- function(
-  true_median = 50,
   tau_sq = 0,
   median_ratio = 1.2,
   rdist = "norm",
   parameters = list(mean = 50, sd = 0.2),
   n_df = sim_n(k = 1),
-  true_effect = 50
+  true_effect = 50,
+  knha = TRUE
 ) {
 
   # calculate true effects
   true_effects <- tibble::tibble(measure = c("m", "lr"),
-                                 true_effect = c(true_median,
+                                 true_effect = c(true_effect,
                                                  log(median_ratio)))
 
   # simulate data

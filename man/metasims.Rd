@@ -2,17 +2,18 @@
 % Please edit documentation in R/metasims.R
 \name{metasims}
 \alias{metasims}
-\title{simulate over all}
+\title{coverage paobability simulations of an estimator for various}
 \usage{
-metasims(distributions = default_parameters, single_study = FALSE,
+metasims(single_study = FALSE, distributions = default_parameters,
   k = c(3, 7, 10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-  median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
-  trial_fn = metatrial, beep = FALSE, probar = TRUE)
+  median_ratio = c(1, 1.2), prop = 0.3, trials = 3,
+  trial_fn = metatrial, beep = FALSE, loop_output = FALSE,
+  probar = TRUE)
 }
 \arguments{
-\item{distributions}{a dataframe with a \code{dist} column of R distributions, i.e., norm, exp, pareto, and a list-column \code{par} of parameter sets. Defaults to \link{default_parmetres}}
-
 \item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.}
+
+\item{distributions}{a dataframe with a \code{dist} column of R distributions, i.e., norm, exp, pareto, and a list-column \code{par} of parameter sets. Defaults to \link{default_parmetres}}
 
 \item{k}{Simulate for different numbers of studies.}
 
@@ -28,5 +29,5 @@ the time}
 \item{probar}{Turn progress bar on and off.}
 }
 \description{
-simulate over all
+coverage paobability simulations of an estimator for various
 }

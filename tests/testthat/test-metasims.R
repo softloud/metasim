@@ -9,17 +9,14 @@ test_that("default trial_fn metatrial", {
 })
 
 test_that("singletrial trial_fn", {
-  expect_is(metasims(trial_fn = singletrial, probar = FALSE), "data.frame")
-  expect_true(nrow(metasims(
+  expect_is(metasims(single_study = TRUE, trial_fn = singletrial, probar = FALSE), "data.frame")
+  expect_true(nrow(metasims(single_study = TRUE,
     trial_fn = singletrial, probar = FALSE
   )) > 0)
-  expect_true("k" %in% colnames(metasims(
+  expect_true("k" %in% colnames(metasims(single_study = TRUE,
     trial_fn = singletrial, probar = FALSE
   )))
-  expect_true("sim" %in% colnames(metasims(
-    trial_fn = singletrial, probar = FALSE
-  )))
-  expect_true("median_ratio" %in% colnames(metasims(
+  expect_true("median_ratio" %in% colnames(metasims(single_study = TRUE,
     trial_fn = singletrial, probar = FALSE
   )))
 })
