@@ -7,7 +7,7 @@
 metasim(..., id = "simulation1", trial_fn = metatrial, trials = 4)
 }
 \arguments{
-\item{...}{\code{trial_fn} arguments}
+\item{...}{\code{trial_fn} arguments, i.e., simulation nparameters}
 
 \item{trial_fn}{the function to repeat}
 

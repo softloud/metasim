@@ -9,6 +9,10 @@ small <- runif(3, 0.1, 0.9)
 
 # tests -------------------------------------------------------------------
 
+test_that("test tau2", {
+  expect_is(singletrial(tau_sq = 0), "data.frame")
+})
+
 test_that("defaults return expected", {
   expect_is(singletrial(), "data.frame")
   expect_equal(nrow(singletrial()), 2)
@@ -29,11 +33,12 @@ test_that("effect ratio", {
       pluck("results"),
     "data.frame"
   )
-  expect_is(metasim(trial_fn = singletrial, median_ratio = 1.2) %>%
-              pluck("results"),
-            "data.frame")
-
-  })
+  expect_is(
+    metasim(trial_fn = singletrial, median_ratio = 1.2) %>%
+      pluck("results"),
+    "data.frame"
+  )
+})
 
 test_that("distributions", {
   expect_is(singletrial(rdist = "pareto",
@@ -59,10 +64,9 @@ test_that("singletrial in sims", {
   expect_is(metasim(trial_fn = singletrial) %>% pluck("results"),
             "data.frame")
   expect_is(metasims(
+    single_study = TRUE,
     trial_fn = singletrial,
-    probar = FALSE,
-    k = 1,
-    tau2_true = 0
-  ),
+    probar = FALSE
+    ),
   "data.frame")
 })

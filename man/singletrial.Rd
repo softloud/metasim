@@ -6,7 +6,7 @@
 \usage{
 singletrial(true_median = 50, tau_sq = 0, median_ratio = 1.2,
   rdist = "norm", parameters = list(mean = 50, sd = 0.2),
-  n_df = sim_n(k = 1), true_effect = 50)
+  n_df = sim_n(k = 1), true_effect = 50, knha = TRUE)
 }
 \description{
 This trial samples one paired set of data and returns the confidence interval, bias, and coverage.

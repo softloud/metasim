@@ -2,14 +2,17 @@
 % Please edit documentation in R/metasims.R
 \name{metasims}
 \alias{metasims}
-\title{simulate over all}
+\title{coverage paobability simulations of an estimator for various}
 \usage{
-metasims(distributions = default_parameters, k = c(3, 7, 10),
-  tau2_true = seq(from = 0, to = 0.4, by = 0.2), median_ratio = c(1,
-  1.2), prop = 0.3, trials = 10, trial_fn = metatrial,
-  beep = FALSE, probar = TRUE)
+metasims(single_study, distributions = default_parameters, k = c(3, 7,
+  10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
+  median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
+  trial_fn = metatrial, beep = FALSE, loop_output = FALSE,
+  probar = TRUE)
 }
 \arguments{
+\item{single_study}{logical indicating if k takes only one value, k = 1.}
+
 \item{k}{Simulate for different numbers of studies.}
 
 \item{tau2_true}{Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect}
@@ -22,5 +25,5 @@ the time}
 \item{probar}{Turn progress bar on and off.}
 }
 \description{
-simulate over all
+coverage paobability simulations of an estimator for various
 }

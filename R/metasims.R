@@ -1,5 +1,6 @@
-#' simulate over all
+#' coverage paobability simulations of an estimator for various
 #'
+#' @param single_study logical indicating if k takes only one value, k = 1.
 #' @param k Simulate for different numbers of studies.
 #' @param tau2_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of
@@ -8,7 +9,8 @@
 #' @param probar Turn progress bar on and off.
 #' @export
 
-metasims <- function(distributions = default_parameters,
+metasims <- function(single_study,
+                     distributions = default_parameters,
                      k = c(3, 7, 10),
                      tau2_true = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
@@ -16,8 +18,19 @@ metasims <- function(distributions = default_parameters,
                      trials = 10,
                      trial_fn = metatrial,
                      beep = FALSE,
-                     probar = TRUE) {
-  # set up simulation parameters
+                     loop_output = FALSE,
+                     probar = TRUE
+                     ) {
+
+  # ensure there is only one control and one intervention sampled for single
+  # study simulations
+  if (isTRUE(single_study)) {
+    k <- 1
+    tau2_true <- 0
+  }
+
+
+    # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = distributions,
     k = k,
@@ -25,8 +38,6 @@ metasims <- function(distributions = default_parameters,
     median_ratio = median_ratio,
     prop = prop
   )
-
-
 
   # set progress bar
   if (isTRUE(probar)) {
@@ -86,9 +97,6 @@ metasims <- function(distributions = default_parameters,
   if (isTRUE(beep)) beepr::beep("treasure")
 
   # output of function
-  return( results_df)
-   # list(simpars, results))
-
-
-
+  return(results_df)
 }
+

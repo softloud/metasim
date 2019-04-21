@@ -13,7 +13,8 @@ singletrial <- function(
   rdist = "norm",
   parameters = list(mean = 50, sd = 0.2),
   n_df = sim_n(k = 1),
-  true_effect = 50
+  true_effect = 50,
+  knha = TRUE
 ) {
 
   # calculate true effects
