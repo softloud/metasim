@@ -71,7 +71,7 @@ metasims <- function(distributions = default_parameters,
         id = simpars$id[[i]],
         trial_fn = trial_fn,
         trials = trials
-      ) %>% pluck("results")
+      )
 
     })
 
@@ -86,9 +86,7 @@ metasims <- function(distributions = default_parameters,
   results_df <- simpars %>%
     ungroup()  %>%
     mutate(id = as.character(id)) %>%
-    full_join(results %>%
-                bind_rows() %>%
-                mutate(id = as.character(id)),
+    full_join(results %>% bind_rows(),
               by = "id")
 
   if (isTRUE(probar)) cat("\n")
@@ -96,8 +94,5 @@ metasims <- function(distributions = default_parameters,
 
   # output of function
   return( results_df)
-   # list(simpars, results))
-
-
 
 }

@@ -13,11 +13,11 @@ metasim <- function(...,
                     id = "simulation1",
                     trial_fn,
                     trials = 4) {
-  safe_trial_fn <- purrr::safely(trial_fn)
+  all_trials <-
+    map_peacefully(1:trials, .f = function(x) {metatrial()})
 
-  results <- purrr::rerun(.n = trials, safe_trial_fn(...)) %>%
-    transpose() %>%
-    pluck("result") %>%
+  results <- all_trials %>%
+    map("result") %>%
     keep(is.data.frame) %>%
     keep( ~ nrow(.) >= 1) %>% # keep non-empty results
     bind_rows() %>%
@@ -29,13 +29,14 @@ metasim <- function(...,
       coverage_count = sum(coverage),
       successful_trials = length(coverage),
       coverage = coverage_count / successful_trials
-    ) %>% mutate(id = id)
+    ) %>%
+    mutate(id = id,
+           errors = tally_errors(all_trials),
+           warnings = tally_warnings(all_trials),
+           messages = tally_messages(all_trials),
+           result = tally_results(all_trials)
+    )
 
-  errors <- results %>%
-    transpose() %>%
-    purrr::pluck("error")
-
-  list(errors = errors,
-       results = results)
+  return(results)
 
 }
