@@ -19,7 +19,7 @@ singletrial <- function(
 
   # calculate true effects
   true_effects <- tibble::tibble(measure = c("m", "lr"),
-                                 true_effect = c(true_median,
+                                 true_effect = c(true_effect,
                                                  log(median_ratio)))
 
   # simualte data
