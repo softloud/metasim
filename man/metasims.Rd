@@ -4,14 +4,16 @@
 \alias{metasims}
 \title{coverage paobability simulations of an estimator for various}
 \usage{
-metasims(single_study, distributions = default_parameters, k = c(3, 7,
-  10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-  median_ratio = c(1, 1.2), prop = 0.3, trials = 10,
+metasims(single_study = FALSE, distributions = default_parameters,
+  k = c(3, 7, 10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
+  median_ratio = c(1, 1.2), prop = 0.3, trials = 3,
   trial_fn = metatrial, beep = FALSE, loop_output = FALSE,
   probar = TRUE)
 }
 \arguments{
-\item{single_study}{logical indicating if k takes only one value, k = 1.}
+\item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.}
+
+\item{distributions}{a dataframe with a \code{dist} column of R distributions, i.e., norm, exp, pareto, and a list-column \code{par} of parameter sets. Defaults to \link{default_parmetres}}
 
 \item{k}{Simulate for different numbers of studies.}
 
@@ -21,6 +23,8 @@ metasims(single_study, distributions = default_parameters, k = c(3, 7,
 
 \item{prop}{Proportion of sample size we expect to cohorts to vary by most of
 the time}
+
+\item{beep}{Turn on beep alert when successfully finished.}
 
 \item{probar}{Turn progress bar on and off.}
 }

@@ -1,36 +1,35 @@
 #' coverage paobability simulations of an estimator for various
 #'
-#' @param single_study logical indicating if k takes only one value, k = 1.
+#' @param distributions a dataframe with a `dist` column of R distributions, i.e., norm, exp, pareto, and a list-column `par` of parameter sets. Defaults to [default_parmetres]
+#' @param single_study When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.
 #' @param k Simulate for different numbers of studies.
 #' @param tau2_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
 #' @param prop Proportion of sample size we expect to cohorts to vary by most of
 #' the time
 #' @param median_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
+#' @param beep Turn on beep alert when successfully finished.
 #' @param probar Turn progress bar on and off.
 #' @export
 
-metasims <- function(single_study,
+metasims <- function(single_study = FALSE,
                      distributions = default_parameters,
                      k = c(3, 7, 10),
                      tau2_true = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
-                     trials = 10,
+                     trials = 3,
                      trial_fn = metatrial,
                      beep = FALSE,
                      loop_output = FALSE,
                      probar = TRUE
                      ) {
 
-  # ensure there is only one control and one intervention sampled for single
-  # study simulations
   if (isTRUE(single_study)) {
     k <- 1
     tau2_true <- 0
   }
 
-
-    # set up simulation parameters
+  # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = distributions,
     k = k,

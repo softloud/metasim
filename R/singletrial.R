@@ -7,7 +7,6 @@
 #' @export
 
 singletrial <- function(
-  true_median = 50,
   tau_sq = 0,
   median_ratio = 1.2,
   rdist = "norm",
@@ -22,7 +21,7 @@ singletrial <- function(
                                  true_effect = c(true_effect,
                                                  log(median_ratio)))
 
-  # simualte data
+  # simulate data
   ssdata <- sim_stats(
     n_df = n_df,
     rdist = rdist,

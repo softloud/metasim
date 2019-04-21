@@ -6,21 +6,24 @@ Description: What the package does (one paragraph).
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 3.2.0)
 Suggests: 
     testthat,
     covr
 RoxygenNote: 6.1.1.9000
 Imports: 
-    magrittr,
+    actuar,
+    beepr,
     dplyr,
-    purrr,
     assertthat,
+    janitor,
+    magrittr,
+    metabroom,
     metafor,
+    purrr,
     tibble,
     tidyr,
-    testthat,
-    metabroom,
-    varameta 
+    varameta
 Roxygen: list(markdown = TRUE)
 Remotes: 
     softloud/metabroom,
