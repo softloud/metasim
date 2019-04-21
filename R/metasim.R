@@ -15,6 +15,9 @@ metasim <- function(...,
                     trials = 4) {
   safe_trial_fn <- purrr::safely(trial_fn)
 
+  # implementing collateral
+
+
   results <- purrr::rerun(.n = trials, safe_trial_fn(...)) %>%
     transpose() %>%
     pluck("result") %>%
