@@ -1,5 +1,8 @@
 context("sim_n")
 
+k <- sample(seq(3, 100, by = 3), 1)
+
+
 test_that("different inputs parse in sim_n", {
   # sanity check
   expect_is(sim_n(), "data.frame")
@@ -12,7 +15,4 @@ test_that("different inputs parse in sim_n", {
   expect_true(sum(colnames(sim_n(k = k)) == c("study", "group", "n")) == 3)
   expect_true(sum(unique(sim_n(k = k)$group) == c("control", "intervention")) == 2)
   expect_true(length(unique(sim_n(k = k)$study)) == k)
-
-  # check the table is non-empty
-  expect_gt(nrow(testdf), 0)
 })

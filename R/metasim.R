@@ -4,14 +4,14 @@
 #'
 #' @param trial_fn the function to repeat
 #' @param trials the number of trials per simulation
-#' @param ... \code{trial_fn} arguments
+#' @param ... \code{trial_fn} arguments, i.e., simulation nparameters
 #' @inheritParams metatrial
 #'
 #' @export
 
 metasim <- function(...,
                     id = "simulation1",
-                    trial_fn,
+                    trial_fn = metatrial,
                     trials = 4) {
   all_trials <-
     map_peacefully(1:trials, .f = function(x) {metatrial()})

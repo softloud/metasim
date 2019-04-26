@@ -1,4 +1,4 @@
-#' simulate over all
+#' coverage paobability simulations of an estimator for various
 #'
 #' @param distributions a dataframe with a `dist` column of R distributions, i.e., norm, exp, pareto, and a list-column `par` of parameter sets. Defaults to [default_parmetres]
 #' @param single_study When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.
@@ -11,18 +11,19 @@
 #' @param probar Turn progress bar on and off.
 #' @export
 
-metasims <- function(distributions = default_parameters,
-                     single_study = FALSE,
+metasims <- function(single_study = FALSE,
+                     distributions = default_parameters,
                      k = c(3, 7, 10),
                      tau2_true = seq(from = 0, to = 0.4, by = 0.2),
                      median_ratio = c(1, 1.2),
                      prop = 0.3,
-                     trials = 10,
+                     trials = 3,
                      trial_fn = metatrial,
                      beep = FALSE,
-                     probar = TRUE) {
+                     loop_output = FALSE,
+                     probar = TRUE
+                     ) {
 
-  #
   if (isTRUE(single_study)) {
     k <- 1
     tau2_true <- 0
@@ -92,7 +93,7 @@ metasims <- function(distributions = default_parameters,
   if (isTRUE(probar)) cat("\n")
   if (isTRUE(beep)) beepr::beep("treasure")
 
-  # output of function
-  return( results_df)
-
+  # output   
+  return(results_df)
 }
+
