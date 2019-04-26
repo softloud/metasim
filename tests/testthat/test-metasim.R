@@ -5,14 +5,14 @@ tau <- runif(1, 0.2, 0.8)
 
 test_that("simulation runs over other inputs", {
   # test defaults work
-  expect_is(metasim() %>% pluck("results"), "data.frame")
-  expect_gt(metasim() %>% pluck("results") %>% nrow(), 1)
+  expect_is(metasim() , "data.frame")
+  expect_gt(metasim()  %>% nrow(), 1)
 
   # todo: problems
 
   expect_error(metasim(
     rdist = "pareto",
-    par = list(shape = 2, scale = 3) %>% pluck("results")
+    par = list(shape = 2, scale = 3)
   ))
   expect_error(metasim(
     rdist = "lnorm",
@@ -27,15 +27,15 @@ test_that("simulation runs over other inputs", {
               pluck("results"),
             "data.frame")
   # test equal rataios
-  expect_is(metasim(median_ratio = 1) %>% pluck("results"),
+  expect_is(metasim(median_ratio = 1) ,
             "data.frame")
-  expect_is(metasim(median_ratio = 1.3) %>% pluck("results"),
+  expect_is(metasim(median_ratio = 1.3) ,
             "data.frame")
-  expect_is(metasim(median_ratio = median_ratio) %>% pluck("results"),
+  expect_is(metasim(median_ratio = median_ratio) ,
             "data.frame")
   # test tau values
-  expect_is(metasim(tau = 0) %>% pluck("results"), "data.frame")
-  expect_is(metasim(tau = tau) %>% pluck("results"), "data.frame")
+  expect_is(metasim(tau = 0) , "data.frame")
+  expect_is(metasim(tau = tau) , "data.frame")
 
   # # check that coverage probability is above 0.9.
   # expect_gt(metasim(trials = 100) %>%

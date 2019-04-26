@@ -6,9 +6,9 @@ library(tidyverse)
 library(metasim)
 
 test_that("metasim runs for different n", {
-  expect_is(metasim() %>% pluck("results"), 'data.frame')
-  expect_is(metasim(trials = 100)  %>% pluck("results"), "data.frame")
-  # expect_is(metasim(trials = 1000)  %>% pluck("results"), "data.frame")
+  expect_is(metasim(), 'data.frame')
+  expect_is(metasim(trials = 100) , "data.frame")
+  # expect_is(metasim(trials = 1000) , "data.frame")
 })
 
 test_that("exponential is parsed throughout", {

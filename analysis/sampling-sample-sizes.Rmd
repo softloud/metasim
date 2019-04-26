@@ -1,40 +1,45 @@
 ---
-title: "sampling sample sizes"
+title: "sampling sizes"
 author: "Charles T. Gray"
-date: "09/04/2019"
+date: "26/04/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 library(tidyverse)
 ```
 
+## create parameter estimators
+
 ```{r}
-# arguments
-k = 3 # number of studies
-p_control = 0.5 # expected portion of n
-min_n = 10 # smallest possible cohort
-max_n = 50 # largest possible cohort
-p_deviance = 0.1 #    
+# set args
+mu = 0.7
+epsilon = 0.1
 
 ```
 
-
 ```{r}
-# sample sizes
-# perhaps sample from a sequence to keep integers
-(n <- sample(seq(min_n, max_n), k, replace = TRUE))
+alpha <- mu * (
+  ((10 * mu^2) / epsilon^2) * 
+    (1 / mu - 1) - 1 
+)
 
- 
-```
-
-
-```{r}
-
-# sample proportion of case group
-p <- rbeta()
+beta <- alpha / mu - alpha
 
 ```
 
+```{r}
+tibble(x = c(0, 1)) %>% 
+  ggplot(aes(x = x)) +
+  stat_function(fun = dbeta, args = list(shape1 = alpha, shape2 = beta)) +
+  labs(title = paste0(
+    "beta distribution with expected centre ",
+    mu, 
+    " and 90% of values falling within ",
+    epsilon
+    ))
+
+```
 

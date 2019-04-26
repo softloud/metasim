@@ -1,5 +1,6 @@
 #' @import dplyr
 #' @import purrr
+#' @importFrom collateral map_peacefully tally_errors tally_warnings tally_results tally_messages
 #' @importFrom metafor rma escalc forest
 #' @importFrom janitor clean_names
 #' @importFrom tibble tibble as_tibble
