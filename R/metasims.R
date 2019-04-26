@@ -72,7 +72,7 @@ metasims <- function(single_study = FALSE,
         id = simpars$id[[i]],
         trial_fn = trial_fn,
         trials = trials
-      ) %>% pluck("results")
+      )
 
     })
 
@@ -87,15 +87,13 @@ metasims <- function(single_study = FALSE,
   results_df <- simpars %>%
     ungroup()  %>%
     mutate(id = as.character(id)) %>%
-    full_join(results %>%
-                bind_rows() %>%
-                mutate(id = as.character(id)),
+    full_join(results %>% bind_rows(),
               by = "id")
 
   if (isTRUE(probar)) cat("\n")
   if (isTRUE(beep)) beepr::beep("treasure")
 
-  # output of function
+  # output   
   return(results_df)
 }
 
