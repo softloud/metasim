@@ -6,9 +6,9 @@
 \usage{
 metasims(single_study = FALSE, distributions = default_parameters,
   k = c(3, 7, 10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-  median_ratio = c(1, 1.2), prop = 0.3, trials = 3,
-  trial_fn = metatrial, beep = FALSE, loop_output = FALSE,
-  probar = TRUE)
+  median_ratio = c(1, 1.2), min_n = 20, max_n = 200, prop = 0.5,
+  prop_error = 0.1, trials = 3, trial_fn = metatrial, beep = FALSE,
+  loop_output = FALSE, probar = TRUE)
 }
 \arguments{
 \item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.}
@@ -21,8 +21,13 @@ metasims(single_study = FALSE, distributions = default_parameters,
 
 \item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
-\item{prop}{Proportion of sample size we expect to cohorts to vary by most of
-the time}
+\item{min_n}{lower bound for sample sizes, defaults to 20}
+
+\item{max_n}{upper bound for sample sizes, defaults to 200}
+
+\item{prop}{proportion of n we expect}
+
+\item{prop_error}{what do we expect 90% of proportions to fall within?}
 
 \item{beep}{Turn on beep alert when successfully finished.}
 

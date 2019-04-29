@@ -2,6 +2,7 @@ context("sampling")
 
 library(tidyverse)
 library(metasim)
+set.seed(38)
 
 big <- runif(3, 5, 100)
 small <- runif(3, 0.1, 0.9)
@@ -21,19 +22,13 @@ test_that("sample sizes are positive", {
   expect_error(sim_n(min_n= 50, max_n = 2))
 })
 
-
-
 # samples -----------------------------------------------------------------
-
-
 
 test_sample_norm <-
   sim_sample(10, 0, "norm", list(mean = 20, sd = 1))
 test_sample_norm_another <-
   sim_sample(10, 0, "norm", list(mean = 104, sd = 0.3))
 test_sample_pareto <- sim_sample(10, 0, "pareto", list(1, 2))
-
-
 
 test_that("samples are plausible", {
   expect_is(test_sample_norm, "numeric")
@@ -80,7 +75,6 @@ test_that("samples are plausible", {
               length, 2)
 })
 
-
   test_that("sim stats gives non-empty dataframe",{
 
     expect_is(sim_stats(), "data.frame")
@@ -109,6 +103,4 @@ test_that("samples are plausible", {
     # pareto
     expect_is(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)), "data.frame")
     expect_gt(sim_stats(rdist = "pareto", par = list(shape = 3, scale = 2)) %>% nrow(), 2)
-
-
   })
