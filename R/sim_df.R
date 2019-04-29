@@ -13,11 +13,17 @@
 #' @export
 
 
-sim_df <- function(dist_tribble = default_parameters,
-                   k = c(3, 7, 20),
-                   tau2 = seq(0, 0.4, 0.2),
-                   median_ratio = c(1, 1.2),
-                   prop = 0.3) {
+sim_df <- function(
+  # simulation-level parameters
+  dist_tribble = default_parameters,
+  k = c(3, 7, 20),
+  tau2 = seq(0, 0.4, by = 0.2),
+  median_ratio = c(1, 1.2),
+  # arguments for sample sizes
+  min_n = 20,
+  max_n = 200,
+  prop = 0.5,
+  prop_error = 0.1) {
   dist_tribble %>%
     dplyr::mutate(distribution =
                     purrr::map2(dist, par,
@@ -30,8 +36,7 @@ sim_df <- function(dist_tribble = default_parameters,
           distribution = .,
           k = k,
           tau2_true = tau2,
-          median_ratio = median_ratio,
-          prop = prop
+          median_ratio = median_ratio
         )
       )
     } %>%
@@ -40,7 +45,12 @@ sim_df <- function(dist_tribble = default_parameters,
       parameters = purrr::map(distribution, "par")
     )  %>%
     dplyr::select(-distribution) %>%
-    dplyr::mutate(n = purrr::map2(k, prop, sim_n),
+    dplyr::mutate(n = purrr::map(k,
+                                 sim_n,
+                                 min_n = min_n,
+                                 max_n = max_n,
+                                 prop = prop,
+                                 prop_error = prop_error),
                   id = paste0("sim_", seq(1, nrow(.))))  %>%
     dplyr::mutate(true_effect =
                     purrr::map2_dbl(
@@ -57,5 +67,8 @@ sim_df <- function(dist_tribble = default_parameters,
                             parameters = parameters,
                             type = "q",
                             x = 0.5
-                          )}}))}
-
+                          )
+                        }
+                      }
+                    ))
+}

@@ -10,21 +10,19 @@ test_that("simulation runs over other inputs", {
 
   # todo: problems
 
-  expect_error(metasim(
+  expect_is(metasim(
     rdist = "pareto",
     par = list(shape = 2, scale = 3)
-  ))
-  expect_error(metasim(
+  ), "data.frame")
+  expect_is(metasim(
     rdist = "lnorm",
-    par = list(meanlog = 67, sdlog = 0.25) %>%
-      pluck("results")))
+    par = list(meanlog = 67, sdlog = 0.25)), "data.frame")
 
   # test simulation
 
   expect_is(metasim(rdist = "norm",
-                    par = list(mean = 67, sd = 0.25)), "list")
-  expect_is(metasim(rdist = "exp", par = list(rate = 3)) %>%
-              pluck("results"),
+                    par = list(mean = 67, sd = 0.25)), "data.frame")
+  expect_is(metasim(rdist = "exp", par = list(rate = 3)),
             "data.frame")
   # test equal rataios
   expect_is(metasim(median_ratio = 1) ,

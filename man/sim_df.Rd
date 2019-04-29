@@ -5,7 +5,8 @@
 \title{generate simulation parameter dataframe}
 \usage{
 sim_df(dist_tribble = default_parameters, k = c(3, 7, 20),
-  tau2 = seq(0, 0.4, 0.2), median_ratio = c(1, 1.2), prop = 0.3)
+  tau2 = seq(0, 0.4, by = 0.2), median_ratio = c(1, 1.2), min_n = 20,
+  max_n = 200, prop = 0.5, prop_error = 0.1)
 }
 \arguments{
 \item{dist_tribble}{A \code{\link{tibble::tribble}}
@@ -15,7 +16,13 @@ with one column for distribution, and one column for the parameters}
 
 \item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
+\item{min_n}{lower bound for sample sizes, defaults to 20}
+
+\item{max_n}{upper bound for sample sizes, defaults to 200}
+
 \item{prop}{proportion of n we expect}
+
+\item{prop_error}{what do we expect 90% of proportions to fall within?}
 }
 \description{
 generate simulation parameter dataframe

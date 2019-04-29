@@ -18,8 +18,10 @@ test_that("from user inputs, generate a simulation overview dataframe", {
 
   # check the sample size dataset has control and intervention rows for k studies
   expect_is(testdf %>% pluck("n") %>% purrr::map_int(nrow) / 2, "numeric")
-  expect_equal(testdf %>% pluck("n") %>% purrr::map_int(nrow) / 2,
-               testdf %>% pluck("k") %>% as.integer())
+  expect_equal(
+    testdf %>% pluck("n") %>% purrr::map_int(nrow) / 2,
+    testdf %>% pluck("k") %>% as.integer()
+  )
   expect_gt(testdf %>% nrow(), 2)
 
   expect_is(sim_df(tau2 = 0.3), "data.frame")
@@ -45,4 +47,69 @@ test_that("from user inputs, generate a simulation overview dataframe", {
   # check that simulation id is unique
   expect_equal(testdf %>% pluck("id") %>% unique() %>% length(),
                testdf %>% nrow())
+})
+
+sim_df_test  <- function(...) {
+  sim_df(...) %>%
+    dplyr::select(id, n) %>%
+    tidyr::unnest(n) %>%
+    tidyr::spread(group, n) %>%
+    dplyr::mutate(p = intervention / (intervention + control),
+                  n = intervention + control)
+}
+
+test_that("sim_df produces correct sample sizes", {
+  expect_lt(sim_df_test() %>% pluck("p") %>% mean(), 0.6)
+  expect_gt(sim_df_test() %>% pluck("p") %>% mean(), 0.4)
+  expect_lt(sim_df_test(prop = 0.2, prop_error = 0.01) %>% pluck("p") %>% mean(),
+            0.25)
+  expect_gt(sim_df_test(prop = 0.2, prop_error = 0.01) %>% pluck("p") %>% mean(),
+            0.15)
+  expect_gte(sim_df_test(min_n = 300, max_n = 350) %>% pluck("n") %>% min(),
+             300)
+  expect_lte(sim_df_test(min_n = 300, max_n = 350) %>% pluck("n") %>% max(),
+             350)
+})
+
+metasims_test  <- function(...) {
+  metasims(...) %>%
+    dplyr::filter(measure == "m") %>%
+    dplyr::select(id, n) %>%
+    tidyr::unnest(n) %>%
+    tidyr::spread(group, n) %>%
+    dplyr::mutate(p = intervention / (intervention + control),
+                  n = intervention + control)
+}
+
+test_that("metasims parses sample size arguments", {
+  expect_lt(metasims_test(probar = FALSE) %>% pluck("p") %>% mean(), 0.6)
+  expect_gt(metasims_test(probar = FALSE) %>% pluck("p") %>% mean(), 0.4)
+  expect_lt(
+    metasims_test(
+      prop = 0.2,
+      prop_error = 0.01,
+      probar = FALSE
+    ) %>% pluck("p") %>% mean(),
+    0.25
+  )
+  expect_gt(
+    metasims_test(
+      prop = 0.2,
+      prop_error = 0.01,
+      probar = FALSE
+    ) %>% pluck("p") %>% mean(),
+    0.15
+  )
+  expect_gte(metasims_test(
+    min_n = 300,
+    max_n = 350,
+    probar = FALSE
+  ) %>% pluck("n") %>% min(),
+  300)
+  expect_lte(metasims_test(
+    min_n = 300,
+    max_n = 350,
+    probar = FALSE
+  ) %>% pluck("n") %>% max(),
+  350)
 })
