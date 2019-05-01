@@ -1,6 +1,6 @@
 context("metasim")
 
-median_ratio <- runif(1, 0.8, 1.2)
+effect_ratio <- runif(1, 0.8, 1.2)
 tau <- runif(1, 0.2, 0.8)
 
 test_that("simulation runs over other inputs", {
@@ -25,11 +25,11 @@ test_that("simulation runs over other inputs", {
   expect_is(metasim(rdist = "exp", par = list(rate = 3)),
             "data.frame")
   # test equal rataios
-  expect_is(metasim(median_ratio = 1) ,
+  expect_is(metasim(effect_ratio = 1) ,
             "data.frame")
-  expect_is(metasim(median_ratio = 1.3) ,
+  expect_is(metasim(effect_ratio = 1.3) ,
             "data.frame")
-  expect_is(metasim(median_ratio = median_ratio) ,
+  expect_is(metasim(effect_ratio = effect_ratio) ,
             "data.frame")
   # test tau values
   expect_is(metasim(tau = 0) , "data.frame")

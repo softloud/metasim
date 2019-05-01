@@ -1,4 +1,5 @@
 #' @import dplyr
+#' @import tidyr
 #' @import purrr
 #' @importFrom collateral map_peacefully tally_errors tally_warnings tally_results tally_messages
 #' @importFrom metafor rma escalc forest

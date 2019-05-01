@@ -18,7 +18,7 @@ sim_df <- function(
   dist_tribble = default_parameters,
   k = c(3, 7, 20),
   tau2 = seq(0, 0.4, by = 0.2),
-  median_ratio = c(1, 1.2),
+  effect_ratio = c(1, 1.2),
   # arguments for sample sizes
   min_n = 20,
   max_n = 200,
@@ -36,7 +36,7 @@ sim_df <- function(
           distribution = .,
           k = k,
           tau2_true = tau2,
-          median_ratio = median_ratio
+          effect_ratio = effect_ratio
         )
       )
     } %>%

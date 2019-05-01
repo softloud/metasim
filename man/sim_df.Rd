@@ -5,7 +5,7 @@
 \title{generate simulation parameter dataframe}
 \usage{
 sim_df(dist_tribble = default_parameters, k = c(3, 7, 20),
-  tau2 = seq(0, 0.4, by = 0.2), median_ratio = c(1, 1.2), min_n = 20,
+  tau2 = seq(0, 0.4, by = 0.2), effect_ratio = c(1, 1.2), min_n = 20,
   max_n = 200, prop = 0.5, prop_error = 0.1)
 }
 \arguments{
@@ -13,8 +13,6 @@ sim_df(dist_tribble = default_parameters, k = c(3, 7, 20),
 with one column for distribution, and one column for the parameters}
 
 \item{k}{number of studies, defaults to 3}
-
-\item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
 \item{min_n}{lower bound for sample sizes, defaults to 20}
 

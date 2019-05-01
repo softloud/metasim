@@ -14,10 +14,11 @@ metasim <- function(...,
                     trial_fn = metatrial,
                     trials = 4) {
   all_trials <-
-    map_peacefully(1:trials, .f = function(x) {metatrial()})
+    map_peacefully(1:trials, .f = function(x) {metatrial(...)})
 
   results <- all_trials %>%
-    map("result") %>%
+    transpose() %>%
+    pluck("result") %>%
     keep(is.data.frame) %>%
     keep( ~ nrow(.) >= 1) %>% # keep non-empty results
     bind_rows() %>%

@@ -7,8 +7,10 @@
 #' @export
 
 singletrial <- function(
+  measure = "median",
+  meausure_spread = "iqr",
   tau_sq = 0,
-  median_ratio = 1.2,
+  effect_ratio = 1.2,
   rdist = "norm",
   parameters = list(mean = 50, sd = 0.2),
   n_df = sim_n(k = 1),
@@ -19,7 +21,7 @@ singletrial <- function(
   # calculate true effects
   true_effects <- tibble::tibble(measure = c("m", "lr"),
                                  true_effect = c(true_effect,
-                                                 log(median_ratio)))
+                                                 log(effect_ratio)))
 
   # simulate data
   ssdata <- sim_stats(
@@ -27,42 +29,42 @@ singletrial <- function(
     rdist = rdist,
     par = parameters,
     tau_sq = tau_sq,
-    median_ratio = median_ratio,
+    effect_ratio = effect_ratio,
     wide = TRUE
   ) %>%
     mutate(
-      median = median_c,
-      median_se = pmap_dbl(
+      effect = measure,
+      effect_se = pmap_dbl(
         list(
-          centre = median_c,
-          spread = iqr_c,
+          centre = effect,
+          spread = effect_se_c,
           n = n_c
         ),
         varameta::effect_se,
-        centre_type = "median",
-        spread_type = "iqr"
+        centre_type = "measure",
+        spread_type = "measure_spread"
       ),
-      median_se_i = pmap_dbl(
+      effect_se_i = pmap_dbl(
         list(
-          centre = median_i,
-          spread = iqr_i,
+          centre = effect_i,
+          spread = effect_se_i,
           n = n_i
         ),
         varameta::effect_se,
-        centre_type = "median",
-        spread_type = "iqr"
+        centre_type = "measure",
+        spread_type = "measure_spread"
       ),
-      lr = log(median_i / median_c),
-      lr_se = sqrt(median_se^2 / median^2 + median_se_i / median_i^2)
+      lr = log(effect_i / effect_c),
+      lr_se = sqrt(effect_se^2 / effect^2 + effect_se_i / effect_i^2)
      )  %>%
-    select(median, median_se, lr, lr_se, median_se_i)
+    select(median, effect_se, lr, lr_se, effect_se_i)
 
   results <- ssdata %>%
     {
       tibble(
         measure = c("m", "lr"),
-        effect = c(.$median, .$lr),
-        effect_se = c(.$median_se, .$lr_se),
+        effect = c(.$effect, .$lr),
+        effect_se = c(.$effect_se, .$lr_se),
       )
     } %>%
     full_join(true_effects, by = "measure") %>%
