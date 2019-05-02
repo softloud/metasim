@@ -8,10 +8,7 @@ library(metasim)
 big <- runif(3, 4, 100)
 small <- runif(3, 0.1, 0.9)
 
-
 # tests -------------------------------------------------------------------
-
-
 
 test_that("defaults return expected", {
   expect_is(metatrial(), "data.frame")

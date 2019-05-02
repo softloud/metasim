@@ -23,8 +23,10 @@ Imports:
     purrr,
     tibble,
     tidyr,
+    collateral,
     varameta
 Roxygen: list(markdown = TRUE)
 Remotes: 
+    rensa/collateral
     softloud/metabroom,
     softloud/varameta
