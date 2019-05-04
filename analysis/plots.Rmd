@@ -70,11 +70,15 @@ caption_text %>% knitr::asis_output()
 ```{r simulate meta-analysis data, warning=FALSE, output=FALSE, message=FALSE}
 
 meta_data <- metasims(
-  probar = FALSE, 
+  progress = FALSE, 
   trials = params$trials,
   k = params$k)
 
+
+
 ```
+
+
 
 ```{r ma scatterplot}
 ma_plot <- function(data, measure = "all") {
@@ -87,7 +91,7 @@ ma_plot <- function(data, measure = "all") {
   
 df  %>%
     mutate(
-      median_ratio = as.character(median_ratio),
+      effect_ratio = as.character(effect_ratio),
       distribution = map_chr(rdist, dist_name),
       measure = map_chr(measure, function(x) {
         if (x == "m")
@@ -113,17 +117,17 @@ cap_text <- "Simulation results for various distributions "
 ```{r}
 
 meta_data %>% 
-ma_plot(measure = "m") +   
+ma_plot(measure = "median") +   
   geom_point(
-      aes(colour = distribution, shape = distribution),
+      aes(colour = distribution),
       position = "jitter",
       alpha = 0.6
     ) +
-    facet_grid(k ~ between_study_variation) +
-  scale_shape_discrete(name = "Distribution") +
+    facet_grid(k ~ tau2_true) +
   hrbrthemes::scale_colour_ipsum(name = "Distribution") +
   labs(title = str_wrap("Simulation results for estimating the variance of the sample median"))
-  
+
+ggsave("simulation-coverage.png", path = "visualisations/")
 
 ```
 
@@ -134,12 +138,12 @@ ma_plot(measure = "m") +
 meta_data %>% 
 ma_plot(measure = "lr") +
   geom_point(
-      aes(shape = median_ratio, colour = median_ratio),
+      aes(shape = measure, colour = effect_ratio),
       position = "jitter",
       alpha = 0.6
     )  +
-      facet_grid(k ~ between_study_variation) +
-    scale_shape_discrete(name = "Median Ratio") +
+      facet_grid(k ~ tau2_true) +
+    scale_shape_discrete(name = "Measure") +
     hrbrthemes::scale_colour_ft(name = "Median Ratio") +
   labs(title = str_wrap("Simulation results for estimating the variance of the log-ratio of sample medians"))
 ```
@@ -160,29 +164,38 @@ default_parameters %>%
 Although these results will be presented first in the paper, computationally this is a special use-case of `metasims` where `k = 1`.
 
 ```{r ss data}
-ss_data <- metasims(
-  k = 1, 
+single_sim <- metasims(
+  single_study = TRUE,
   trials = params$trials, 
-  probar = FALSE)
+  trial_fn = singletrial,
+  progress = FALSE)
 
 ```
 
 ### single-study plot
 
 
-
-
-```{r ss plot}
-ss_data %>% 
-  ma_plot() +
-  geom_point(position = "jitter",
+```{r}
+single_plot <- single_sim %>% 
+  mutate(distribution = map_chr(rdist, dist_name)) %>% 
+     ggplot(aes(x = distribution, y = coverage)) +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1),
+          plot.caption = element_text(hjust = 0)) +
+    labs(x = "Distribution",
+         y = "Coverage"
+        )  +  geom_point(position = "jitter",
       aes(colour = distribution, shape = distribution),
-      alpha = 0.6) +
-  facet_grid(measure ~ between_study_variation) +
+      alpha = 0.8, size = 3) +
+  facet_wrap(~ effect_ratio) +
   scale_shape_discrete(name = "Distribution") +
   hrbrthemes::scale_colour_ipsum(name = "Distribution") +
   labs(title = str_wrap("Simulation results for estimating the variance of the sample median"))
 
+usethis::use_data(single_plot)
+
+
 ```
 
+
 Since I can't get $\LaTeX$ to play nice with `str_wrap`, I'll export the caption as text and the vis separately. 
+

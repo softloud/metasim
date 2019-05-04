@@ -10,86 +10,98 @@
 #'
 #' @export
 
-metatrial <- function(true_median = 50,
-                         tau_sq = 0.6,
-                         median_ratio = 1.2,
-                         rdist = "norm",
-                         parameters = list(mean = 50, sd = 0.2),
-                         n_df = sim_n(k = 3),
-                         knha = TRUE,
-                         true_effect = 50,
-                         test = "knha"
-                         ) {
-
+metatrial <- function(measure = "median",
+                      measure_spread = "iqr",
+                      tau_sq = 0.6,
+                      effect_ratio = 1.2,
+                      rdist = "norm",
+                      parameters = list(mean = 50, sd = 0.2),
+                      n_df = sim_n(k = 3),
+                      knha = TRUE,
+                      true_effect = 50,
+                      test = "knha") {
+  measures <- c(measure, paste0("lr_", measure))
 
   # calculate true effects
-  true_effects <- tibble::tibble(measure = c("m", "lr"),
+  true_effects <- tibble::tibble(measure = measures,
                                  true_effect = c(true_effect,
-                                                  log(median_ratio)))
-
-  # simualte data
+                                                 log(effect_ratio)))
+  # # simulate data
   metadata <- sim_stats(
+    measure = measure,
+    measure_spread = measure_spread,
     n_df = n_df,
     rdist = rdist,
     par = parameters,
     tau_sq = tau_sq,
-    median_ratio = median_ratio,
+    effect_ratio = effect_ratio,
     wide = TRUE
   ) %>%
     mutate(
-      median = median_c,
-      median_se = pmap_dbl(
+      effect_se_c = pmap_dbl(
         list(
-          centre = median_c,
-          spread = iqr_c,
+          centre = effect_c,
+          spread = effect_spread_c,
           n = n_c
         ),
         varameta::effect_se,
-        centre_type = "median",
-        spread_type = "iqr"
+        centre_type = measure,
+        spread_type = measure_spread
       ),
-      median_se_i = pmap_dbl(
+      effect_se_i = pmap_dbl(
         list(
-          centre = median_i,
-          spread = iqr_i,
+          centre = effect_i,
+          spread = effect_spread_i,
           n = n_i
         ),
         varameta::effect_se,
-        centre_type = "median",
-        spread_type = "iqr"
-      ),
-      lr = log(median_i / median_c),
-      lr_se = sqrt(median_se^2 / median^2 + median_se_i / median_i^2)
-    ) %>%
-    select(study, median, median_se, lr, lr_se, median_se_i)
-
-  # meta-analyse
-  m_model <- metamodel(
-    y = metadata$median,
-    se = metadata$median_se
-  )
-
-  lr_model <- metamodel(
-    y = metadata$lr,
-    se = metadata$lr_se
-  )
-
-  # bind together into df of results
-  results <- list(
-    m_model,
-    lr_model
-  )  %>%
-    keep(is.data.frame) %>%
-    bind_rows() %>%
-    mutate(
-      measure = c("m", "lr")
-    ) %>%
-    full_join(true_effects, by = "measure") %>%
-    mutate(
-      coverage = conf_low < true_effect & true_effect < conf_high,
-      # can't scale bc log(1) = 0
-      bias = effect - true_effect
+        centre_type = measure,
+        spread_type = measure_spread
+      ) ,
+      lr = log(effect_i / effect_c),
+      # to do: have a look at variance for log-ratio of means, might just
+      # need to specify this component for means if else
+      lr_se = pmap_dbl(
+        list(
+          measure = measure,
+          n_c = n_c,
+          effect_c = effect_c,
+          effect_se_c = effect_se_c,
+          n_i = n_i,
+          effect_i = effect_i,
+          effect_se_i = effect_se_i
+        ),
+      .f = lr_se)) %>%
+  select(study, effect_c, effect_se_c, lr, lr_se) %>%
+  mutate(effect = map2(effect_c, effect_se_c,
+                       .f = function(x, y) list(x, y))) %>%
+  select(-effect_c, -effect_se_c) %>%
+  rename(lr_value = lr) %>%
+  mutate(lr = map2(lr_value, lr_se, list)) %>%
+  select(-lr_value, -lr_se) %>%
+  gather(key = measure, value = obs, effect, lr) %>%
+  mutate(centre = map_dbl(obs, 1),
+         error = map_dbl(obs, 2)) %>%
+  select(-obs) %>%
+  group_nest(measure) %>%
+  mutate(model = map(data, .f = function(df){
+    metamodel(df %>% pluck(2), df %>% pluck(3))
+  })) %>%
+  select(-data) %>%
+  unnest(model) %>%
+  # now to rename with informative effect labels
+  mutate(measure = case_when(measure == "effect" ~ measures[[1]],
+                             measure == "lr" ~ measures[[2]])) %>%
+  full_join(true_effects, by = "measure") %>%
+  mutate(
+    coverage = conf_low < true_effect & true_effect < conf_high,
+    # can't scale bc log(1) = 0
+    bias = effect - true_effect,
+    scaled_bias = case_when(
+      measure == measures[[1]] ~ bias / true_effect,
+      measure == measures[[2]] ~ bias
     )
+  )
 
-  return(results)
-  }
+return(metadata)
+}

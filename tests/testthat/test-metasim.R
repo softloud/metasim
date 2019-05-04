@@ -1,13 +1,18 @@
 context("metasim")
 
-median_ratio <- runif(1, 0.8, 1.2)
+set.seed(38)
+
+effect_ratio <- runif(1, 0.8, 1.2)
 tau <- runif(1, 0.2, 0.8)
 
-test_that("simulation runs over other inputs", {
+test_that("simulation runs over defaults", {
   # test defaults work
   expect_is(metasim() , "data.frame")
   expect_gt(metasim()  %>% nrow(), 1)
 
+})
+
+test_that("simulation runs over other inputs", {
   # todo: problems
 
   expect_is(metasim(
@@ -25,25 +30,24 @@ test_that("simulation runs over other inputs", {
   expect_is(metasim(rdist = "exp", par = list(rate = 3)),
             "data.frame")
   # test equal rataios
-  expect_is(metasim(median_ratio = 1) ,
+  expect_is(metasim(effect_ratio = 1) ,
             "data.frame")
-  expect_is(metasim(median_ratio = 1.3) ,
+  expect_is(metasim(effect_ratio = 1.3) ,
             "data.frame")
-  expect_is(metasim(median_ratio = median_ratio) ,
+  expect_is(metasim(effect_ratio = effect_ratio) ,
             "data.frame")
   # test tau values
   expect_is(metasim(tau = 0) , "data.frame")
   expect_is(metasim(tau = tau) , "data.frame")
 
   # # check that coverage probability is above 0.9.
-  # expect_gt(metasim(trials = 100) %>%
-  #           pluck("cp") %>%
-  #           mean(), 0.9)
-  # expect_lt(metasim(trials = 100) %>%
-  #             pluck("cp") %>%
-  #             mean(), 1.0000001)
-  #
+  expect_gt(metasim(trials = 100) %>%
+            pluck("coverage") %>%
+            mean(), 0.9)
+  expect_lt(metasim(trials = 100) %>%
+              pluck("coverage") %>%
+              mean(), 1.0000001)
+
   # # check simualation id is parsed
-  #
-  # expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
+  expect_equal(metasim(id = "sim_4") %>% pluck("id") %>% unique(), "sim_4")
 })

@@ -9,7 +9,9 @@ LazyData: true
 Depends: R (>= 3.2.0)
 Suggests: 
     testthat,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 RoxygenNote: 6.1.1.9000
 Imports: 
     actuar,
@@ -30,3 +32,4 @@ Remotes:
     rensa/collateral
     softloud/metabroom,
     softloud/varameta
+VignetteBuilder: knitr

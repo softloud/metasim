@@ -1,4 +1,5 @@
 #' @import dplyr
+#' @import tidyr
 #' @import purrr
 #' @importFrom collateral map_peacefully tally_errors tally_warnings tally_results tally_messages
 #' @importFrom metafor rma escalc forest
@@ -8,7 +9,7 @@
 #' @importFrom varameta effect_se
 #' @importFrom graphics par
 #' @importFrom stats qnorm
-#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom dplyr filter
 NULL
 
 #' @export

@@ -4,13 +4,13 @@
 \alias{metatrial}
 \title{Generate meta-analysis data and calculate estimator}
 \usage{
-metatrial(true_median = 50, tau_sq = 0.6, median_ratio = 1.2,
-  rdist = "norm", parameters = list(mean = 50, sd = 0.2),
-  n_df = sim_n(k = 3), knha = TRUE, true_effect = 50,
+metatrial(measure = "median", measure_spread = "iqr", tau_sq = 0.6,
+  effect_ratio = 1.2, rdist = "norm", parameters = list(mean = 50, sd
+  = 0.2), n_df = sim_n(k = 3), knha = TRUE, true_effect = 50,
   test = "knha")
 }
 \arguments{
-\item{median_ratio}{ratio of population medians}
+\item{effect_ratio}{ratio of population effects intervention / control}
 
 \item{rdist}{string indicating distribution, "norm", "lnorm", "exp", or "pareto"}
 

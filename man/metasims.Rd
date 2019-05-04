@@ -4,11 +4,12 @@
 \alias{metasims}
 \title{coverage paobability simulations of an estimator for various}
 \usage{
-metasims(single_study = FALSE, distributions = default_parameters,
+metasims(single_study = FALSE, measure = "median",
+  measure_spread = "iqr", distributions = default_parameters,
   k = c(3, 7, 10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-  median_ratio = c(1, 1.2), min_n = 20, max_n = 200, prop = 0.5,
+  effect_ratio = c(1, 1.2), min_n = 20, max_n = 200, prop = 0.5,
   prop_error = 0.1, trials = 3, trial_fn = metatrial, beep = FALSE,
-  loop_output = FALSE, probar = TRUE)
+  progress = TRUE)
 }
 \arguments{
 \item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.}
@@ -19,7 +20,7 @@ metasims(single_study = FALSE, distributions = default_parameters,
 
 \item{tau2_true}{Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect}
 
-\item{median_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
+\item{effect_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
 
 \item{min_n}{lower bound for sample sizes, defaults to 20}
 
@@ -31,7 +32,7 @@ metasims(single_study = FALSE, distributions = default_parameters,
 
 \item{beep}{Turn on beep alert when successfully finished.}
 
-\item{probar}{Turn progress bar on and off.}
+\item{progress}{Turn progress bar on and off.}
 }
 \description{
 coverage paobability simulations of an estimator for various

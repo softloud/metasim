@@ -6,7 +6,7 @@
 \usage{
 sim_sample(n = 18, this_study_error = 0.2, rdist = "norm",
   par = list(mean = 20, sd = 0.2), control = TRUE,
-  median_ratio = 1.2)
+  effect_ratio = 1.2)
 }
 \arguments{
 \item{n}{sample size}
@@ -19,7 +19,7 @@ sim_sample(n = 18, this_study_error = 0.2, rdist = "norm",
 
 \item{control}{value of first parameter of distribution is determined by median ratio}
 
-\item{median_ratio}{ratio of population medians}
+\item{effect_ratio}{ratio of population effects intervention / control}
 
 \item{epsilon}{within study error}
 }

@@ -22,7 +22,7 @@ test_that("exponential is parsed throughout", {
 
   # check trial
   expect_is(metatrial(rdist = "exp", parameters = list(rate = 3),
-                      true_median = log(2) / 3),
+                      true_effect = log(2) / 3),
             "data.frame")
 
   expect_is(purrr::rerun(.n = 10, metatrial(
@@ -32,7 +32,7 @@ test_that("exponential is parsed throughout", {
   expect_is(purrr::rerun(.n = 10, metatrial(
     rdist = "exp",
     parameters = list(rate = 3),
-    true_median = log(2) / 3
+    true_effect = log(2) / 3
   )) %>% bind_rows(), "data.frame")
 
 })
