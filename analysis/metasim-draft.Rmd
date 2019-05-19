@@ -1,0 +1,624 @@
+---
+title: "metasim-draft"
+author: "Charles T. Gray"
+date: "04/05/2019"
+bibliography: biblio.bib
+params:
+  trials: 1000
+  progress: TRUE
+output: html_document
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  fig.width = 7,
+  fig.height = 5#,
+  # collapse = TRUE,
+  # 3comment = "#>"
+)
+```
+
+# vignette text
+
+## preamble
+
+```{r packages, message=FALSE}
+# packages used in this paper
+library(metasim)
+library(tidyverse)
+library(patchwork)
+
+
+# for reproducibility
+set.seed(38)
+
+```
+
+## introduction
+
+`metasim::` aims to lower the programmatic barrier to running simulation experiments on meta-analysis estimators for the effect, or variance of the effect, of interest. The intended audience of this package are practicing scientists who wish to experiment to see how their chosen estimator works under specific conditions, but who are not necessarily computational mathematicians.
+
+Frequently, scientists wish to verify their results, and, in particular, that broad findings presented in literature hold for their particular context. For example, perhaps an estimator works well for some sample sizes and not others? For symmetric distributions, such as normal or Cauchy, but not asymmetric distributions, such as exponential and Pareto? Given practical and computational limitations, it is foregone that not every case will have been considered in the literature. An estimator is, after all, an algorithm, and susceptible to the no free lunch principle [@wolpert_no_1997], wherein no algorithm is optimised for all use cases.   
+
+The `metasim::` package was developed to test an estimator for the [variance of the sample median under meta-analysis](#metamed). Given a comparison was required, there is a high risk of repetitive code. And this, too, creates a barrier for scientists whose primary discipline is not programming. The more lines of repeated code, the more likely a small mistake will cause the entire analysis algorithm to grind to a halt. This is not insurmountable, but it _is_ time consuming. Frequently the code was functional at the time of publication, but in the meantime the author has made some small change in the code and it no longer runs without debugging. This package aims to assist in smoothing the inevitable debugging process that accompanies the simulation of meta-analysis data. 
+
+todo: As open software, it is anticipated that `metasim::` 
+ 
+Consider - todo: use an example from Bland [@bland_estimating_2014] comparison paper performs well for some sample sizes and not others. 
+
+
+### opinionated bit 
+
+todo: not sure where this section goes
+
+This package is an _opinionated_ algorithm [@parker_opinionated_2017], in that  todo: 
+
+By integrating the output of the results  todo: 
+
+Consider - three starting papers [@bland_estimating_2014; @hozo_estimating_2005; @wan_estimating_2014] + example dataset [@pinheiro_d-dimer_2012] of motivating problem, these were not written by statisticians. Thus, it's okay for software to be opinionated. And indeed, we must, as methodologists, make necessary choices about presentation and implementation that carry the value judgement of opinion. There are often multiple ways to solve a problem, and it is not always helpful to provide all possible solutions. Often the end-user wishes to find a useful guide. 
+
+todo: sweet spot between clippy-like interfaces and hard code (say, traversing the CRAN guidebook thingies that I've never even looked at for meta-analysis) - indeed, this is what the meta-verse aims to do...
+
+## the package in a glance
+
+This package was 
+
+An advantage with standardised results, whatever they may be 
+
+## test an estimator
+
+This algorithm tests an estimator for the variance of the sample mean or median through measuring _coverage probability_, the proportion of confidence intervals produced from the simulated data, or meta-analyses of the simulated data.   
+
+In this case, we will assume an expected proportion $n_I / (n_C + n_I)$ of the intervention group, and how much 90 per cent of proportions will deviate.
+
+todo: rho is not what I think it is - need to redefine 
+
+Set expected p and its error. Let us assume there is equal division of the total sample size for the $k$*th* study. 
+
+```{r}
+p <- 0.5 
+p_error <- 0.1   
+  
+```
+
+```{r}
+rho_plot(p, p_error)
+```
+
+
+
+## sample sizes
+
+Different experimental designs require different divisions of sample size, and there is a
+
+## create parameter estimators
+
+Here we define $\rho$, the expected value of the proportion for the intervention group. An expected value of $\rho = 0.5$ would indicate equal division between control and intervention group. 
+
+It stands to reason that there would be expected variance, in the proportion $\rho$ of the study's total sample size $N$ allocated to the intervention group $n_i$. We define `epsilon` $:= \varepsilon$, the proportional deviation we allow for 90 per cent of the combined intervention and control sample size, $n_I + n_C = N$. 
+
+We assume the proportion $p$ of the total sample size $N$ allocated to the intervention group follows a beta distribution, $p \sim \mathrm{Beta}(\alpha, \beta)$. 
+
+With these values, we can combine the expected value $\rho$ of $p$ with its error $\varepsilon$ to solve for the parameters of the beta distribution.
+
+Via Chebyshev's inequality, we have 
+
+$$
+1 - \frac{\sigma^2}{\varepsilon^2} = 0.9
+$$
+
+where $\sigma^2$ denotes $\mathrm{Var}(p)$. 
+
+Then, as $\mu$ is also known, we can find the parameters in terms of the expected value $\rho$ of $p$ and its variation $\varepsilon$, given.
+
+$$
+\alpha := \rho \cdot (10\rho^2/\varepsilon^2 \cdot (1/\rho - 1) - 1)
+$$
+$$
+\beta := \frac \alpha \rho (1 - \rho).
+$$
+
+The `rho_plot` function of `metasim::` provides a tool for visually understanding the data will be sampled for the proportion $\rho$ of $N$ allocated to the intervention group, based on the assumptions, $\mu$ and $\varepsilon$.
+
+```{r}
+# collect plots for different expected values
+plots <- map2(list(0.5, 0.2, 0.8, 0.3), list(0.2, 0.01, 0.1, 0.25), rho_plot)
+
+# patchwork example plots
+plots[[1]] + plots[[2]] + plots[[3]] + plots[[4]]
+
+```
+
+
+## sampling the data
+
+
+### assumptions
+
+Let 
+
+- $j \in \{I, C\}$ for intervention and control groups, 
+- $k \in K$ studies,
+- $i \in 1, \dots, n_{jk}$ sample size for the $j$*th* group and $k$*th* study
+- $m_{jk}$ the sample median for the $j$*th* group and $k$*th* study
+- $v_j$ the population median for the $j$*th* group 
+- $x_{jki}$ denote the $i$*th* observation for the $j$*th* group and $k$*th* study
+
+Assume 
+
+- $x_{jki} \sim h(\bar \varphi_{jk})$, where $h$ is a probability distribution and $\bar \varphi_{jk}$ denotes the set of parameters associated with $h$ for the $j$*th* group and $k$*th* study
+- $v_j$ is the median of the distribution $h(\bar \varphi_j)$
+
+We assume the log-ratio of sample medians can be thought of in terms of the log-ratio of true medians, 
+$$
+\log (m_{Ik}/m_{Ck}) = \log(\nu_I/\nu_C) + \gamma_k
+$$
+with some deviation associated with the variation $\gamma_k \sim N(0, \tau^2)$ for the $k$*th* study and sampling error $\varepsilon_k \sim N(0, \psi^2)$.  
+
+For simplicity, we assume all but the first parameter of $h$ are equal across for all $K$ studies, and allow the first parameter to vary according for the $j$*th* group of the $k$*th* study. 
+
+### first parameter derivations
+
+
+#### normal
+
+Suppose $x_{jki} \sim N(\mu_{jk}, \sigma_{jk})$ where the median $\nu_j$ denotes the median of $N(\mu_j, \sigma_j)$. 
+
+For simplicity, we assume $\sigma_j = \sigma = \sigma_{jk}$.
+
+We wish to find $\mu_{jk}$ in terms of $\mu_j$ and $\sigma^2$, $\gamma_k$, and $\varepsilon_k$.
+
+Since $x_{jki} \sim N(\mu_{jk}, \sigma)$, we have $\nu_{jk} = \mu_{jk}$ and $\nu_j = \mu_j$, then
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\mu_{Ik}/\mu_{Ck}) &= \log(\mu_I/\mu_C) + \gamma_k\\
+\implies \log\mu_{Ik} - \log\mu_{Ck} &= \log\mu_I - \log\mu_C + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\mu_{jk} &= \log\mu_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \mu_{jk} &= \mu_j e^{\frac{\gamma_k}{2}}.
+\end{align*}
+
+#### log-normal
+
+Suppose $x_{jki} \sim \log N(\mu_{jk}, \sigma_{jk})$, where $\nu_j$ denotes the median of $\log N(\mu_j, \sigma_j)$.
+
+Then, $\nu_{jk} = \exp(\mu{jk})$ and $\nu_j = \exp(\mu_j)$.
+
+For simplicity, we assume $\sigma_j = \sigma = \sigma_{jk}$. So,
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\exp(\mu_{Ik})) - \log(\exp(\mu_{Ck})) &= \log(\exp(\mu_I)) - \log(\exp(\mu_C)) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \mu_{jk} &= \mu_j + \gamma_k/2 + \varepsilon_k/2.
+\end{align*}
+
+\noindent \textbf{Another way to look at it:} the aim is to add a random effect to the log ratio of medians.  Using notations above, we want $\log(\nu_{1k}/\nu_{2k}) + \gamma_k$ which is equal to $\log(\nu_{1k}) - log(\nu_{2k}) + \gamma_k = \mu_{1k} - \mu_{2k} + \gamma_k$.  So the question is, when we are going to sample from the log-normal distributions for each group then what do we do with the random effect?  One way is to split it between the two which gives $$(\mu_{1k} + \gamma_k/2) - (\mu_{2k} - \gamma_k/2).$$  Therefore we simulate the $x_{1ki}$s from the LN$(\mu_{1k} + \gamma_k/2, \sigma)$ distribution and the $x_{2ki}$s from the LN$(\mu_{2k} - \gamma_k/2, \sigma)$ distribution.  This is similar to what is above, but where (i) note the $-\gamma_k/2$ for the second group, and (ii) no sampling error, $\epsilon_k$.  The sampling error is to account for the sample median being as estimator of the median.  So it shouldn't be used in the sampling process.
+
+#### pareto
+
+Suppose $x_{jki} \sim \mathrm{Pareto}(\theta_{jk}, \alpha_{jk})$ where $\nu_j$ denotes the median of $\mathrm{Pareto}(\theta_{j}, \alpha_{j})$. 
+
+Then $\nu_{jk} = \theta_{jk} \sqrt[\alpha_{jk}]2$ and $\nu_{j} = \theta_{j} \sqrt[\alpha_{j}]2$. 
+
+For simplicity, we assume $\alpha_{jk} = \alpha = \alpha_j$. Then, 
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\theta_{Ik} \sqrt[\alpha_{Ik}]2/\theta_{Ck} \sqrt[\alpha_{Ck}]2) &= \log(\theta_{I} \sqrt[\alpha_{I}]2/\theta_{C} \sqrt[\alpha_{C}]2) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log(\theta_{jk}\sqrt[\alpha_{jk}]2)  &= \log(\theta_{j} \sqrt[\alpha_{j}]2) + \gamma_k/2 + \varepsilon_k/2\\
+\implies \theta_{jk}\sqrt[\alpha_{jk}]2 &= \theta_{j} \sqrt[\alpha_{j}]2 e^{\frac{\gamma_k}{2}}. 
+\end{align*}
+
+And, since $\alpha_{jk} = \alpha = \alpha_j$, we have
+$$
+\theta_{jk} = \theta_j e^{\frac{\gamma_k}{2}}.
+$$
+
+#### exponential
+
+Suppose $x_{jki} \sim \exp(\lambda_{jk})$ where $\nu_j$ denotes the median of $\exp(\lambda_j)$. 
+
+Then $m_{jk} = \log2/\lambda_{jk}$ and $\nu_j = \log2/\lambda_j$. So,
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log\lambda_{Ck} - \log\lambda_{Ik} &= \log\lambda_C - \log\lambda_I + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\lambda_{jk} &= \log\lambda_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \lambda_{jk} &= \lambda_j e^{\frac{\gamma_k}{2}}.
+\end{align*}
+
+### simulation parameters
+
+Since we're interested in simulating  for differences between the group medians, and no differnce between the group medians, we set a proportional difference $p$ between the medians, which defaults to 1 (no difference). 
+
+We set the control parameters $\bar \varphi_C$ as simulation-level parameter, from which we derive a control median $\nu_C$ and calculate the intervention median,
+$$
+\frac{\nu_I}{\nu_C} = p \implies \nu_I = p\nu_C.
+$$
+
+#### normal
+
+Since $\nu_j = \mu_j$, for $N(\mu_j, \sigma^2)$,
+
+$$
+\nu_I = p \nu_C \implies \mu_I = p \mu_C.
+$$
+
+#### log-normal
+
+Since $\nu_j = \exp(\mu_j)$, for $\log N(\mu_j, \sigma_j)$, 
+
+$$
+\nu_I = p \nu_C \implies \exp(\mu_I) = p \exp(\mu_C) \implies \mu_I = \log p + \mu_C. 
+$$
+
+
+#### pareto
+
+Since $\nu_j = \theta_j \sqrt[\alpha_j]2$, for $\mathrm{Pareto}(\theta_j, \alpha_j)$, 
+
+$$
+\nu_I = p \nu_C \implies \theta_I \sqrt[\alpha_I]2 = p \theta_C \sqrt[\alpha_C]2 \implies \theta_I = p\theta_C.
+$$
+
+#### exponential
+
+Since $\nu_j = \log2/\lambda_j$, for $\exp(\lambda_j)$,
+
+$$
+\nu_I = p \nu_C \implies \log2/\lambda_I = \log2/\lambda_C \implies \lambda_I = \lambda_C/p. 
+$$
+
+
+## applications
+
+### meta-analysis of medians {#metamed}
+
+The `metasim::` package began as a script to solve this particular problem, and so it is currently the default simulation parameter set for `metasims()`.
+
+
+#### the problem
+
+
+#### simulation parameters
+
+In order to compare the performance of the estimator, we wished to consider a number of different constraints. 
+
+```{r simulation parameters, echo = FALSE}
+metasims_args <- args(metasims) %>% as.list()
+metasims_args %>% names()
+
+# store values to parameterise this 
+k <- metasims_args %>% pluck("k") %>% eval()
+tau_sq <- metasims_args %>% pluck("tau2_true") %>% eval() 
+effect_ratio <- metasims_args %>% pluck("effect_ratio") %>% eval()
+
+
+```
+
+- $k =$ `r k` studies
+- $\tau^2 =$ `r tau_sq` variation between studies
+- constrain the smallest and largest size sample, from `r metasims_args$min_n` , to  `r metasims_args$max_n`.
+- compare how the estimator performs for whether there is no difference, between the control and intervention group, of the two measures of interest, and when there is; with the ratio of effects $\rho = \nu_I / \nu_C =$ `r effect_ratio` 
+- sample from symmetric (normal distribution) and asymmetric (log-normal, exponential) underlying distributions, from any number of a parameter sets. 
+- the expected proportion the intervention group, defaulting to `r metasims_args$prop` and what difference from the `r metasims_args$prop_error`   difference 90% of other proportions fall within.   
+
+There is scope to extend the number of distributions in future releases of `metasim::`. Furthermore, the question of the optimal selection of simulation parameter sets remains for future work. For example, incorporating elements from experimental design [@pardalos_sampling_2016] into the construction of the simulation parameter set.        
+
+
+A set of default parameters is exported as a data object `default_parameters` in `metasim::`.
+
+```{r params table, echo = FALSE}
+
+# todo: make this a 
+default_parameters %>%
+  mutate(distribution = map_chr(dist, dist_name)) %>% 
+  mutate(par = map_chr(par, paste, collapse = ", ")) %>%
+  select(distribution, par) %>% 
+  rename(parameters = par) %>% 
+  knitr::kable() 
+
+```
+
+#### default distributions
+
+```{r distribution plots, echo=FALSE, fig.width=2}
+metasim::default_parameters %>% 
+  uncount(weights = 50, .id = "x") %>%
+  mutate(
+    x = x / 10,
+    y = pmap_dbl(
+    list(
+      x = x,
+      dist = dist,
+      par = par
+    ), .f = function(x, dist, par) {
+      if (dist == "pareto") actuar::dpareto2(x, par[[1]], par[[2]])
+      else density_fn(x, distribution = dist, parameters = par, type = "d")
+    }
+  ),
+  density = map2_chr(dist, par, .f = function(x,y) {
+    paste(dist_name(x), paste(y, collapse = ", "))
+  })) %>% 
+  mutate(distribution = map_chr(dist, dist_name)) %>% 
+  ggplot(aes(x = x, y = y)) +
+  geom_line(aes(group = density, 
+                linetype = density,
+                colour = distribution)) +
+  hrbrthemes::scale_color_ipsum() +
+  facet_grid(distribution ~ ., scales = "free") +
+  labs(title = "Distributions sampled",
+       x = NULL,
+       y = "density")  
+
+ggsave("distributions.png", 
+       width = 4, height = 8)
+
+
+```
+
+
+#### ratio plots
+
+
+
+#### single-study simulation
+
+```{r ss sim caption, echo=FALSE}
+
+
+measure = "median"
+distributions = default_parameters 
+cap_width = 110
+
+caption_distributions <- distributions %>% 
+  mutate(distribution = map_chr(dist, dist_name),
+  output = paste0("the ", distribution, 
+                  " distribution, with parameters "),
+  par_count = map_int(par, length),
+  par_1 = map_dbl(par, 1),
+  par_2 = map(par, 2),
+  output = case_when(
+    par_count == 1 ~ paste0(output, par_1),
+    par_count == 2 ~ paste0(output, par_1, " and ", par_2)
+   )) %>% pluck("output") %>% paste(., collapse = ", ")
+
+single_sim_caption <- paste0(
+  "Simulation results for the number of confidence intervals 
+  that contain the true measure of interest, the ",
+  measure, 
+  " and, log-ratio of the control ",
+  measure, 
+  " with intervention ",
+  measure,
+  ". The case where the control ",
+  measure, 
+  " is equal to the intervention ",
+  measure, 
+  " is considered, as is unequal ratio = ",
+  metasims_args$effect_ratio %>% eval() %>% paste(collapse = ","),
+  ". The distributions considered were ",
+  caption_distributions,
+  "."
+)
+
+```
+
+
+##### new functions
+
+
+```{r}
+# new caption
+singletrial_caption()
+singletrial_plot()
+
+
+```
+
+##### simulation
+
+```{r ss plot, cho=FALSE, eval=FALSE}
+single_sim <- metasims(
+  trials = params$trials,
+  progress = params$progress, 
+  single_study = TRUE)
+
+# generate a caption
+
+
+
+
+```
+
+```{r}
+
+ggsave("visualisations/single-sim.png", width = 2, units = "in", height = 2)
+```
+
+```{r eval=FALSE}
+usethis::use_data(single_sim)
+```
+
+
+#### meta-analysis simulation
+
+
+```{r meta analysis sim, echo=FALSE, eval=FALSE}
+library(tictoc)
+Sys.time()
+tic()
+meta_sim <- metasims(
+  trials = params$trials,
+  progress = params$progress, 
+  single_study = FALSE)
+toc()
+```
+
+```{r eval=FALSE}
+usethis::use_data(meta_sim)
+```
+
+
+```{r ma plot, echo=FALSE}
+meta_sim_caption <- paste0(
+  single_sim_caption, " Different numbers of studies were considered, ",
+  metasims_args$k %>% eval() %>% paste(collapse = ", "),
+  ", in the vertical facets of the plot; and values for the variation between studies, ",
+  metasims_args$tau2_true %>% eval() %>% paste(collapse = ", "),
+  " in the horizontal facets of the plot.")
+
+
+```
+
+```{r}
+ggsave("meta-sim.png")
+
+```
+
+
+
+
+## ratio plots
+
+```{r}
+
+
+```
+
+```{r fig.width=1}
+plot_data <- compare_estimators %>%
+  mutate(par_2_chr = as.character(par_2)) %>%
+  count(dist, par_1, par_2_chr) %>%
+  mutate(par_2 = as.numeric(par_2_chr)) %>%
+  mutate(par = map2(
+    par_1,
+    par_2,
+    .f = function(x, y) {
+      if (is.na(y))
+        list(x)
+      else
+        list(x, y)
+    }
+  )) %>%
+  mutate(par_label = map_chr(par, paste, collapse = ",")) %>%
+  uncount(weights = 50, .id = "x") %>%
+  dplyr::filter(dist != "beta") %>%
+  mutate(
+    x = x / 30,
+    y = pmap_dbl(
+      list(x = x,
+           dist = dist,
+           par = par),
+      .f = function(x, dist, par) {
+        # if (dist == "pareto") actuar::dpareto2(x, par[[1]], par[[2]])
+        # else
+        metasim::density_fn(x,
+                            distribution = dist,
+                            parameters = par,
+                            type = "d")
+      }
+    ),
+    density = map2_chr(
+      dist,
+      par,
+      .f = function(x, y) {
+        paste(metasim::dist_name(x), paste(y, collapse = ", "))
+      }
+    )
+  ) %>%
+  mutate(distribution = map_chr(dist, metasim::dist_name))
+
+label_data <- plot_data %>% 
+  filter(x == 1) %>% 
+  mutate(x = map_dbl(x, .f = function(x) {x + runif(1,-1,0.5)}),
+         y = pmap_dbl(
+      list(x = x,
+           dist = dist,
+           par = par),
+      .f = function(x, dist, par) {
+        # if (dist == "pareto") actuar::dpareto2(x, par[[1]], par[[2]])
+        # else
+        metasim::density_fn(x,
+                            distribution = dist,
+                            parameters = par,
+                            type = "d")
+      }
+    ))
+
+
+plot_data  %>% 
+  filter(x == 1) %>% 
+  select(distribution, par_label) %>%
+  rename(parameters = par_label) %>% 
+  kableExtra::kable("latex", booktabs = TRUE) %>%  
+  kableExtra::save_kable(
+    file = "ratios_dist_table.pdf", 
+    keep_tex = TRUE)
+
+```
+
+
+
+```{r}
+
+
+plot <-  plot_data %>% 
+  ggplot(aes(x = x, y = y)) +
+  geom_line(aes(group = density,
+                colour = distribution),
+            # linetype = 6,
+            alpha = 0.5
+            ) +
+  hrbrthemes::scale_color_ipsum() +
+  facet_grid(distribution~ ., scales = "free") +
+  labs(title = "Distributions for ratios",
+       x = NULL,
+       legend = "Distribution",
+       y = "Density") +
+  theme(text = element_text(size = 6))
+
+
+  
+plot  +
+  ggrepel::geom_text_repel(aes(label = par_label, x = x , y=y), alpha = 0.5,
+                           size = 2,
+                           data = label_data)
+
+
+ggsave("ratio-dist.png", width = 3)
+
+
+```
+
+
+## ratios bit
+
+```{r}
+
+compare_estimators %>% 
+  filter(estimator != "exp") %>% 
+  ggplot(aes(x = dist, y = ratio, colour = dist)) +
+  geom_point(position = "jitter", alpha = 0.6) +
+  facet_grid(estimator ~ . , scales = "free") +
+   hrbrthemes::scale_color_ipsum("Distribution") +
+  #theme_ipsum_rc() +
+ theme(axis.text.x = element_text(angle = 70, vjust = 0.7)) + 
+  labs(x = "Distribution",
+       y = "Ratio")
+
+
+
+```
+
+```{r}
+ggsave("ratios_scatter.png" , width = 3)
+
+
+```
+
+
+
+
+## references

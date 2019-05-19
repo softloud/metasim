@@ -255,9 +255,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -282,22 +280,92 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
 });
 </script>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -307,8 +375,8 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">derivations</h1>
-<h4 class="author"><em>Charles T. Gray</em></h4>
-<h4 class="date"><em>23/03/2019</em></h4>
+<h4 class="author">Charles T. Gray</h4>
+<h4 class="date">23/03/2019</h4>
 
 </div>
 
@@ -322,6 +390,120 @@ $(document).ready(function () {
 <p>We assume the variance of the error terms <span class="math inline">\(\tau^2\)</span> and <span class="math inline">\(\sigma^2\)</span> are fixed and that all but the first parameter of the distribtuion are common, for all <span class="math inline">\(j\)</span> and <span class="math inline">\(k\)</span>.</p>
 <p>We fix the true ratio <span class="math inline">\(\rho\)</span> of medians, as we wish to compare the performance of the estimator for both groups. And we choose distribution parameters for the control group.</p>
 <p>In order to simulate <span class="math inline">\(x_{jki} \in \{1, \dots, n_{jk}\}\)</span> observations, we require the first parameter for the control and interventions for the <span class="math inline">\(j\)</span>th arm of the <span class="math inline">\(k\)</span>th study.</p>
+
+<div id="sampling-the-data" class="section level2">
+<h2>sampling the data</h2>
+<div id="assumptions" class="section level3">
+<h3>assumptions</h3>
+<p>Let</p>
+<ul>
+<li><span class="math inline">\(j \in \{I, C\}\)</span> for intervention and control groups,</li>
+<li><span class="math inline">\(k \in K\)</span> studies,</li>
+<li><span class="math inline">\(i \in 1, \dots, n_{jk}\)</span> sample size for the <span class="math inline">\(j\)</span><em>th</em> group and <span class="math inline">\(k\)</span><em>th</em> study</li>
+<li><span class="math inline">\(m_{jk}\)</span> the sample median for the <span class="math inline">\(j\)</span><em>th</em> group and <span class="math inline">\(k\)</span><em>th</em> study</li>
+<li><span class="math inline">\(v_j\)</span> the population median for the <span class="math inline">\(j\)</span><em>th</em> group</li>
+<li><span class="math inline">\(x_{jki}\)</span> denote the <span class="math inline">\(i\)</span><em>th</em> observation for the <span class="math inline">\(j\)</span><em>th</em> group and <span class="math inline">\(k\)</span><em>th</em> study</li>
+</ul>
+<p>Assume</p>
+<ul>
+<li><span class="math inline">\(x_{jki} \sim h(\bar \varphi_{jk})\)</span>, where <span class="math inline">\(h\)</span> is a probability distribution and <span class="math inline">\(\bar \varphi_{jk}\)</span> denotes the set of parameters associated with <span class="math inline">\(h\)</span> for the <span class="math inline">\(j\)</span><em>th</em> group and <span class="math inline">\(k\)</span><em>th</em> study</li>
+<li><span class="math inline">\(v_j\)</span> is the median of the distribution <span class="math inline">\(h(\bar \varphi_j)\)</span></li>
+</ul>
+<p>We assume the log-ratio of sample medians can be thought of in terms of the log-ratio of true medians, <span class="math display">\[
+\log (m_{Ik}/m_{Ck}) = \log(\nu_I/\nu_C) + \gamma_k
+\]</span> with some deviation associated with the variation <span class="math inline">\(\gamma_k \sim N(0, \tau^2)\)</span> for the <span class="math inline">\(k\)</span><em>th</em> study and sampling error <span class="math inline">\(\varepsilon_k \sim N(0, \psi^2)\)</span>.</p>
+<p>For simplicity, we assume all but the first parameter of <span class="math inline">\(h\)</span> are equal across for all <span class="math inline">\(K\)</span> studies, and allow the first parameter to vary according for the <span class="math inline">\(j\)</span><em>th</em> group of the <span class="math inline">\(k\)</span><em>th</em> study.</p>
+</div>
+<div id="first-parameter-derivations" class="section level3">
+<h3>first parameter derivations</h3>
+<div id="normal" class="section level4">
+<h4>normal</h4>
+<p>Suppose <span class="math inline">\(x_{jki} \sim N(\mu_{jk}, \sigma_{jk})\)</span> where the median <span class="math inline">\(\nu_j\)</span> denotes the median of <span class="math inline">\(N(\mu_j, \sigma_j)\)</span>.</p>
+<p>For simplicity, we assume <span class="math inline">\(\sigma_j = \sigma = \sigma_{jk}\)</span>.</p>
+<p>We wish to find <span class="math inline">\(\mu_{jk}\)</span> in terms of <span class="math inline">\(\mu_j\)</span> and <span class="math inline">\(\sigma^2\)</span>, <span class="math inline">\(\gamma_k\)</span>, and <span class="math inline">\(\varepsilon_k\)</span>.</p>
+<p>Since <span class="math inline">\(x_{jki} \sim N(\mu_{jk}, \sigma)\)</span>, we have <span class="math inline">\(\nu_{jk} = \mu_{jk}\)</span> and <span class="math inline">\(\nu_j = \mu_j\)</span>, then</p>
+<p><span class="math display">\[\begin{align*}
+\log(m_{Ik}/m_{Ck}) &amp;= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\mu_{Ik}/\mu_{Ck}) &amp;= \log(\mu_I/\mu_C) + \gamma_k\\
+\implies \log\mu_{Ik} - \log\mu_{Ck} &amp;= \log\mu_I - \log\mu_C + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\mu_{jk} &amp;= \log\mu_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \mu_{jk} &amp;= \mu_j e^{\frac{\gamma_k}{2}}.
+\end{align*}\]</span></p>
+</div>
+<div id="log-normal" class="section level4">
+<h4>log-normal</h4>
+<p>Suppose <span class="math inline">\(x_{jki} \sim \log N(\mu_{jk}, \sigma_{jk})\)</span>, where <span class="math inline">\(\nu_j\)</span> denotes the median of <span class="math inline">\(\log N(\mu_j, \sigma_j)\)</span>.</p>
+<p>Then, <span class="math inline">\(\nu_{jk} = \exp(\mu{jk})\)</span> and <span class="math inline">\(\nu_j = \exp(\mu_j)\)</span>.</p>
+<p>For simplicity, we assume <span class="math inline">\(\sigma_j = \sigma = \sigma_{jk}\)</span>. So,</p>
+<p><span class="math display">\[\begin{align*}
+\log(m_{Ik}/m_{Ck}) &amp;= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\exp(\mu_{Ik})) - \log(\exp(\mu_{Ck})) &amp;= \log(\exp(\mu_I)) - \log(\exp(\mu_C)) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \mu_{jk} &amp;= \mu_j + \gamma_k/2 + \varepsilon_k/2.
+\end{align*}\]</span></p>
+<p> the aim is to add a random effect to the log ratio of medians. Using notations above, we want <span class="math inline">\(\log(\nu_{1k}/\nu_{2k}) + \gamma_k\)</span> which is equal to <span class="math inline">\(\log(\nu_{1k}) - log(\nu_{2k}) + \gamma_k = \mu_{1k} - \mu_{2k} + \gamma_k\)</span>. So the question is, when we are going to sample from the log-normal distributions for each group then what do we do with the random effect? One way is to split it between the two which gives <span class="math display">\[(\mu_{1k} + \gamma_k/2) - (\mu_{2k} - \gamma_k/2).\]</span> Therefore we simulate the <span class="math inline">\(x_{1ki}\)</span>s from the LN<span class="math inline">\((\mu_{1k} + \gamma_k/2, \sigma)\)</span> distribution and the <span class="math inline">\(x_{2ki}\)</span>s from the LN<span class="math inline">\((\mu_{2k} - \gamma_k/2, \sigma)\)</span> distribution. This is similar to what is above, but where (i) note the <span class="math inline">\(-\gamma_k/2\)</span> for the second group, and (ii) no sampling error, <span class="math inline">\(\epsilon_k\)</span>. The sampling error is to account for the sample median being as estimator of the median. So it shouldn’t be used in the sampling process.</p>
+</div>
+<div id="pareto" class="section level4">
+<h4>pareto</h4>
+<p>Suppose <span class="math inline">\(x_{jki} \sim \mathrm{Pareto}(\theta_{jk}, \alpha_{jk})\)</span> where <span class="math inline">\(\nu_j\)</span> denotes the median of <span class="math inline">\(\mathrm{Pareto}(\theta_{j}, \alpha_{j})\)</span>.</p>
+<p>Then <span class="math inline">\(\nu_{jk} = \theta_{jk} \sqrt[\alpha_{jk}]2\)</span> and <span class="math inline">\(\nu_{j} = \theta_{j} \sqrt[\alpha_{j}]2\)</span>.</p>
+<p>For simplicity, we assume <span class="math inline">\(\alpha_{jk} = \alpha = \alpha_j\)</span>. Then, <span class="math display">\[\begin{align*}
+\log(m_{Ik}/m_{Ck}) &amp;= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\theta_{Ik} \sqrt[\alpha_{Ik}]2/\theta_{Ck} \sqrt[\alpha_{Ck}]2) &amp;= \log(\theta_{I} \sqrt[\alpha_{I}]2/\theta_{C} \sqrt[\alpha_{C}]2) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log(\theta_{jk}\sqrt[\alpha_{jk}]2)  &amp;= \log(\theta_{j} \sqrt[\alpha_{j}]2) + \gamma_k/2 + \varepsilon_k/2\\
+\implies \theta_{jk}\sqrt[\alpha_{jk}]2 &amp;= \theta_{j} \sqrt[\alpha_{j}]2 e^{\frac{\gamma_k}{2}}. 
+\end{align*}\]</span></p>
+<p>And, since <span class="math inline">\(\alpha_{jk} = \alpha = \alpha_j\)</span>, we have <span class="math display">\[
+\theta_{jk} = \theta_j e^{\frac{\gamma_k}{2}}.
+\]</span></p>
+</div>
+<div id="exponential" class="section level4">
+<h4>exponential</h4>
+<p>Suppose <span class="math inline">\(x_{jki} \sim \exp(\lambda_{jk})\)</span> where <span class="math inline">\(\nu_j\)</span> denotes the median of <span class="math inline">\(\exp(\lambda_j)\)</span>.</p>
+<p>Then <span class="math inline">\(m_{jk} = \log2/\lambda_{jk}\)</span> and <span class="math inline">\(\nu_j = \log2/\lambda_j\)</span>. So,</p>
+<p><span class="math display">\[\begin{align*}
+\log(m_{Ik}/m_{Ck}) &amp;= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log\lambda_{Ck} - \log\lambda_{Ik} &amp;= \log\lambda_C - \log\lambda_I + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\lambda_{jk} &amp;= \log\lambda_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \lambda_{jk} &amp;= \lambda_j e^{\frac{\gamma_k}{2}}.
+\end{align*}\]</span></p>
+</div>
+</div>
+<div id="simulation-parameters" class="section level3">
+<h3>simulation parameters</h3>
+<p>Since we’re interested in simulating for differences between the group medians, and no differnce between the group medians, we set a proportional difference <span class="math inline">\(p\)</span> between the medians, which defaults to 1 (no difference).</p>
+<p>We set the control parameters <span class="math inline">\(\bar \varphi_C\)</span> as simulation-level parameter, from which we derive a control median <span class="math inline">\(\nu_C\)</span> and calculate the intervention median, <span class="math display">\[
+\frac{\nu_I}{\nu_C} = p \implies \nu_I = p\nu_C.
+\]</span></p>
+<div id="normal-1" class="section level4">
+<h4>normal</h4>
+<p>Since <span class="math inline">\(\nu_j = \mu_j\)</span>, for <span class="math inline">\(N(\mu_j, \sigma^2)\)</span>,</p>
+<p><span class="math display">\[
+\nu_I = p \nu_C \implies \mu_I = p \mu_C.
+\]</span></p>
+</div>
+<div id="log-normal-1" class="section level4">
+<h4>log-normal</h4>
+<p>Since <span class="math inline">\(\nu_j = \exp(\mu_j)\)</span>, for <span class="math inline">\(\log N(\mu_j, \sigma_j)\)</span>,</p>
+<p><span class="math display">\[
+\nu_I = p \nu_C \implies \exp(\mu_I) = p \exp(\mu_C) \implies \mu_I = \log p + \mu_C. 
+\]</span></p>
+</div>
+<div id="pareto-1" class="section level4">
+<h4>pareto</h4>
+<p>Since <span class="math inline">\(\nu_j = \theta_j \sqrt[\alpha_j]2\)</span>, for <span class="math inline">\(\mathrm{Pareto}(\theta_j, \alpha_j)\)</span>,</p>
+<p><span class="math display">\[
+\nu_I = p \nu_C \implies \theta_I \sqrt[\alpha_I]2 = p \theta_C \sqrt[\alpha_C]2 \implies \theta_I = p\theta_C.
+\]</span></p>
+</div>
+<div id="exponential-1" class="section level4">
+<h4>exponential</h4>
+<p>Since <span class="math inline">\(\nu_j = \log2/\lambda_j\)</span>, for <span class="math inline">\(\exp(\lambda_j)\)</span>,</p>
+<p><span class="math display">\[
+\nu_I = p \nu_C \implies \log2/\lambda_I = \log2/\lambda_C \implies \lambda_I = \lambda_C/p. 
+\]</span></p>
+</div>
+</div>
+</div>
 
 
 

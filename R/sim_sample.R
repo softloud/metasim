@@ -8,7 +8,7 @@
 #' @param rdist string indicating distribution, "norm", "lnorm", "exp", or "pareto"
 #' @param par list of parameter arguments
 #' @param control value of first parameter of distribution is determined by median ratio
-#' @param median_ratio ratio of population medians
+#' @param effect_ratio ratio of population effects intervention / control
 #' @export
 
 sim_sample <- function(n = 18,
@@ -16,7 +16,7 @@ sim_sample <- function(n = 18,
                        rdist = "norm",
                        par = list(mean = 20, sd = 0.2),
                        control = TRUE,
-                       median_ratio = 1.2) {
+                       effect_ratio = 1.2) {
   # check inputs are valid
   assert_that(length(par) <= 2,
                           msg = "haven't coded this
@@ -33,8 +33,8 @@ sim_sample <- function(n = 18,
   assert_that(is.logical(control),
                           msg = "control argument needs to be a logical
                           indicating if in control group")
-  assert_that(is.numeric(median_ratio),
-                          msg = "median_ratio needs to be a numeric")
+  assert_that(is.numeric(effect_ratio),
+                          msg = "effect_ratio needs to be a numeric")
 
   # set up sign for different arms
   beta <- if (control == TRUE) {
@@ -47,7 +47,7 @@ sim_sample <- function(n = 18,
     # set value of first parameter to ensure median ratio
     par_1 <-
       if (control == FALSE)
-        par[[1]] * median_ratio
+        par[[1]] * effect_ratio
     else
       par[[1]]
 
@@ -62,7 +62,7 @@ sim_sample <- function(n = 18,
     # set value of first parameter to ensure median ratio
     par_1 <-
       if (control == FALSE)
-        par[[1]] + log(median_ratio)
+        par[[1]] + log(effect_ratio)
     else
       par[[1]]
 
@@ -72,7 +72,7 @@ sim_sample <- function(n = 18,
   } else if (rdist == "pareto") {
     # set value of first parameter to ensure median ratio
     par_1 <- if (control == FALSE) {
-      par[[1]] * median_ratio
+      par[[1]] * effect_ratio
     } else {
       par[[1]]
     }
@@ -83,7 +83,7 @@ sim_sample <- function(n = 18,
   } else if (rdist == "exp") {
     # set value of first parameter to ensure median ratio
     par_1 <- if (control == FALSE) {
-      par[[1]] / median_ratio
+      par[[1]] * effect_ratio # todo: double check this maths
     } else {
       par[[1]]
     }

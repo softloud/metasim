@@ -1,0 +1,14 @@
+---
+title: "test"
+author: "Charles T. Gray"
+date: "05/05/2019"
+bibliography: biblio.bib
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+test [@pardalos_sampling_2016; @pinheiro_d-dimer_2012]

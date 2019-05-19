@@ -2,10 +2,9 @@
 #'
 #' @export
 
-density_fn <- function(distribution = "norm",
+density_fn <- function(x, distribution = "norm",
                        parameters = list(mean = 50, sd = 0.2),
-                                         type = "q",
-                                         x) {
+                                         type = "q") {
   fn <- get(paste0(type, distribution))
   if (length(parameters == 1)) fn(x, parameters[[1]])
   else fn(x, parameters[[1]], parameters[[2]])

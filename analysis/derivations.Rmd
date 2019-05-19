@@ -28,3 +28,142 @@ We fix the true ratio $\rho$ of medians, as we wish to compare the performance o
 In order to simulate $x_{jki} \in \{1, \dots, n_{jk}\}$ observations, we require the first parameter for the control and interventions for the $j$th arm of the $k$th study. 
 
 \section{how the parameters were approximated in the estimator}
+
+
+## sampling the data
+
+
+### assumptions
+
+Let 
+
+- $j \in \{I, C\}$ for intervention and control groups, 
+- $k \in K$ studies,
+- $i \in 1, \dots, n_{jk}$ sample size for the $j$*th* group and $k$*th* study
+- $m_{jk}$ the sample median for the $j$*th* group and $k$*th* study
+- $v_j$ the population median for the $j$*th* group 
+- $x_{jki}$ denote the $i$*th* observation for the $j$*th* group and $k$*th* study
+
+Assume 
+
+- $x_{jki} \sim h(\bar \varphi_{jk})$, where $h$ is a probability distribution and $\bar \varphi_{jk}$ denotes the set of parameters associated with $h$ for the $j$*th* group and $k$*th* study
+- $v_j$ is the median of the distribution $h(\bar \varphi_j)$
+
+We assume the log-ratio of sample medians can be thought of in terms of the log-ratio of true medians, 
+$$
+\log (m_{Ik}/m_{Ck}) = \log(\nu_I/\nu_C) + \gamma_k
+$$
+with some deviation associated with the variation $\gamma_k \sim N(0, \tau^2)$ for the $k$*th* study and sampling error $\varepsilon_k \sim N(0, \psi^2)$.  
+
+For simplicity, we assume all but the first parameter of $h$ are equal across for all $K$ studies, and allow the first parameter to vary according for the $j$*th* group of the $k$*th* study. 
+
+### first parameter derivations
+
+
+#### normal
+
+Suppose $x_{jki} \sim N(\mu_{jk}, \sigma_{jk})$ where the median $\nu_j$ denotes the median of $N(\mu_j, \sigma_j)$. 
+
+For simplicity, we assume $\sigma_j = \sigma = \sigma_{jk}$.
+
+We wish to find $\mu_{jk}$ in terms of $\mu_j$ and $\sigma^2$, $\gamma_k$, and $\varepsilon_k$.
+
+Since $x_{jki} \sim N(\mu_{jk}, \sigma)$, we have $\nu_{jk} = \mu_{jk}$ and $\nu_j = \mu_j$, then
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\mu_{Ik}/\mu_{Ck}) &= \log(\mu_I/\mu_C) + \gamma_k\\
+\implies \log\mu_{Ik} - \log\mu_{Ck} &= \log\mu_I - \log\mu_C + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\mu_{jk} &= \log\mu_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \mu_{jk} &= \mu_j e^{\frac{\gamma_k}{2}}.
+\end{align*}
+
+#### log-normal
+
+Suppose $x_{jki} \sim \log N(\mu_{jk}, \sigma_{jk})$, where $\nu_j$ denotes the median of $\log N(\mu_j, \sigma_j)$.
+
+Then, $\nu_{jk} = \exp(\mu{jk})$ and $\nu_j = \exp(\mu_j)$.
+
+For simplicity, we assume $\sigma_j = \sigma = \sigma_{jk}$. So,
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\exp(\mu_{Ik})) - \log(\exp(\mu_{Ck})) &= \log(\exp(\mu_I)) - \log(\exp(\mu_C)) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \mu_{jk} &= \mu_j + \gamma_k/2 + \varepsilon_k/2.
+\end{align*}
+
+\noindent \textbf{Another way to look at it:} the aim is to add a random effect to the log ratio of medians.  Using notations above, we want $\log(\nu_{1k}/\nu_{2k}) + \gamma_k$ which is equal to $\log(\nu_{1k}) - log(\nu_{2k}) + \gamma_k = \mu_{1k} - \mu_{2k} + \gamma_k$.  So the question is, when we are going to sample from the log-normal distributions for each group then what do we do with the random effect?  One way is to split it between the two which gives $$(\mu_{1k} + \gamma_k/2) - (\mu_{2k} - \gamma_k/2).$$  Therefore we simulate the $x_{1ki}$s from the LN$(\mu_{1k} + \gamma_k/2, \sigma)$ distribution and the $x_{2ki}$s from the LN$(\mu_{2k} - \gamma_k/2, \sigma)$ distribution.  This is similar to what is above, but where (i) note the $-\gamma_k/2$ for the second group, and (ii) no sampling error, $\epsilon_k$.  The sampling error is to account for the sample median being as estimator of the median.  So it shouldn't be used in the sampling process.
+
+#### pareto
+
+Suppose $x_{jki} \sim \mathrm{Pareto}(\theta_{jk}, \alpha_{jk})$ where $\nu_j$ denotes the median of $\mathrm{Pareto}(\theta_{j}, \alpha_{j})$. 
+
+Then $\nu_{jk} = \theta_{jk} \sqrt[\alpha_{jk}]2$ and $\nu_{j} = \theta_{j} \sqrt[\alpha_{j}]2$. 
+
+For simplicity, we assume $\alpha_{jk} = \alpha = \alpha_j$. Then, 
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log(\theta_{Ik} \sqrt[\alpha_{Ik}]2/\theta_{Ck} \sqrt[\alpha_{Ck}]2) &= \log(\theta_{I} \sqrt[\alpha_{I}]2/\theta_{C} \sqrt[\alpha_{C}]2) + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log(\theta_{jk}\sqrt[\alpha_{jk}]2)  &= \log(\theta_{j} \sqrt[\alpha_{j}]2) + \gamma_k/2 + \varepsilon_k/2\\
+\implies \theta_{jk}\sqrt[\alpha_{jk}]2 &= \theta_{j} \sqrt[\alpha_{j}]2 e^{\frac{\gamma_k}{2}}. 
+\end{align*}
+
+And, since $\alpha_{jk} = \alpha = \alpha_j$, we have
+$$
+\theta_{jk} = \theta_j e^{\frac{\gamma_k}{2}}.
+$$
+
+#### exponential
+
+Suppose $x_{jki} \sim \exp(\lambda_{jk})$ where $\nu_j$ denotes the median of $\exp(\lambda_j)$. 
+
+Then $m_{jk} = \log2/\lambda_{jk}$ and $\nu_j = \log2/\lambda_j$. So,
+
+\begin{align*}
+\log(m_{Ik}/m_{Ck}) &= \log(\nu_I/\nu_C) + \gamma_k \\
+\implies \log\lambda_{Ck} - \log\lambda_{Ik} &= \log\lambda_C - \log\lambda_I + 2\gamma_k/2 + 2\varepsilon_k/2\\
+\implies \log\lambda_{jk} &= \log\lambda_j + \gamma_k/2 + \varepsilon_k/2\\
+\implies \lambda_{jk} &= \lambda_j e^{\frac{\gamma_k}{2}}.
+\end{align*}
+
+### simulation parameters
+
+Since we're interested in simulating  for differences between the group medians, and no differnce between the group medians, we set a proportional difference $p$ between the medians, which defaults to 1 (no difference). 
+
+We set the control parameters $\bar \varphi_C$ as simulation-level parameter, from which we derive a control median $\nu_C$ and calculate the intervention median,
+$$
+\frac{\nu_I}{\nu_C} = p \implies \nu_I = p\nu_C.
+$$
+
+#### normal
+
+Since $\nu_j = \mu_j$, for $N(\mu_j, \sigma^2)$,
+
+$$
+\nu_I = p \nu_C \implies \mu_I = p \mu_C.
+$$
+
+#### log-normal
+
+Since $\nu_j = \exp(\mu_j)$, for $\log N(\mu_j, \sigma_j)$, 
+
+$$
+\nu_I = p \nu_C \implies \exp(\mu_I) = p \exp(\mu_C) \implies \mu_I = \log p + \mu_C. 
+$$
+
+
+#### pareto
+
+Since $\nu_j = \theta_j \sqrt[\alpha_j]2$, for $\mathrm{Pareto}(\theta_j, \alpha_j)$, 
+
+$$
+\nu_I = p \nu_C \implies \theta_I \sqrt[\alpha_I]2 = p \theta_C \sqrt[\alpha_C]2 \implies \theta_I = p\theta_C.
+$$
+
+#### exponential
+
+Since $\nu_j = \log2/\lambda_j$, for $\exp(\lambda_j)$,
+
+$$
+\nu_I = p \nu_C \implies \log2/\lambda_I = \log2/\lambda_C \implies \lambda_I = \lambda_C/p. 
+$$
