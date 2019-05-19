@@ -13,6 +13,7 @@ dist_name <- function(dist, toR = FALSE) {
   if (toR) {
     switch(dist,
            normal = "norm",
+           Cauchy = "cauchy",
            "log-normal" = "lnorm",
            beta = "beta",
            Weibull = "weibull",
@@ -24,6 +25,7 @@ dist_name <- function(dist, toR = FALSE) {
   } else {
     switch(dist,
            norm = "normal",
+           cauchy = "Cauchy",
            lnorm = "log-normal",
            beta = "beta",
            weibull = "Weibull",

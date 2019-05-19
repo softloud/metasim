@@ -27,6 +27,7 @@ metasims <- function(single_study = FALSE,
                      beep = FALSE,
                      progress = TRUE) {
 
+  measure_string <- measure
 
   # set variance between studies to 0 when there's only one study
   if (isTRUE(single_study)) {
@@ -81,16 +82,28 @@ metasims <- function(single_study = FALSE,
 
   # bind all the output together
   # tried to use unnest to do this, but to no avail
-  output <- results %>%
+  sim <- list(simulation = match.call(expand.dots = TRUE),
+              results = results %>%
     pluck("sim_results") %>%
     bind_rows() %>%
-    full_join(results, by = "id")
+    full_join(results, by = "id") %>%
+    mutate(effect_ratio = map2_chr(measure, effect_ratio, .f = function(x, y) {
+      output <- if (x == measure_string) {NA} else {y}
+      return(output)
+    })))
+
+
+  # define simulation class
+  class(sim) <- if_else(
+    !isTRUE(single_study),
+    "sim_ma",
+    "sim_ss"
+  )
 
 
   if (isTRUE(progress)) cat("\n")
 
   if (isTRUE(beep)) beepr::beep("treasure")
 
-  return(output)
-
+  return(sim)
 }

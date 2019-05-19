@@ -20,7 +20,6 @@ Imports:
     assertthat,
     janitor,
     magrittr,
-    metabroom,
     metafor,
     purrr,
     tibble,
