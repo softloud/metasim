@@ -4,7 +4,7 @@
 \alias{plot.sim_ss}
 \title{Plot coverage probability for single-study simulation}
 \usage{
-\method{plot}{sim_ss}(sim = single_sim)
+\method{plot}{sim_ss}(sim = single_sim, caption = NULL)
 }
 \arguments{
 \item{sim}{A \code{sim_ss} object from \link{metasim}.}

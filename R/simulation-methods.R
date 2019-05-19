@@ -8,10 +8,11 @@ NULL
 #' Plot single-study simulation results.
 #'
 #' @param sim A `sim_ss` object from [metasim].
+#' @param caption Whether or not to include the caption.
 #'
 #' @export
 
-plot.sim_ss <- function(sim = single_sim) {
+plot.sim_ss <- function(sim = single_sim, caption = NULL) {
   # shorthand for now
   sim %>%
     pluck("results") %>%
@@ -21,7 +22,7 @@ plot.sim_ss <- function(sim = single_sim) {
       effect_ratio = if_else(
         is.na(effect_ratio),
         "single measure",
-        as.character(effect_ratio)
+        as.character(round(as.numeric(effect_ratio), 1))
       ),
       measure = if_else(
         str_detect(measure, "lr_"),
@@ -36,11 +37,11 @@ plot.sim_ss <- function(sim = single_sim) {
           shape = effect_ratio),
       alpha = 0.6,
       size = 2) +
-    scale_shape_discrete(namet = "Effect ratio", drop = FALSE) +
+    scale_shape_discrete(name = "Effect ratio", drop = FALSE) +
     hrbrthemes::scale_colour_ipsum(name = "Distribution") +
     labs(x = "Distribution",
          y = "Coverage",
-         title = "Simulation results for estimating the variance \nof the sample median") +
+         title = str_wrap("Simulation results for estimating the variance of the sample median")) +
     theme(
       axis.text.x = element_text(
         angle = 35,
@@ -61,11 +62,12 @@ caption <- function(sim) {
 #' Output caption as a character string.
 #'
 #' @export
-
 caption.sim_ss <- function(sim) {
-  k <- metasims_args %>% pluck("k") %>% eval()
-  tau_sq <- metasims_args %>% pluck("tau2_true") %>% eval()
-  effect_ratio <- metasims_args %>% pluck("effect_ratio") %>% eval()
+
+
+  # k <- metasims_args %>% pluck("k") %>% eval()
+  # tau_sq <- metasims_args %>% pluck("tau2_true") %>% eval()
+  # effect_ratio <- metasims_args %>% pluck("effect_ratio") %>% eval()
 
   caption_distributions <- distributions %>%
     mutate(
@@ -84,7 +86,7 @@ caption.sim_ss <- function(sim) {
 
 
   single_sim_caption <- paste0(
-    "Simulation results for the proportion, \emph{coverage}, of confidence intervals that contain the true measure of interest, the ",
+    "Simulation results for the proportion, \\emph{coverage}, of confidence intervals that contain the true measure of interest, the ",
     measure,
     " and, log-ratio of the control ",
     measure,

@@ -4,8 +4,9 @@
 \alias{singlesim_caption}
 \title{caption distributions}
 \usage{
-singlesim_caption(distributions = default_parameters, cap_width = 110,
-  measure = "median", metasims_args = args(metasims) \%>\% as.list())
+singlesim_caption(sim, distributions = default_parameters,
+  cap_width = 110, measure = "median", metasims_args = args(metasims)
+  \%>\% as.list())
 }
 \arguments{
 \item{sim}{The output of the \link{metasims} function.}
