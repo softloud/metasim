@@ -64,7 +64,7 @@ get_arguments <- function(...) {
 
   defaults <- formals() %>% {
     tibble(argument = names(.),
-           default = as.list(.)) # %>% mutate(value = map(value, 1))
+           default = as.list(.))
   }
 
 

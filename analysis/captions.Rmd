@@ -1,0 +1,94 @@
+---
+title: "captions"
+author: "Charles T. Gray"
+date: "20/05/2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  echo = TRUE)
+
+conflicted::conflict_prefer("filter", "dplyr")
+
+```
+
+```{r packages}
+# packages
+library(kableExtra)
+library(dplyr)
+```
+
+
+## simulate
+
+```{r run simulation}
+sim <- metasims(single_study = TRUE)
+
+```
+
+
+```{r parmaeter extractor}
+sim_parameter <- function(sim, arg){
+
+  sim %>% 
+    purrr::pluck("arguments") %>% 
+    dplyr::filter(argument == arg) %>% 
+    purrr::pluck("value")
+}
+
+
+```
+
+
+```{r}
+(effect_ratio <- sim %>% sim_parameter("effect_ratio"))
+
+```
+
+
+
+
+## Caption drafts
+
+```{r }
+# tracking 
+sim %>% 
+  pluck("arguments") %>% 
+  select(argument, value) %>% mutate(
+    status = paste(argument, ""),
+    status = case_when(
+      argument == "beep" ~ NA,
+      argument == "distributions" ~ "done",
+      TRUE ~ status
+    )
+  ) %>% 
+  kable() 
+
+
+```
+
+
+#  Caption for the simulation
+
+Results for the proportion, coverage, of 3 simulated confidence intervals that contain the true measure of interest, the median and, log-ratio of the control median with intervention median.
+
+The case where the control median $\nu_C$ is equal to the intervention median $\nu_I$ is considered, $\rho := \nu_I/\nu_C = 1$, as is an unequal ratio, $\rho =$ `r effect_ratio[-1]`,  with ratio = `r effect_ratio`. 
+
+Data for the control and intervention arms sampled from distributions: the normal distribution, with parameters 2 and 0.3, the exponential distribution, with parameters 2, the Pareto distribution, with parameters 3 and 3, the Pareto distribution, with parameters 2 and 1, the Pareto distribution, with parameters 0.5 and 1, the log-normal distribution, with parameters 1 and 0.3. 
+
+Summary statistics were calculated from the samples, for the estimator of the variance of the sample median. 
+
+## only for meta-analysis
+
+```{r}
+k <- sim %>% sim_parameter("k")
+tau_sq_true <- sim %>% sim_parameter("tau_sq_true")
+
+```
+
+

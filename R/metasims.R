@@ -1,10 +1,14 @@
 #' coverage paobability simulations of an estimator for various
 #'
+#' @param single_study Set this to TRUE for a simulation of single samples; i.e., one control and one intervention group.
+#' @param measure Calculate sample median or mean. Defaults to median.
+#' @param k Vector of desired numbers studies to simulate for.
+#' @param tau_sq_true
 #' @param distributions a dataframe with a `dist` column of R distributions, i.e., norm, exp, pareto, and a list-column `par` of parameter sets. Defaults to [default_parmetres]
-#' @param single_study When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.
+#' @param single_study When set to TRUE, will override simulation parameters with k = 1 and tau_sq_true = 0.
 #' @param k Simulate for different numbers of studies.
-#' @param tau2_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
-#' @param effect_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.
+#' @param tau_sq_true Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect
+#' @param unequal_effect_ratio \eqn{\nu_I / \nu_C := \rho} where \eqn{\rho = 1} and whatever arguments passed to this. Defaults to 1.2, so that the cases \eqn{\rho = 1, 1.2} are considered.
 #' @param beep Turn on beep alert when successfully finished.
 #' @param progress Turn progress bar on and off.
 #' @inheritParams sim_n
@@ -16,8 +20,8 @@ metasims <- function(single_study = FALSE,
                      measure_spread = "iqr",
                      distributions = default_parameters,
                      k = c(3, 7, 10),
-                     tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-                     effect_ratio = c(1, 1.2),
+                     tau_sq_true = seq(from = 0, to = 0.4, by = 0.2),
+                     unequal_effect_ratio = 1.2,
                      min_n = 20,
                      max_n = 200,
                      prop = 0.5,
@@ -26,26 +30,82 @@ metasims <- function(single_study = FALSE,
                      trial_fn = metatrial,
                      beep = FALSE,
                      progress = TRUE) {
+  # simulation-level parameters ---------------------------------------------
 
+  # Ultimately, I'd love to extract this as a function, but I'm not sure how.
+  match_call <- match.call()
+  names_match_call <- names(match_call)
+
+  specified_args <- if (!is.null(names_match_call)) {
+    as.list(match_call)[-1] %>%  {
+      tibble(argument = names(.),
+             specified = as.list(.))
+
+    }
+  } else {
+    "no specified args"
+  }
+
+  defaults <- formals() %>% {
+    tibble(argument = names(.),
+           default = as.list(.))
+  }
+
+
+  arguments <- if (!is.character(specified_args)) {
+    defaults %>%
+      full_join(specified_args, by = "argument") %>%
+      mutate(
+        default_flag = map_lgl(specified, is.null),
+        value_raw = if_else(default_flag,
+                            default,
+                            specified)
+      ) %>%
+      arrange(argument) %>%
+      mutate(value = case_when(
+        class(value_raw) == "language" ~ eval(value_raw),
+        TRUE ~ value_raw
+      ),
+      value = as.character(eval(value)))
+
+  } else {
+    defaults
+  }
+
+
+  # simulation-level tweaks -------------------------------------------------
+
+  # include the case where the control and median are equal
+  effect_ratio <- c(1, effect_ratio)
+
+  # to avoid confusion with measure column
   measure_string <- measure
 
   # set variance between studies to 0 when there's only one study
   if (isTRUE(single_study)) {
     k <- 1
-    tau2_true <- 0
+    tau_sq_true <- 0
   }
+
+
+  # instantiate simulation --------------------------------------------------
+
 
   # set up simulation parameters
   simpars <- sim_df(
     dist_tribble = distributions,
     k = k,
-    tau2 = tau2_true,
+    tau2 = tau_sq_true,
     effect_ratio = effect_ratio,
     min_n = min_n,
     max_n = max_n,
     prop = prop,
     prop_error = prop_error
   )
+
+
+  # run simulation ----------------------------------------------------------
+
 
   # set progress bar
   if (isTRUE(progress)) {
@@ -55,55 +115,72 @@ metasims <- function(single_study = FALSE,
       " simulations of ",
       trials,
       " trials\n"
-    ))}
-
-  # output
-  # return(results_df)
-  # solution for simulation-level arguments ---------------------------------
-
-  results <- simpars %>%
-    mutate(sim_results = pmap(
-      list(
-        tau_sq = tau2_true,
-        effect_ratio = effect_ratio,
-        rdist = rdist,
-        parameters = parameters,
-        n_df = n,
-        true_effect = true_effect,
-        id = id
-      ),
-      metasim,
-      measure = measure,
-      measure_spread = measure_spread,
-      trials = trials,
-      trial_fn = trial_fn,
-      knha = knha
     ))
+  }
+
+
+  # simulate
+  results <- simpars %>%
+    mutate(
+      sim_results = pmap(
+        list(
+          tau_sq = tau_sq_true,
+          effect_ratio = effect_ratio,
+          rdist = rdist,
+          parameters = parameters,
+          n_df = n,
+          true_effect = true_effect,
+          id = id
+        ),
+        metasim,
+        measure = measure,
+        measure_spread = measure_spread,
+        trials = trials,
+        trial_fn = trial_fn,
+        knha = knha
+      )
+    )
+
+
+  # wrangle simulation output ------------------------------------------------
+
 
   # bind all the output together
   # tried to use unnest to do this, but to no avail
-  sim <- list(simulation = match.call(expand.dots = TRUE),
-              results = results %>%
-    pluck("sim_results") %>%
-    bind_rows() %>%
-    full_join(results, by = "id") %>%
-    mutate(effect_ratio = map2_chr(measure, effect_ratio, .f = function(x, y) {
-      output <- if (x == measure_string) {NA} else {y}
-      return(output)
-    })))
-
-
-  # define simulation class
-  class(sim) <- if_else(
-    !isTRUE(single_study),
-    "sim_ma",
-    "sim_ss"
+  sim <- list(
+    results = results %>%
+      pluck("sim_results") %>%
+      bind_rows() %>%
+      full_join(results, by = "id") %>%
+      mutate(effect_ratio = map2_chr(
+        measure,
+        effect_ratio,
+        .f = function(x, y) {
+          output <- if (x == measure_string) {
+            NA
+          } else {
+            y
+          }
+          return(output)
+        }
+      )),
+    arguments = arguments,
+    sim_pars = simpars,
+    distributions = distributions
   )
 
+  # define simulation class
+  class(sim) <- if_else(!isTRUE(single_study),
+                        "sim_ma",
+                        "sim_ss")
 
-  if (isTRUE(progress)) cat("\n")
+  # at the end --------------------------------------------------------------
 
-  if (isTRUE(beep)) beepr::beep("treasure")
+  if (isTRUE(progress))
+    cat("\n")
+
+  if (isTRUE(beep))
+    beepr::beep("treasure")
 
   return(sim)
 }

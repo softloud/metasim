@@ -11,7 +11,7 @@
 #' @importFrom varameta effect_se
 #' @importFrom graphics par
 #' @importFrom stats qnorm
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter mutate
 NULL
 
 #' @export

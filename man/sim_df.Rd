@@ -14,8 +14,6 @@ with one column for distribution, and one column for the parameters}
 
 \item{k}{number of studies, defaults to 3}
 
-\item{effect_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
-
 \item{min_n}{lower bound for sample sizes, defaults to 20}
 
 \item{max_n}{upper bound for sample sizes, defaults to 200}

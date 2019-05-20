@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{sim}{A \code{sim_ss} object from \link{metasim}.}
+
+\item{caption}{Whether or not to include the caption.}
 }
 \description{
 Plot single-study simulation results.
