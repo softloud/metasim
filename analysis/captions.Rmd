@@ -1,0 +1,153 @@
+---
+title: "captions"
+author: "Charles T. Gray"
+date: "20/05/2019"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  cache = TRUE,
+  echo = TRUE)
+
+```
+
+```{r packages, message=FALSE}
+
+# packages
+library(tidyverse)
+library(metasim)
+library(kableExtra)
+library(dplyr)
+library(latex2exp)
+
+# set winners
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("group_rows", "kableExtra")
+
+```
+
+
+## simulate
+
+```{r run simulation}
+sim <- metasims(single_study = TRUE)
+
+```
+
+
+```{r parmaeter extractor}
+sim_parameter <- function(sim, arg){
+
+  sim %>% 
+    purrr::pluck("arguments") %>% 
+    dplyr::filter(argument == arg) %>% 
+    purrr::pluck("value")
+}
+
+
+```
+
+
+```{r parameters}
+# parameters 
+(unequal_effect_ratio <- sim %>% sim_parameter("unequal_effect_ratio") %>% 
+   as.numeric())
+
+trials <- sim %>% sim_parameter("trials") %>% as.numeric()
+
+
+```
+
+
+## Caption drafts
+
+
+## only for meta-analysis
+
+```{r meta-analysis parameters}
+
+(k <- sim %>% sim_parameter("k") %>% parse(text = .) %>% eval())
+
+(tau_sq_true <- sim %>% sim_parameter("tau_sq_true") %>% parse(text = .) %>% eval())
+
+```
+
+# distributions caption
+
+b) Data for the control and intervention arms were sampled from distributions: the normal distribution, with parameters 2 and 0.3, the exponential distribution, with parameters 2, the Pareto distribution, with parameters 3 and 3, the Pareto distribution, with parameters 2 and 1, the Pareto distribution, with parameters 0.5 and 1, the log-normal distribution, with parameters 1 and 0.3. 
+
+
+# plot caption
+
+a) These simulation results are summarised by the proportion, coverage, of `r trials` confidence intervals that contain the true measure $\nu$, or log-ratio $\log(\rho)$ of control $\nu_C$ and intervention $\nu_I$ measures, with $\rho := \nu_I/\nu_C$. 
+
+##  Caption for the simulation
+
+The case where the control median $\nu_C$ is equal to the intervention median $\nu_I$ is considered, $\rho= 1$, as is an unequal ratio, $\rho =$ `r unequal_effect_ratio`. 
+
+Data for the control and intervention arms sampled from distributions in accompanying Distributions plot. 
+
+Summary statistics were calculated from the samples, for the estimator of the variance $\mathcal V(m)$ of the sample median. 
+
+### meta-analysis only
+
+For each of the `r trials` trials, $K$ studies' control and intervention arms were simulated.  A meta-analysis was performed via `metafor::rma` with the Knapp-Hartung test for... todo:. The confidence interval that informs the coverage was extracted from the model results. 
+
+Simulations, `r trials` trials, were performed for each of $K =$ `r k` studies. 
+
+The cases where there where there is no variation between the studies, $\tau^2 = 0$, and some variation introduced by independent factors other than the measure of interest for a given study,  $\tau^2 =$  `r tau_sq_true[-1]` are provided.
+
+```{r}
+# todo tau2
+```
+
+
+### single-study simulation
+  
+For each of the `r trials` trials, a confidence interval, $\theta \pm \Phi^{-1}(0.975)\mathcal \sqrt(V(\theta))$, was calculated, where $\theta$ estimates the true measure, or log-ratio of control and intervention measures.      
+
+
+# experiments
+
+## results as is
+```{r results = "asis", echo = FALSE}
+sim %>% plot()
+
+sim %>% caption()
+
+
+```
+
+## fig.cap=caption(sim) + results = asis
+
+```{r fig.cap=caption(sim), results='asis'}
+
+sim %>% plot()
+
+```
+
+
+## fig.cap=kable(caption(sim))
+
+```{r fig.cap=kable(caption(sim)), fig.height=0.5}
+
+sim %>% plot()
+
+```
+
+### output text
+
+<div align="center">
+
+
+```{r echo=TRUE}
+sim %>% caption() %>%  kable()
+```
+
+
+
+</div>

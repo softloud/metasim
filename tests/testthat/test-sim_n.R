@@ -1,6 +1,4 @@
 context("sim_n")
-import::from(dplyr, mutate)
-
 
 k <- sample(seq(3, 100, by = 3), 1)
 

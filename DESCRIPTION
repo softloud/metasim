@@ -1,34 +1,42 @@
 Package: metasim
 Title: Simulate Meta-Analytic Data
 Version: 0.0.0.9000
-Authors@R: person("Charles", "Gray", email = "charlestigray@gmail.com", role = c("aut", "cre"))
+Authors@R: 
+    person(given = "Charles",
+           family = "Gray",
+           role = c("aut", "cre"),
+           email = "charlestigray@gmail.com")
 Description: What the package does (one paragraph).
 License: What license it uses
-Encoding: UTF-8
-LazyData: true
-Depends: R (>= 3.2.0)
-Suggests: 
-    testthat,
-    covr,
-    knitr,
-    rmarkdown
-RoxygenNote: 6.1.1.9000
+Depends: 
+    R (>= 3.2.0)
 Imports: 
     actuar,
-    beepr,
-    dplyr,
     assertthat,
+    beepr,
+    collateral,
+    dplyr,
+    ggplot2,
+    graphics,
+    hrbrthemes,
     janitor,
     magrittr,
     metafor,
     purrr,
+    stats,
+    stringr,
     tibble,
     tidyr,
-    collateral,
     varameta
-Roxygen: list(markdown = TRUE)
+Suggests: 
+    import,
+    testthat,
+    tidyverse
+VignetteBuilder: 
+    knitr
 Remotes: 
-    rensa/collateral
-    softloud/metabroom,
     softloud/varameta
-VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1.9000
