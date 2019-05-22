@@ -14,7 +14,7 @@ metasim <- function(...,
                     trial_fn = metatrial,
                     trials = 4) {
   all_trials <-
-    map_peacefully(1:trials, .f = function(x) {metatrial(...)})
+    map_peacefully(1:trials, .f = function(x) {trial_fn(...)})
 
   results <- all_trials %>%
     transpose() %>%

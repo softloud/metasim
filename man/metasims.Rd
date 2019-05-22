@@ -2,19 +2,21 @@
 % Please edit documentation in R/metasims.R
 \name{metasims}
 \alias{metasims}
-\title{coverage paobability simulations of an estimator for various}
+\title{metasims}
 \usage{
 metasims(single_study = FALSE, measure = "median",
   measure_spread = "iqr", distributions = default_parameters,
   k = c(3, 7, 10), tau_sq_true = seq(from = 0, to = 0.4, by = 0.2),
   unequal_effect_ratio = 1.2, min_n = 20, max_n = 200, prop = 0.5,
   prop_error = 0.1, trials = 3, trial_fn = metatrial, beep = FALSE,
-  progress = TRUE)
+  knha = TRUE, progress = TRUE)
 }
 \arguments{
 \item{single_study}{Set this to TRUE for a simulation of single samples; i.e., one control and one intervention group.}
 
 \item{measure}{Calculate sample median or mean. Defaults to median.}
+
+\item{measure_spread}{Specify "iqr", "range", "sd", "var". Will have to check how many of these are done right now.}
 
 \item{distributions}{a dataframe with a \code{dist} column of R distributions, i.e., norm, exp, pareto, and a list-column \code{par} of parameter sets. Defaults to \link{default_parmetres}}
 
