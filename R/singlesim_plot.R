@@ -21,7 +21,7 @@ metasim_plot <- function(sim = meta_sim) {
                      aes(colour = distribution,
                          shape = as.character(effect_ratio)),
                      alpha = 0.6, size = 2) +
-    facet_grid(k ~ tau2_true, scales = "free") +
+    facet_grid(k ~ tau_sq_true, scales = "free") +
     scale_shape_discrete(name = "Effect ratio") +
     hrbrthemes::scale_colour_ipsum(name = "Distribution") +
     labs(title = str_wrap("Simulated meta-analysis results for estimating the variance of the median"),

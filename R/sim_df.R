@@ -35,7 +35,7 @@ sim_df <- function(
         list(
           distribution = .,
           k = k,
-          tau2_true = tau2,
+          tau_sq_true = tau2,
           effect_ratio = effect_ratio
         )
       )
