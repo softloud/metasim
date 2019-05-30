@@ -11,7 +11,8 @@
 #' @importFrom varameta effect_se
 #' @importFrom graphics par
 #' @importFrom stats qnorm
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter mutate
+#' @importFrom stringr str_wrap str_detect
 NULL
 
 #' @export

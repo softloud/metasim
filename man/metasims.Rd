@@ -2,25 +2,29 @@
 % Please edit documentation in R/metasims.R
 \name{metasims}
 \alias{metasims}
-\title{coverage paobability simulations of an estimator for various}
+\title{metasims}
 \usage{
 metasims(single_study = FALSE, measure = "median",
   measure_spread = "iqr", distributions = default_parameters,
-  k = c(3, 7, 10), tau2_true = seq(from = 0, to = 0.4, by = 0.2),
-  effect_ratio = c(1, 1.2), min_n = 20, max_n = 200, prop = 0.5,
+  k = c(3, 7, 10), tau_sq_true = seq(from = 0, to = 0.4, by = 0.2),
+  unequal_effect_ratio = 1.2, min_n = 20, max_n = 200, prop = 0.5,
   prop_error = 0.1, trials = 3, trial_fn = metatrial, beep = FALSE,
-  progress = TRUE)
+  knha = TRUE, progress = TRUE)
 }
 \arguments{
-\item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau2_true = 0.}
+\item{single_study}{Set this to TRUE for a simulation of single samples; i.e., one control and one intervention group.}
+
+\item{measure}{Calculate sample median or mean. Defaults to median.}
+
+\item{measure_spread}{Specify "iqr", "range", "sd", "var". Will have to check how many of these are done right now.}
 
 \item{distributions}{a dataframe with a \code{dist} column of R distributions, i.e., norm, exp, pareto, and a list-column \code{par} of parameter sets. Defaults to \link{default_parmetres}}
 
-\item{k}{Simulate for different numbers of studies.}
+\item{k}{Vector of desired numbers studies to simulate for.}
 
-\item{tau2_true}{Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect}
+\item{tau_sq_true}{Variance \eqn{\gamma_k \sim N(0, \tau^2)} associated with the random effect}
 
-\item{effect_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho} denotes the ratio of medians.}
+\item{unequal_effect_ratio}{\eqn{\nu_I / \nu_C := \rho} where \eqn{\rho = 1} and whatever arguments passed to this. Defaults to 1.2, so that the cases \eqn{\rho = 1, 1.2} are considered.}
 
 \item{min_n}{lower bound for sample sizes, defaults to 20}
 
@@ -33,7 +37,11 @@ metasims(single_study = FALSE, measure = "median",
 \item{beep}{Turn on beep alert when successfully finished.}
 
 \item{progress}{Turn progress bar on and off.}
+
+\item{single_study}{When set to TRUE, will override simulation parameters with k = 1 and tau_sq_true = 0.}
+
+\item{k}{Simulate for different numbers of studies.}
 }
 \description{
-coverage paobability simulations of an estimator for various
+coverage probability simulations of an estimator for various
 }

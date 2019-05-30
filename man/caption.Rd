@@ -4,7 +4,7 @@
 \alias{caption}
 \title{Generic caption function.}
 \usage{
-caption(sim)
+caption(dat)
 }
 \description{
 Generic caption function.

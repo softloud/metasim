@@ -1,0 +1,62 @@
+---
+title: "reprex"
+author: "Charles T. Gray"
+date: "23/05/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# how do I add a long plot with latex commands into a plot?
+
+library(tidyverse)
+library(latex2exp)
+
+# dummy parameters for the caption
+
+trials <- 10
+unequal_effect_ratio <- 1.2
+measure <- "median"
+
+# some text
+
+caption_text <-  paste0(
+    "a) These simulation results are summarised by the proportion, coverage, of ",
+    trials,
+    " confidence intervals that contain the true measure $\\nu$, or log-ratio $\\log(\\rho)$ of control $\\nu_C$ and intervention $\\nu_I$ measures, with $\\rho := \\nu_I/\\nu_C$.\n
+The case where the control median $\\nu_C$ is equal to the intervention median $\\nu_I$ is considered, $\\rho= 1$, as is an unequal ratio, $\\rho =$ ",
+    unequal_effect_ratio,
+    ".\n Data for the control and intervention arms sampled from distributions in accompanying b) Distributions plot.\n
+Summary statistics were calculated from the samples, for the estimator of the variance $\\mathcal{V}(m)$ of the sample ",
+    measure,
+    " $m$ or $m_C/m_I$.\n" 
+  )
+
+# a plot to try out the caption text
+dummy_plot <- iris %>% ggplot(aes(x = Petal.Length)) + 
+  geom_density() +
+  facet_wrap(~ Species)
+
+# here, of course, the TeX is not parsed
+dummy_plot + labs(caption = caption_text)
+
+# this wraps but latex is not parsed yet
+dummy_plot + labs(caption = str_wrap(caption_text))
+
+# some TeX works, but not wrapped
+dummy_plot + labs(caption = TeX(caption_text))
+
+# argh! wraps horror text
+dummy_plot + labs(caption = str_wrap(TeX(caption_text)))
+
+# doesn't wrap
+dummy_plot + labs(caption = TeX(str_wrap(caption_text)))
+
+
+```
+
+

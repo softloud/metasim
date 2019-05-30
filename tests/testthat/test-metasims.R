@@ -2,8 +2,6 @@ context("metasims")
 
 set.seed(38)
 
-import::from(purrr, pluck) # todo: figure out what export pluck not working
-
 default_metasims <- metasims(progress = FALSE, trials = 100)
 
 test_that("default trial_fn metatrial", {

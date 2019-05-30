@@ -2,7 +2,7 @@
 #'
 #' @export
 
-rho_plot <- function(mu, epsilon) {
+zeta_plot <- function(mu, epsilon) {
 
   # calculate parameters
   par <- beta_par(mu, epsilon)
