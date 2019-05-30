@@ -9,7 +9,7 @@
 \alias{caption.distributions}
 \alias{plot.sim_ss}
 \alias{plot.sim_ma}
-\alias{plot.distributions}
+\alias{plot.dist}
 \title{A first pass at S3 methods for datulation objects}
 \usage{
 dat_parameter(dat, arg)
@@ -26,7 +26,7 @@ caption_text(dat)
 
 \method{plot}{sim_ma}(dat, caption = NULL)
 
-\method{plot}{distributions}(dat, caption = NULL)
+\method{plot}{dist}(dat, caption = NULL)
 }
 \arguments{
 \item{caption}{Whether or not to include the caption.}

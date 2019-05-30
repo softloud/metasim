@@ -232,7 +232,7 @@ plot.sim_ma <- function(dat, caption = NULL) {
 #' @rdname plots
 #' @export
 
-plot.distributions <- function(dat, caption = NULL){
+plot.dist <- function(dat, caption = NULL){
   dat %>%
     uncount(weights = 50, .id = "x") %>%
     mutate(
