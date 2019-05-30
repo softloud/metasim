@@ -2,6 +2,7 @@
 #' @import tidyr
 #' @import purrr
 #' @import ggplot2
+#' @import assertthat
 #' @importFrom stringr str_detect str_remove
 #' @importFrom collateral map_peacefully tally_errors tally_warnings tally_results tally_messages
 #' @importFrom metafor rma escalc forest
