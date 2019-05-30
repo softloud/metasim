@@ -2,30 +2,39 @@
 % Please edit documentation in R/simulation-methods.R
 \name{plots}
 \alias{plots}
-\alias{sim_parameter}
+\alias{dat_parameter}
 \alias{caption_text}
 \alias{caption.sim_ma}
 \alias{caption.sim_ss}
+\alias{caption.distributions}
 \alias{plot.sim_ss}
-\title{A first pass at S3 methods for simulation objects}
+\alias{plot.sim_ma}
+\alias{plot.distributions}
+\title{A first pass at S3 methods for datulation objects}
 \usage{
-sim_parameter(sim, arg)
+dat_parameter(dat, arg)
 
-caption_text(sim)
+caption_text(dat)
 
-\method{caption}{sim_ma}(sim)
+\method{caption}{sim_ma}(dat)
 
-\method{caption}{sim_ss}(sim)
+\method{caption}{sim_ss}(dat)
 
-\method{plot}{sim_ss}(sim = single_sim, caption = NULL)
+\method{caption}{distributions}(dat)
+
+\method{plot}{sim_ss}(dat = single_sim, caption = NULL)
+
+\method{plot}{sim_ma}(dat, caption = NULL)
+
+\method{plot}{distributions}(dat, caption = NULL)
 }
 \arguments{
-\item{sim}{A \code{sim_ss} object from \link{metasim}.}
-
 \item{caption}{Whether or not to include the caption.}
+
+\item{sim}{A \code{sim_ss} object from \link{metasim}.}
 }
 \description{
-Methods for simulation results.
+Methods for datulation results.
 
 Plot single-study simulation results.
 }

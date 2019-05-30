@@ -11,6 +11,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   cache = TRUE,
+  eval = FALSE,
   echo = TRUE)
 
 ```
@@ -33,9 +34,43 @@ conflicted::conflict_prefer("group_rows", "kableExtra")
 
 ## simulate
 
-```{r run simulation}
-sim <- metasims(single_study = TRUE)
+```{r run simulation, eval=TRUE}
+ss <- metasims(single_study = TRUE, trial_fn = singletrial)
 
+ma <- metasims()
+
+```
+
+```{r}
+ss %>% plot()
+ss %>% caption()
+ss %>% plot(caption = "test")
+ss %>% plot(caption = caption(.))
+ss %>% plot(caption = TeX(caption(.)))
+
+```
+
+
+
+
+## single-study simulation figure
+
+```{r ss plot, results='asis', fig.cap=caption(ss), eval=TRUE}
+
+ss %>% plot()
+
+```
+
+
+
+# before
+
+```{r eval=TRUE}
+trials <- 10
+unequal_effect_ratio <- 1.2
+k <- c(3, 7)
+tau_sq_true <- seq(0, 0.4, by = 0.2)
+  
 ```
 
 
@@ -119,35 +154,8 @@ sim %>% plot()
 
 sim %>% caption()
 
-
-```
-
-## fig.cap=caption(sim) + results = asis
-
-```{r fig.cap=caption(sim), results='asis'}
-
-sim %>% plot()
+sim %>% plot(caption = caption(sim))
 
 ```
 
 
-## fig.cap=kable(caption(sim))
-
-```{r fig.cap=kable(caption(sim)), fig.height=0.5}
-
-sim %>% plot()
-
-```
-
-### output text
-
-<div align="center">
-
-
-```{r echo=TRUE}
-sim %>% caption() %>%  kable()
-```
-
-
-
-</div>

@@ -43,5 +43,5 @@ metasims(single_study = FALSE, measure = "median",
 \item{k}{Simulate for different numbers of studies.}
 }
 \description{
-coverage paobability simulations of an estimator for various
+coverage probability simulations of an estimator for various
 }
