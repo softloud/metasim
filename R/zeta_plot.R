@@ -3,6 +3,9 @@
 #' @export
 
 zeta_plot <- function(mu, epsilon) {
+  assert_that(mu < 1 && mu > 0, msg = "mu must be between 0 and 1")
+  assert_that(epsilon < 1 && epsilon > 0, msg = "epsilon must be between 0 and 1")
+
   # calculate parameters
   par <- beta_par(mu, epsilon)
 
@@ -29,6 +32,4 @@ zeta_plot <- function(mu, epsilon) {
         mu + epsilon,
         "]"), width = 50)) +
     theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-
-
 }
