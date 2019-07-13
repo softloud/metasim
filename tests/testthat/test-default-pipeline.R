@@ -14,7 +14,7 @@ test_that("work upwards through algorithm", {
   expect_is(singletrial(), "data.frame") # alternate trial
   expect_is(metasim(trials = 3), "data.frame")
   # metasims calls sim_df & metasim
-  expect_is(metasims(single_study = FALSE, trials = 3, progress = FALSE), "data.frame")
+  expect_is(metasims(single_study = FALSE, trials = 3, progress = FALSE), "sim_ss")
 })
 
 
