@@ -143,8 +143,8 @@ metasims <- function(single_study = FALSE,
     mutate(
       sim_results = pmap(
         list(
-           tau_sq = tau_sq_true,
-            effect_ratio = effect_ratio,
+          tau_sq = tau_sq_true,
+          effect_ratio = effect_ratio,
           rdist = rdist,
           parameters = parameters,
           n_df = n,

@@ -212,7 +212,7 @@ plot.sim_ma <- function(dat, caption = NULL) {
       size = 2
     ) +
     scale_shape_discrete(name = "Effect ratio", drop = FALSE) +
-    facet_grid(k ~ tau2_true) +
+    facet_grid(k ~ tau_sq_true) +
     labs(
       x = "Distribution",
       y = "Coverage",
